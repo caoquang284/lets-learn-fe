@@ -10,7 +10,7 @@
     [user]="user ? user : null"
   />
   } @else if(selectedTab === tabs.PEOPLE) {
-  <p>PEOPLE</p>
+  <tab-people [course]="course" />
   } @else if(selectedTab === tabs.DASHBOARD) {
   <p>DASHBOARD</p>
   } @else if(selectedTab === tabs.SETTINGS) {

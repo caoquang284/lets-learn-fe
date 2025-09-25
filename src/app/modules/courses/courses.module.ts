@@ -21,6 +21,7 @@ import { JoinCodeViewComponent } from './components/course-list/student-course-l
 import { JoiningCodeComponent } from './components/course-list/student-course-list/student-course-card/joining-code-card/joining-code-card.component';
 import { StudentCourseListComponent } from './components/course-list/student-course-list/student-course-list.component';
 import { StudentCourseCardComponent } from './components/course-list/student-course-list/student-course-card/student-course-card.component';
+import { TabPeopleComponent } from './components/course-layout/course-tabs/tab-people/tab-people.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { StudentCourseCardComponent } from './components/course-list/student-cou
     TabActivitiesComponent,
     TabSettingComponent,
     ActivityComponent,
+    TabPeopleComponent,
     JoinCodeButtonComponent,
     JoinCodeViewComponent,
     JoiningCodeComponent,
