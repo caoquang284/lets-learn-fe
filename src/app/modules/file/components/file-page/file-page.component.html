@@ -1,0 +1,13 @@
+@if(topic) {
+<topic-page-layout [topic]="topic">
+  @if(selectedTab === tabs.FILE){
+  <tab-file [topic]="topic" />
+  } @else if(selectedTab === tabs.SETTINGS) {
+  <tab-setting [topic]="topic" />
+  }
+</topic-page-layout>
+} @else {
+<div class="loading-container">
+  <p>Loading topic...</p>
+</div>
+}

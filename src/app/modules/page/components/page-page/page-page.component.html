@@ -1,0 +1,7 @@
+<topic-page-layout [topic]="topic">
+  @if(selectedTab === tabs.PAGE){
+  <tab-page [topic]="topic" />
+  } @else if(selectedTab === tabs.SETTINGS) {
+  <tab-setting [topic]="topic" />
+  }
+</topic-page-layout>
