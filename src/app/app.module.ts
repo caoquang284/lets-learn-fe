@@ -13,6 +13,7 @@ import { CalendarModule } from '@modules/calendar/calendar.module';
 import { QuizModule } from '@modules/quiz/quiz.module';
 import { AssignmentModule } from '@modules/assignment/assignment.module';
 import { LinkModule } from '@modules/link/link.module';
+import { PageModule } from '@modules/page/page.module';
 
 @NgModule({
   imports: [
@@ -26,6 +27,7 @@ import { LinkModule } from '@modules/link/link.module';
     AssignmentModule,
     CalendarModule,
     LinkModule,
+    PageModule,
     ToastrModule.forRoot(),
   ],
   declarations: [AppComponent],

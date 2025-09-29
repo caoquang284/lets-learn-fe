@@ -1,0 +1,19 @@
+<div class="file-container">
+  <card>
+    <div class="file-message">
+      @if (hasFile) {
+      <p>
+        Click on
+        <a [href]="fileUrl" class="file-link">
+          {{ fileName || "File" }}
+        </a>
+        to test the file uploaded
+      </p>
+      } @else {
+      <p class="no-file-message">
+        No file has been uploaded yet. Please upload a file in the Settings tab.
+      </p>
+      }
+    </div>
+  </card>
+</div>
