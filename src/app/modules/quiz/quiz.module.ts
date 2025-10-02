@@ -23,6 +23,8 @@ import { TabQuizComponent } from './components/quiz-page/quiz-tabs/tab-quiz/tab-
 import { ResultTableComponent } from './components/quiz-page/quiz-tabs/tab-result/result-table/result-table.component';
 import { TabResultComponent } from './components/quiz-page/quiz-tabs/tab-result/tab-result.component';
 import { TabSettingComponent } from './components/quiz-page/quiz-tabs/tab-setting/tab-setting.component';
+import { TabDashboardComponent } from './components/quiz-page/quiz-tabs/tab-dashboard/tab-dashboard.component';
+import { DashboardComponent } from './components/quiz-page/quiz-tabs/tab-dashboard/dashboard/dashboard.component';
 import { QuizResultTableComponent } from './components/quiz-result-table/quiz-result-table.component';
 import { ImageColumnComponent } from './components/quiz-page/quiz-tabs/tab-result/result-table/table-columns/image-column/image-column.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -54,6 +56,8 @@ import { ActionColumnComponent } from './components/quiz-page/quiz-tabs/tab-ques
     QuestionBankTableComponent,
     StatusColumnComponent,
     ActionColumnComponent,
+    TabDashboardComponent,
+    DashboardComponent,
   ],
   imports: [
     SharedModule,
