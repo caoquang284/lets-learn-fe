@@ -4,6 +4,7 @@ import { LoginPageComponent } from '../modules/auth/components/login-page/login-
 import { RegisterPageComponent } from '../modules/auth/components/register-page/register-page.component';
 import { CalendarPageComponent } from '@modules/calendar/components/calendar-page/calendar-page.component';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
+import { SettingsPageComponent } from '@modules/settings/components/settings-page/settings-page.component';
 
 const routes: Routes = [
   { path: 'auth/login', component: LoginPageComponent },
@@ -14,6 +15,7 @@ const routes: Routes = [
     component: LayoutComponent,
     children: [
       { path: 'calendar', component: CalendarPageComponent },
+      { path: 'settings', component: SettingsPageComponent },
       {
         path: 'courses',
         loadChildren: () =>

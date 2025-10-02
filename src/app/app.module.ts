@@ -14,6 +14,7 @@ import { QuizModule } from '@modules/quiz/quiz.module';
 import { AssignmentModule } from '@modules/assignment/assignment.module';
 import { LinkModule } from '@modules/link/link.module';
 import { PageModule } from '@modules/page/page.module';
+import { SettingsModule } from '@modules/settings/settings.module';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import { PageModule } from '@modules/page/page.module';
     CalendarModule,
     LinkModule,
     PageModule,
+    SettingsModule,
     ToastrModule.forRoot(),
   ],
   declarations: [AppComponent],
