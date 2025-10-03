@@ -15,6 +15,7 @@ import { AssignmentModule } from '@modules/assignment/assignment.module';
 import { LinkModule } from '@modules/link/link.module';
 import { PageModule } from '@modules/page/page.module';
 import { SettingsModule } from '@modules/settings/settings.module';
+import { ToReviewModule } from '@modules/to-review/to-review.module';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import { SettingsModule } from '@modules/settings/settings.module';
     LinkModule,
     PageModule,
     SettingsModule,
+    ToReviewModule,
     ToastrModule.forRoot(),
   ],
   declarations: [AppComponent],

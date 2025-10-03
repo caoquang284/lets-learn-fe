@@ -1,0 +1,168 @@
+<div class="to-review-page">
+  <app-combobox
+    class="course-combobox"
+    [options]="courseOptions()"
+    (onSelect)="onSelectOption($event)"
+    placeholder="Select a course"
+  />
+
+  <app-collapsible-list>    
+    <!-- Work in progress section -->
+    <app-collapsible-section sectionId="work-in-progress">
+      <div title class="section-title-wrapper">
+        <h2>Work in progress</h2>
+        <span class="item-count">{{ workInProgressItems.length }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of workInProgressItems; track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>
+            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-stats">
+                @if (item.type === 'assignment') {
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.graded }}</span>
+                    <span class="stat-label">Graded</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.submitted }}</span>
+                    <span class="stat-label">Submitted</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.assigned }}</span>
+                    <span class="stat-label">Assigned</span>
+                  </div>
+                } @else if (item.type === 'quiz') {
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.submitted || 0 }}</span>
+                    <span class="stat-label">Attempted</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.assigned }}</span>
+                    <span class="stat-label">Assigned</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No items in progress</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>    
+    <!-- Closed section -->
+    <app-collapsible-section sectionId="closed">
+      <div title class="section-title-wrapper">
+        <h2>Closed</h2>
+        <span class="item-count">{{ closedItems.length }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of closedItems; track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>
+            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-stats">
+                @if (item.type === 'assignment') {
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.graded }}</span>
+                    <span class="stat-label">Graded</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.submitted }}</span>
+                    <span class="stat-label">Submitted</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.assigned }}</span>
+                    <span class="stat-label">Assigned</span>
+                  </div>
+                } @else if (item.type === 'quiz') {
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.submitted || 0 }}</span>
+                    <span class="stat-label">Attempted</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.assigned }}</span>
+                    <span class="stat-label">Assigned</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No closed items</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>    
+    <!-- No due date section -->
+    <app-collapsible-section sectionId="no-due-date">
+      <div title class="section-title-wrapper">
+        <h2>No due date</h2>
+        <span class="item-count">{{ noDueDateItems.length }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of noDueDateItems; track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>
+            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-stats">
+                @if (item.type === 'assignment') {
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.graded }}</span>
+                    <span class="stat-label">Graded</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.submitted }}</span>
+                    <span class="stat-label">Submitted</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.assigned }}</span>
+                    <span class="stat-label">Assigned</span>
+                  </div>
+                } @else if (item.type === 'quiz') {
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.submitted || 0 }}</span>
+                    <span class="stat-label">Attempted</span>
+                  </div>
+                  <div class="stat-group">
+                    <span class="stat-value">{{ item.assigned }}</span>
+                    <span class="stat-label">Assigned</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No items without due dates</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>
+
+  </app-collapsible-list>
+</div>
