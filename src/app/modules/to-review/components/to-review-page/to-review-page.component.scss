@@ -1,0 +1,145 @@
+@use "styles/theme/theme.variables" as *;
+
+:host {
+  padding: 16px 140px;
+  font-family: 'Nunito';
+}
+
+.course-combobox {
+  justify-self: center;
+}
+
+.section-title-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  flex: 1;
+  
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: $text-color;
+  }
+  
+  .item-count {
+    color: $tint-color;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 4px 12px;
+    display: flex-end;
+  }
+}
+
+.section-content {
+  padding-top: 20px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+
+  p {
+    color: $text-secondary-color;
+    font-size: 16px;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.review-item {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: $tint-color;
+    transform: translateY(-1px);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    flex-shrink: 0;    
+    
+    .material-symbols-outlined {
+      font-size: 24px;
+
+      &.assignment-icon {
+        color: $assignment-color;
+      }
+
+      &.quiz-icon {
+        color: $quiz-color;
+      }
+    }
+  }
+  .item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+
+    .item-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: $text-color;
+      margin: 0;
+      line-height: 1.3;
+      flex: 0 0 auto;
+    }
+
+    .item-stats {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .stat-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
+
+      .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        color: $text-color;
+      }
+
+      .stat-label {
+        font-size: 11px;
+        color: $text-secondary-color;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+::ng-deep .section .section-header .section-title .title-content {
+  flex: 1;
+}

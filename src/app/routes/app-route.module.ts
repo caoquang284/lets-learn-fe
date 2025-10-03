@@ -21,6 +21,13 @@ const routes: Routes = [
             (m) => m.CourseRoutingModule
           ),
       },
+      {
+        path: 'to-review',
+        loadChildren: () =>
+          import('@modules/to-review/to-review.module').then(
+            (m) => m.ToReviewModule
+          ),
+      },
     ],
   },
   {
