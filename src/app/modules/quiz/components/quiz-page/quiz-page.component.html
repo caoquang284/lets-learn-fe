@@ -14,6 +14,8 @@
       <tab-result [topic]="topic" />
     } @else if (selectedTab === tabs.QUESTION_BANK) {
       <tab-question-bank [topic]="topic"/>
+    } @else if (selectedTab === tabs.DASHBOARD) {
+      <tab-dashboard [topic]="topic" />
     }
   </topic-page-layout>
 } @else {
