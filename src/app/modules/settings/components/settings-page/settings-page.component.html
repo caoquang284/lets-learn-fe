@@ -1,0 +1,26 @@
+ <div class="container">
+  <div class="settings-header">
+    <div class="settings-title">
+      <h2>Profile Settings</h2>
+    </div>
+  </div>
+
+  <card>
+    <div class="settings-content">
+      <app-tab-list
+        [tabs]="tabs"
+        [selectedTab]="selectedTab"
+        variant="default"
+        [localStorageKey]="'settings-tab'"
+      ></app-tab-list>
+
+      <div class="tab-content">
+        @if(selectedTab === 'Profile') {
+          <tab-profile [user]="user" />
+        } @else if(selectedTab === 'Password') {
+          <tab-password />
+        }
+      </div>
+    </div>
+  </card>
+</div>

@@ -1,0 +1,64 @@
+@use "styles/theme/theme.variables" as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 16px 30px;
+  font-family: 'Nunito', sans-serif;
+
+  ::ng-deep card {
+    max-width: 96%;
+    height: 100%;
+    width: 100%;
+    min-height: fit-content;
+    font-family: 'Nunito', sans-serif;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  gap: 14px;
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .settings-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .material-symbols-outlined {
+        font-size: 24px;
+        color: $text-color;
+      }
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+        color: $text-color;
+        font-family: 'Nunito', sans-serif;
+      }
+    }
+  }
+  .settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+    flex: 1;
+    app-tab-list {
+      border-bottom: 1px solid $border-color;
+      margin: -15px;
+    }
+    .tab-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+  }
+}

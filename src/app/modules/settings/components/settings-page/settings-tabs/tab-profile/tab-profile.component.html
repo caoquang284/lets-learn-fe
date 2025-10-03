@@ -1,0 +1,55 @@
+<div class="profile-section">
+  <form [formGroup]="profileForm" (ngSubmit)="saveProfile($event)" class="profile-form">
+    <div class="form-section">
+      <div class="form-controls">
+        <app-form-field
+          [form]="profileForm"
+          [control]="usernameControl"
+          controlName="username"
+          [showLabel]="true"
+        />
+
+        <app-form-field
+          [form]="profileForm"
+          [control]="emailControl"
+          controlName="email"
+          [showLabel]="true"
+        />
+      </div>
+      <div class="submit-container">
+        <div class="submit-button">
+          <app-button type="submit" label="Save Profile" variant="primary" [loading]="loading" />
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="image-section">
+    <div class="profile-image-container">
+      <div class="profile-image" (click)="onImageClick()" [class.uploading]="uploadingImage">
+        <img [src]="currentImageUrl" [alt]="user?.username + ' profile picture'" />
+
+        <!-- Upload overlay -->
+        <div class="upload-overlay">
+          <div class="upload-content">
+            <span class="material-symbols-outlined">upload_file</span>
+          </div>
+        </div>
+          <!-- Loading overlay -->
+        <div class="loading-overlay" *ngIf="uploadingImage">
+          <div class="loading-content">
+            <img src="svgs/loading-24px.svg" alt="Loading..." class="loading-icon" />
+            <span class="loading-text">Uploading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="image-requirements">
+      <h3>Image requirement</h3>
+      <p>Your image needs to have:</p>
+      <ul>
+        <li><span class="material-symbols-outlined check-icon">check_circle</span>Max size of 2MB</li>
+        <li><span class="material-symbols-outlined check-icon">check_circle</span>Only .jpg, .jpeg, .png or .webp</li>
+      </ul>
+    </div>
+  </div>
+</div>
