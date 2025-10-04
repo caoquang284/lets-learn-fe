@@ -1,0 +1,37 @@
+@use "styles/theme/theme.variables" as *;
+@use "styles/material-ui/material-ui.style" as *;
+
+.join-code-button {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $background-color;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  box-shadow: $box-shadow;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: $box-shadow;
+    .material-symbols-outlined {
+      font-variation-settings: $google-icon-hover-setting;
+    }
+  }
+
+  &.hidden {
+    transform: scale(0);
+  }
+  .material-symbols-outlined {
+    color: $icon-color;
+  }
+
+  .icon {
+    color: #6b7280; // Tailwind gray-500
+    width: 32px;
+    height: 32px;
+  }
+}

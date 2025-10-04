@@ -1,0 +1,45 @@
+@use "styles/theme/theme.variables" as *;
+
+.course-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  color: $text-color;
+  border: 0.5px solid $border-color;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: $box-shadow;
+  }
+  &.scale-on-click:active {
+    transform: scale(0.98);
+    transform-origin: center !important;
+  }
+}
+
+img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.course-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  p {
+    font-size: 0.875rem;
+    color: #6b7280; // Tailwind's gray-500
+  }
+
+  button {
+    width: 20px;
+  }
+}

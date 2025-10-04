@@ -16,6 +16,11 @@ import { TeacherCourseListComponent } from './components/course-list/teacher-cou
 import { CoursesLayoutComponent } from './components/courses-layout/courses-layout.component';
 import { NewCourseFormComponent } from './components/new-course/new-course-form/new-course-form.component';
 import { NewCourseComponent } from './components/new-course/new-course.component';
+import { JoinCodeButtonComponent } from './components/course-list/student-course-list/student-course-card/join-code-button/join-code-button.component';
+import { JoinCodeViewComponent } from './components/course-list/student-course-list/student-course-card/join-code-view/join-code-view.component';
+import { JoiningCodeComponent } from './components/course-list/student-course-list/student-course-card/joining-code-card/joining-code-card.component';
+import { StudentCourseListComponent } from './components/course-list/student-course-list/student-course-list.component';
+import { StudentCourseCardComponent } from './components/course-list/student-course-list/student-course-card/student-course-card.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +35,11 @@ import { NewCourseComponent } from './components/new-course/new-course.component
     TabActivitiesComponent,
     TabSettingComponent,
     ActivityComponent,
+    JoinCodeButtonComponent,
+    JoinCodeViewComponent,
+    JoiningCodeComponent,
+    StudentCourseListComponent,
+    StudentCourseCardComponent,
   ],
   imports: [
     SharedModule,

@@ -1,0 +1,20 @@
+.container {
+  position: relative;
+  min-height: 200px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px dashed #d1d5db; // Tailwind gray-300
+  border-radius: 0.5rem;
+  transition: border 0.3s ease;
+
+  &.borderless {
+    border: none;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}

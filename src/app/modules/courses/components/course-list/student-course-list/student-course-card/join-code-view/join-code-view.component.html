@@ -1,0 +1,22 @@
+<form
+  (submit)="onSubmit($event)"
+  [class]="{
+    'joining-code-form': true,
+    open: open,
+  }"
+>
+  <span class="material-symbols-outlined close-icon" (click)="handleClose()">
+    hide
+  </span>
+
+  <h4>Join with a code</h4>
+  <div class="content">
+    <input #inputRef type="text" placeholder="Enter joining code" />
+    <app-button
+      type="submit"
+      class="submit-button"
+      variant="outline-blue"
+      label="Join"
+    />
+  </div>
+</form>

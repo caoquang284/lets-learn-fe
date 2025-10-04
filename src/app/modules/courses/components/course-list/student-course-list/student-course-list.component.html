@@ -1,0 +1,12 @@
+<div
+  class="course-list"
+  [class.medium]="screenSize === 'medium'"
+  [class.small]="screenSize === 'small'"
+  [class.xsmall]="screenSize === 'xsmall'"
+  [class.sidebarCollapsed]="isSidebarCollapsed"
+>
+  <joining-code-card (submitCode)="onSubmitCode($event)"></joining-code-card>
+  @for(course of courses; track course.id) {
+  <student-course-card [course]="course"></student-course-card>
+  }
+</div>

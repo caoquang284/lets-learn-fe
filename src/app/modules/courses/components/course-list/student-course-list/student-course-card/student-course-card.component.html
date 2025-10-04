@@ -1,0 +1,19 @@
+<div
+  [class]="{
+    'course-card': true,
+    'scale-on-click': hasJoined,
+}"
+  (click)="handleClick()"
+>
+  <img
+    [src]="course.imageUrl || '/images/mock-astronomy.jpg'"
+    alt="Course title"
+  />
+  <div class="course-content">
+    <h4>{{ course.title }}</h4>
+    <p>{{ course.category }}</p>
+    @if(!hasJoined) {
+    <app-button variant="outline-blue" (click)="onJoinCourse()" label="Join" />
+    }
+  </div>
+</div>

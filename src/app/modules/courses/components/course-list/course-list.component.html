@@ -1,1 +1,6 @@
+@if(isStudent){
+<!-- <student-course-list [courses]="courses" (submitCode)="onSubmitCode($event)" /> -->
+<student-course-list [courses]="courses" />
+} @else {
 <teacher-course-list [courses]="courses" />
+}

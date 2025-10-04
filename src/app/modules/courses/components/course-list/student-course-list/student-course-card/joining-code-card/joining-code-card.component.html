@@ -1,0 +1,18 @@
+<div
+  [class]="{
+    container: true,
+    borderless: isOpen,
+    disabled: disabled
+  }"
+>
+  <join-code-button
+    [open]="isOpen"
+    (openChange)="handleOpenChange($event)"
+  ></join-code-button>
+
+  <join-code-view
+    [open]="isOpen"
+    (openChange)="handleOpenChange($event)"
+    (submitCode)="handleSubmitCode($event)"
+  ></join-code-view>
+</div>

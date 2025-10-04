@@ -1,0 +1,32 @@
+.course-list {
+  width: 100%;
+  height: fit-content;
+  display: grid;
+  gap: 16px;
+
+  &:not(.sidebarCollapsed) {
+    grid-template-columns: repeat(3, 1fr);
+    &.medium {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    &.small {
+      grid-template-columns: repeat(1, 1fr);
+    }
+    &.xsmall {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+
+  &.sidebarCollapsed {
+    grid-template-columns: repeat(4, 1fr);
+    &.medium {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    &.small {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    &.xsmall {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+}
