@@ -16,6 +16,7 @@ import { LinkModule } from '@modules/link/link.module';
 import { PageModule } from '@modules/page/page.module';
 import { SettingsModule } from '@modules/settings/settings.module';
 import { ToReviewModule } from '@modules/to-review/to-review.module';
+import { FileModule } from '@modules/file/file.module';
 
 @NgModule({
   imports: [
@@ -29,6 +30,7 @@ import { ToReviewModule } from '@modules/to-review/to-review.module';
     AssignmentModule,
     CalendarModule,
     LinkModule,
+    FileModule,
     PageModule,
     SettingsModule,
     ToReviewModule,

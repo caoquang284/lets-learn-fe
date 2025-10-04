@@ -7,12 +7,14 @@ import {
 } from '@modules/file/constants/file.constant';
 import { TabService } from '@shared/components/tab-list/tab-list.service';
 import { Course } from '@shared/models/course';
-import { FileTopic, iconMap } from '@shared/models/topic';
+import { FileTopic, iconMap, TopicType } from '@shared/models/topic';
 import { Role, User } from '@shared/models/user';
 import { BreadcrumbService } from '@shared/services/breadcrumb.service';
 import { UserService } from '@shared/services/user.service';
 import { GetTopic } from '@modules/courses/api/topic.api';
 import { GetCourseById } from '@modules/courses/api/courses.api';
+import { mockTopics } from '@shared/mocks/topic';
+import { mockCourses } from '@shared/mocks/course';
 
 @Component({
   selector: 'app-file-page',
@@ -67,18 +69,28 @@ export class FilePageComponent implements OnInit {
     });
   }
 
-  async fetchTopicData(topicId: string, courseId: string) {
-    try {
-      this.topic = await GetTopic(topicId, courseId) as FileTopic;
-      // Update breadcrumb after both course and topic are loaded
-      if (this.course && this.topic) {
-        this.updateBreadcrumb(this.course, this.topic);
-      }
-    } catch (error) {
-      console.error('Error fetching topic data:', error);
-      this.topic = null;
-    }
+  // async fetchTopicData(topicId: string, courseId: string) {
+  //   try {
+  //     this.topic = await GetTopic(topicId, courseId) as FileTopic;
+  //     // Update breadcrumb after both course and topic are loaded
+  //     if (this.course && this.topic) {
+  //       this.updateBreadcrumb(this.course, this.topic);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching topic data:', error);
+  //     this.topic = null;
+  //   }
+  // }
+
+  fetchTopicData(topicId: string, courseId: string) {
+  const res = mockTopics.find(
+    (topic) => topic.id === topicId && topic.type === TopicType.FILE
+  );
+  if (res) {
+    this.topic = res as FileTopic;
+    if (this.course) this.updateBreadcrumb(this.course, this.topic);
   }
+}
 
   async fetchCourseData(courseId: string) {
     try {

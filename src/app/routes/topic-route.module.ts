@@ -4,6 +4,7 @@ import { AssignmentPageComponent } from '@modules/assignment/components/assignme
 import { QuizPageComponent } from '@modules/quiz/components/quiz-page/quiz-page.component';
 import { LinkPageComponent } from '@modules/link/components/link-page/link-page.component';
 import { PagePageComponent } from '@modules/page/components/page-page/page-page.component';
+import { FilePageComponent } from '@modules/file/components/file-page/file-page.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: 'page/:topicId',
     component: PagePageComponent,
+  },
+  {
+    path: 'file/:topicId',
+    component: FilePageComponent,
   },
 ];
 
