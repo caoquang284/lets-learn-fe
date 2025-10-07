@@ -1,0 +1,256 @@
+@use "styles/theme/theme.variables" as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  font-family: Nunito;
+}
+
+.to-do-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px 140px;
+}
+
+.course-combobox {
+  justify-self: center;
+  align-self: center;
+}
+
+.tab-content {
+  margin-top: 20px;
+}
+
+.tab-assigned,
+.tab-overdue,
+.tab-done {
+  font-family: 'Nunito';
+
+  .tab-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    background-color: white;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    p {
+      color: $text-secondary-color;
+      font-size: 16px;
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+  
+  .section-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    flex: 1;
+    
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: $text-color;
+    }
+    
+    .item-count {
+      color: $tint-color;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 4px 12px;
+      display: flex-end;
+    }
+  }
+
+  .section-content {
+    padding-top: 10px;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+
+    p {
+      color: $text-secondary-color;
+      font-size: 16px;
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+
+  .review-item {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .item-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      flex-shrink: 0;    
+      
+      .material-symbols-outlined {
+        font-size: 24px;
+
+        &.assignment-icon {
+          color: $assignment-color;
+        }
+
+        &.quiz-icon {
+          color: $quiz-color;
+        }
+      }
+    }
+
+    .item-details {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+
+      .item-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-color;
+        margin: 0;
+        line-height: 1.3;
+        flex: 0 0 auto;
+      }
+
+      .item-info {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        text-align: right;
+
+        .course-name {
+          font-size: 14px;
+          color: $text-secondary-color;
+          font-weight: 500;
+        }
+
+        .due-date {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          justify-content: flex-end;
+
+          .due-text {
+            font-size: 14px;
+            color: $text-color;
+            font-weight: 500;
+          }
+
+          .due-status {
+            font-size: 12px;
+            color: $text-secondary-color;
+            font-weight: 500;
+          }
+        }
+
+        .no-due-date {
+          font-size: 14px;
+          color: $text-secondary-color;
+          font-style: italic;
+        }
+      }
+    }
+  }
+}
+
+// Tab-specific styles
+.tab-assigned {
+  .review-item {
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: $tint-color;
+      transform: translateY(-1px);
+    }
+
+    .item-details .item-info .due-date .due-status {
+      color: $tint-third-color;
+      font-weight: 600;
+
+      &.overdue {
+        color: $error-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.tab-overdue {
+  .review-item {
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: $error-color;
+      transform: translateY(-1px);
+    }
+
+    .item-details .item-info .due-date .due-status {
+      &.overdue {
+        color: $error-color;
+        font-weight: 600;
+      }
+
+      &.missing {
+        color: $error-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.tab-done {
+  .review-item {
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: $success-color;
+      transform: translateY(-1px);
+    }
+
+    .item-details .item-info .due-date .due-status {
+      &.early {
+        color: $success-color;
+        font-weight: 600;
+      }
+
+      &.done {
+        color: $success-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+::ng-deep .section .section-header .section-title .title-content {
+  flex: 1;
+}

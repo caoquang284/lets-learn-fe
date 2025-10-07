@@ -1,0 +1,173 @@
+<div class="tab-done">
+  <app-collapsible-list>    
+    <!-- No due date section -->
+    <app-collapsible-section sectionId="no-due-date">
+      <div title class="section-title-wrapper">
+        <h2>No due date</h2>
+        <span class="item-count">{{ getSectionCount('no-due-date') }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of getSectionItems('no-due-date'); track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>            
+            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-info">
+                <div class="course-name">{{ item.course }}</div>
+                <div class="no-due-date">No due date</div>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No completed items without due dates</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>
+    
+    <!-- Complete early section -->
+    <app-collapsible-section sectionId="complete-early">
+      <div title class="section-title-wrapper">
+        <h2>Complete early</h2>
+        <span class="item-count">{{ getSectionCount('complete-early') }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of getSectionItems('complete-early'); track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-info">
+                <div class="course-name">{{ item.course }}</div>                
+                <div class="due-date">
+                  <span class="due-text">{{ item.dueDateFormatted }}</span>                  
+                  <span class="due-status done">(Done)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No items completed early</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>
+    
+    <!-- This week section -->
+    <app-collapsible-section sectionId="this-week">
+      <div title class="section-title-wrapper">
+        <h2>This week</h2>
+        <span class="item-count">{{ getSectionCount('this-week') }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of getSectionItems('this-week'); track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-info">
+                <div class="course-name">{{ item.course }}</div>                
+                <div class="due-date">
+                  <span class="due-text">{{ item.dueDateFormatted }}</span>                  
+                  <span class="due-status done">(Done)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No items completed this week</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>
+    
+    <!-- Last week section -->
+    <app-collapsible-section sectionId="last-week">
+      <div title class="section-title-wrapper">
+        <h2>Last week</h2>
+        <span class="item-count">{{ getSectionCount('last-week') }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of getSectionItems('last-week'); track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>            
+            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-info">
+                <div class="course-name">{{ item.course }}</div>                
+                <div class="due-date">
+                  <span class="due-text">{{ item.dueDateFormatted }}</span>                  
+                  <span class="due-status done">(Done)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No items completed last week</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>
+    
+    <!-- Sooner section -->
+    <app-collapsible-section sectionId="sooner">
+      <div title class="section-title-wrapper">
+        <h2>Sooner</h2>
+        <span class="item-count">{{ getSectionCount('sooner') }}</span>
+      </div>
+      <div content class="section-content">        
+        @for (item of getSectionItems('sooner'); track item.id) {
+          <div class="review-item" (click)="navigateToItem(item)">
+            <div class="item-icon">
+              @if (item.type === 'assignment') {
+                <span class="material-symbols-outlined assignment-icon">upload_file</span>
+              } @else if (item.type === 'quiz') {
+                <span class="material-symbols-outlined quiz-icon">checklist</span>
+              }
+            </div>            <div class="item-details">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <div class="item-info">
+                <div class="course-name">{{ item.course }}</div>                
+                <div class="due-date">
+                  <span class="due-text">{{ item.dueDateFormatted }}</span>                  
+                  <span class="due-status done">(Done)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No items completed sooner</p>
+          </div>
+        }
+      </div>
+    </app-collapsible-section>
+
+  </app-collapsible-list>
+</div>

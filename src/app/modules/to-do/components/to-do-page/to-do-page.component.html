@@ -1,0 +1,23 @@
+<app-tab-list 
+  [tabs]="tabs" 
+  [selectedTab]="selectedTab"
+/>
+
+<div class="to-do-page">
+  <app-combobox
+    class="course-combobox"
+    [options]="courseOptions()"
+    (onSelect)="onSelectOption($event)"
+    placeholder="Select a course"
+  />
+  
+  <div class="tab-content">
+    @if (selectedTab === 'Assigned') {
+      <tab-assigned [items]="assignedItems" />
+    } @else if (selectedTab === 'Overdue') {
+      <tab-overdue [items]="overdueItems" />
+    } @else if (selectedTab === 'Done') {
+      <tab-done [items]="doneItems" />
+    }
+  </div>
+</div>
