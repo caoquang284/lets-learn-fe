@@ -22,6 +22,8 @@ import { JoiningCodeComponent } from './components/course-list/student-course-li
 import { StudentCourseListComponent } from './components/course-list/student-course-list/student-course-list.component';
 import { StudentCourseCardComponent } from './components/course-list/student-course-list/student-course-card/student-course-card.component';
 import { TabPeopleComponent } from './components/course-layout/course-tabs/tab-people/tab-people.component';
+import { AddTopicDialogComponent } from './components/add-topic-dialog/add-topic-dialog.component';
+import { UpdateCourseImageDialogComponent } from './components/update-course-image-dialog/update-course-image-dialog.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +44,8 @@ import { TabPeopleComponent } from './components/course-layout/course-tabs/tab-p
     JoiningCodeComponent,
     StudentCourseListComponent,
     StudentCourseCardComponent,
+    AddTopicDialogComponent,
+    UpdateCourseImageDialogComponent,
   ],
   imports: [
     SharedModule,

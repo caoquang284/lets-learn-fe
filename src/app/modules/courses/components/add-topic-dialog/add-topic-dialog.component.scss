@@ -1,0 +1,244 @@
+@use "styles/theme/theme.variables" as *;
+
+// Dialog styles
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 620px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  padding: 20px 20px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $tint-third-color;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #666;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+
+    span {
+      font-size: 24px;
+    }
+  }
+}
+
+.dialog-body {
+  padding: 20px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;  padding: 16px 20px 20px;
+  border-top: 1px solid #e0e0e0;app-button {
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}
+
+// Topic types tabs
+.topic-types-tabs {
+  display: flex;
+  gap: 8px;  margin-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+
+  .tab-btn {
+    background: none;
+    border: none;    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f5f5f5;
+    }    &.active {
+      color: $tint-color;
+      border-bottom-color: $tint-color;
+    }
+  }
+}
+
+.topic-types-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.topic-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border: 2px solid $border-color;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;  text-align: center;
+  flex: 1;
+  min-width: 70px;
+  max-width: 120px;
+  &:hover {
+    border-color: $border-hover-color;
+    background: $background-secondary-color;
+  }
+
+  &.selected {
+    border-color: $tint-color;
+    background: $background-secondary-color;
+  }  .topic-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $icon-bounding-color;
+    border-radius: 6px;
+
+    span {
+      font-size: 20px;
+      color: $icon-color;
+    }
+  }
+
+  .topic-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: $text-color;
+    line-height: 1.2;
+  }
+}
+
+// Small grid (3 items or less) - larger cards
+.topic-types-grid.small-grid {
+  .topic-type-card {
+    max-width: 140px;
+    padding: 20px 12px;
+    
+    .topic-icon {
+      width: 40px;
+      height: 40px;
+      
+      span {
+        font-size: 22px;
+      }
+    }
+    
+    .topic-label {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+// Large grid (6 items) - smaller cards
+.topic-types-grid.large-grid {
+  gap: 8px;
+  
+  .topic-type-card {
+    max-width: 80px;
+    padding: 12px 4px;
+    
+    .topic-icon {
+      width: 30px;
+      height: 30px;
+      
+      span {
+        font-size: 16px;
+      }
+    }
+    
+    .topic-label {
+      font-size: 0.65rem;
+    }
+  }
+}
+
+.topic-type-card {
+  &.selected .topic-icon {
+    background: $tint-color;
+    
+    span {
+      color: white;
+    }
+  }
+
+  // Individual topic type colors
+  &.topic-assignment .topic-icon {
+    background: $assignment-background;
+    span {
+      color: $assignment-color;
+    }
+  }
+
+  &.topic-quiz .topic-icon {
+    background: $quiz-background;
+    span {
+      color: $quiz-color;
+    }
+  }
+
+  &.topic-meeting .topic-icon {
+    background: $meeting-background;
+    span {
+      color: $meeting-color;
+    }
+  }
+
+  &.topic-link .topic-icon {
+    background: $link-background;
+    span {
+      color: $link-color;
+    }
+  }
+
+  &.topic-file .topic-icon {
+    background: $file-background;
+    span {
+      color: $file-color;
+    }
+  }
+
+  &.topic-page .topic-icon {
+    background: $page-background;
+    span {
+      color: $page-color;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+@if(show) {
+<div class="dialog-overlay" (click)="onClose()">
+  <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h2>Customize course image</h2>
+      <button class="close-btn" (click)="onClose()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    
+    <div class="dialog-body">
+      <!-- Image Preview Section -->
+      <div class="image-preview-container">
+        <div class="image-preview" *ngIf="previewUrl">
+          <img [src]="previewUrl" alt="Course image preview" class="preview-image">
+        </div>
+        <div class="no-image-placeholder" *ngIf="!previewUrl">
+          <span class="material-symbols-outlined">image</span>
+          <p>No image selected</p>
+        </div>
+          <!-- Upload Photo Button -->
+        <button class="upload-photo-btn" (click)="onUploadPhoto()">
+          <span class="material-symbols-outlined">upload_file</span>
+          Upload photo
+        </button>
+        
+        <!-- Hidden file input -->
+        <input 
+          #fileInput
+          type="file" 
+          accept="image/*" 
+          (change)="onFileSelected($event)"
+          style="display: none;">      </div>
+    </div>
+    
+    <div class="dialog-footer">
+      <app-button 
+        label="Cancel" 
+        variant="secondary"
+        (onClick)="onClose()" />
+      <app-button 
+        [label]="isLoading ? 'Saving...' : 'Save'"
+        (onClick)="onSave()"
+        [class.disabled]="!canSave || isLoading">
+        <span class="material-symbols-outlined" icon *ngIf="isLoading">hourglass_empty</span>
+        <span class="material-symbols-outlined" icon *ngIf="!isLoading">check</span>
+      </app-button>
+    </div>
+  </div>
+</div>
+}
