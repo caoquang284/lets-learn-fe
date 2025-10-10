@@ -1,0 +1,63 @@
+@if(show) {
+<div class="dialog-overlay" (click)="onClose()">
+  <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h2>Add a topic</h2>
+      <button class="close-btn" (click)="onClose()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>      <div class="dialog-body">
+      <div class="topic-types-tabs">
+        <button 
+          class="tab-btn"
+          [class.active]="selectedTab === 'all'"
+          (click)="selectTab('all')">
+          All
+        </button>
+        <button 
+          class="tab-btn"
+          [class.active]="selectedTab === 'activities'"
+          (click)="selectTab('activities')">
+          Activities
+        </button>
+        <button 
+          class="tab-btn"
+          [class.active]="selectedTab === 'resources'"
+          (click)="selectTab('resources')">
+          Resources
+        </button>
+      </div>
+      
+      <div class="topic-types-grid" 
+           [class.small-grid]="filteredTopicTypes.length <= 3"
+           [class.large-grid]="filteredTopicTypes.length > 3">        
+        @for(topicType of filteredTopicTypes; track topicType.type) {
+          <div 
+            class="topic-type-card"
+            [class.selected]="selectedTopicType === topicType.type"
+            [class]="'topic-' + topicType.type.toLowerCase()"
+            (click)="selectTopicType(topicType.type)">
+            <div class="topic-icon">
+              <span class="material-symbols-outlined">{{ topicType.icon }}</span>
+            </div>
+            <span class="topic-label">{{ topicType.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+    
+    <div class="dialog-footer">
+      <app-button 
+        label="Cancel changes" 
+        variant="secondary"
+        (onClick)="onClose()" />
+      <app-button 
+        label="Add new topic"
+        (onClick)="onAddTopic()"
+        [class.disabled]="!selectedTopicType">
+        <span class="material-symbols-outlined" icon>add_circle</span>
+      </app-button>
+    </div>
+  </div>
+</div>
+}

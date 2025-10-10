@@ -9,7 +9,7 @@
       <span class="material-symbols-outlined"> content_copy </span>
     </div>
   </div>
-  <button class="customize-btn">
+  <button class="customize-btn" (click)="showUpdateImageDialog = true">
     <span class="material-symbols-outlined"> stylus </span> Customize
   </button>
   <img [src]="course.imageUrl" />
@@ -45,7 +45,7 @@
         } @if(canEdit) {
 
         <div class="topic-action-buttons">
-          <app-button label="Add new topic">
+          <app-button label="Add new topic" (click)="openAddTopicDialog(section.id)">
             <span class="material-symbols-outlined" icon> add_circle </span>
           </app-button>
         </div>
@@ -67,3 +67,21 @@
   </div>
   }
 </div>
+
+<!-- Add Topic Dialog Component -->
+<app-add-topic-dialog
+  [show]="showAddTopicDialog"
+  [sectionId]="selectedSectionId"
+  (closeDialog)="closeAddTopicDialog()"
+  (addTopic)="onAddNewTopic($event)"
+>
+</app-add-topic-dialog>
+
+<!-- Update Course Image Dialog Component -->
+<app-update-course-image-dialog
+  [show]="showUpdateImageDialog"
+  [course]="course"
+  (closeDialog)="closeUpdateImageDialog()"
+  (updateImage)="onUpdateImage($event)"
+>
+</app-update-course-image-dialog>
