@@ -33,6 +33,7 @@ import { MeetingModule } from '@modules/meeting/meeting.module';
     LinkModule,
     FileModule,
     PageModule,
+    MeetingModule,
     SettingsModule,
     ToReviewModule,
     ToastrModule.forRoot(),

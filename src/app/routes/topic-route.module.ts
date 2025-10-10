@@ -27,6 +27,10 @@ const routes: Routes = [
     path: 'file/:topicId',
     component: FilePageComponent,
   },
+  {
+    path: 'meeting/:topicId',
+    component: MeetingPageComponent,
+  }
 ];
 
 @NgModule({

@@ -24,7 +24,7 @@ import { mockCourses } from '@shared/mocks/course';
 })
 export class MeetingPageComponent implements OnInit {
   course: Course | null = null;
-  topic: MeetingTopic = mockTopics.find(topic => topic.type === TopicType.MEETING) as MeetingTopic;
+  topic: MeetingTopic | null = null;
   tabs = MeetingTab;
   user: User | null = null;
   isStudent = true;
@@ -44,7 +44,12 @@ export class MeetingPageComponent implements OnInit {
     
     // Fetch mock data based on route params
     if (this.courseId) this.fetchCourseData(this.courseId);
-    if (this.topicId) this.fetchTopicData(this.topicId);
+    if (this.topicId) {
+      this.fetchTopicData(this.topicId);
+    } else {
+      // If no topicId in route, create a mock topic
+      this.createMockTopic();
+    }
   }
 
   ngOnInit(): void {
@@ -84,7 +89,12 @@ export class MeetingPageComponent implements OnInit {
 
   fetchTopicData(topicId: string) {
     const res = mockTopics.find((topic) => topic.id === topicId);
-    if (res) this.topic = res as MeetingTopic;
+    if (res && res.type === TopicType.MEETING) {
+      this.topic = res as MeetingTopic;
+    } else {
+      // If no topic found with the given ID, create a mock topic
+      this.createMockTopic();
+    }
   }
 
   fetchCourseData(courseId: string) {
@@ -119,7 +129,7 @@ export class MeetingPageComponent implements OnInit {
         title: 'Sample Course'
       } as Course,
       data: {
-        id: this.topicId || 'mock-meeting-data-id',
+          id: this.topicId || 'mock-meeting-data-id',
         topic: 'Sample Meeting Topic',
         description: 'Sample meeting description',
         meetingDate: new Date(),
