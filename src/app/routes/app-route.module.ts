@@ -17,6 +17,11 @@ const routes: Routes = [
       { path: 'calendar', component: CalendarPageComponent },
       { path: 'settings', component: SettingsPageComponent },
       {
+        path: 'to-do',
+        loadChildren: () =>
+          import('@modules/to-do/to-do.module').then((m) => m.ToDoModule),
+      },
+      {
         path: 'courses',
         loadChildren: () =>
           import('@routes/course-route.module').then(
