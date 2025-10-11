@@ -15,8 +15,13 @@ export const mockTopics: Topic[] = [
     type: TopicType.MEETING,
     title: 'Topic Meeting',
     data: {
+      id: 'meeting-3',
+      topic: 'Topic Meeting',
       description: 'Meeting description',
-      open: new Date().toISOString(),
+      meetingDate: new Date(),
+      meetingUrl: 'https://zoom.us/j/1234567890',
+      isActive: true,
+      comments: []
     },
   },
   {

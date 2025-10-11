@@ -17,6 +17,7 @@ import { PageModule } from '@modules/page/page.module';
 import { SettingsModule } from '@modules/settings/settings.module';
 import { ToReviewModule } from '@modules/to-review/to-review.module';
 import { FileModule } from '@modules/file/file.module';
+import { MeetingModule } from '@modules/meeting/meeting.module';
 
 @NgModule({
   imports: [
@@ -32,6 +33,7 @@ import { FileModule } from '@modules/file/file.module';
     LinkModule,
     FileModule,
     PageModule,
+    MeetingModule,
     SettingsModule,
     ToReviewModule,
     ToastrModule.forRoot(),

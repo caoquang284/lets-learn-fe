@@ -5,7 +5,7 @@ import { QuizPageComponent } from '@modules/quiz/components/quiz-page/quiz-page.
 import { LinkPageComponent } from '@modules/link/components/link-page/link-page.component';
 import { PagePageComponent } from '@modules/page/components/page-page/page-page.component';
 import { FilePageComponent } from '@modules/file/components/file-page/file-page.component';
-
+import { MeetingPageComponent } from '@modules/meeting/components/meeting-page/meeting-page.component';
 const routes: Routes = [
   {
     path: 'quiz/:topicId',
@@ -27,6 +27,10 @@ const routes: Routes = [
     path: 'file/:topicId',
     component: FilePageComponent,
   },
+  {
+    path: 'meeting/:topicId',
+    component: MeetingPageComponent,
+  }
 ];
 
 @NgModule({
