@@ -1,3 +1,4 @@
+
 <div class="settings-container">
   <card>
     <h3 class="card-title">Edit Setting</h3>
@@ -8,16 +9,36 @@
         <span class="title" title>General</span>
         <!-- Section dynamic content -->        
          <div class="content" content>
-          @for(control of generalFormControls; track control.id) {
-          <setting-row [label]="control.label" [id]="control.id">
+          <!-- Name field -->
+          <setting-row [label]="'Name'" id="name">
             <app-form-field
-              [control]="control"
-              [controlName]="control.id"
+              [control]="generalFormControls[0]"
+              controlName="name"
               [form]="form"
               [showLabel]="false"
             />
           </setting-row>
-          }
+          <!-- Meeting Date & Time field -->
+          <setting-row [label]="'Meeting Date & Time'" id="meetingDate">
+            <app-form-field
+              [control]="generalFormControls[1]"
+              controlName="meetingDate"
+              [form]="form"
+              [showLabel]="false"
+            />
+          </setting-row>
+          <!-- Description field as rich text editor -->
+          <setting-row [label]="'Description'" id="description">
+            <div class="rich-text-container">
+              <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
+              <ngx-editor
+                formControlName="description"
+                [editor]="editor"
+                placeholder="Enter meeting description..."
+                class="rich-text-editor"
+              ></ngx-editor>
+            </div>
+          </setting-row>
         </div>
       </app-collapsible-section>
     </app-collapsible-list>

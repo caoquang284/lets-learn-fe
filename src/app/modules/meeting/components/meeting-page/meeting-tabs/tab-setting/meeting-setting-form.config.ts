@@ -20,19 +20,19 @@ export const meetingGeneralSettingFormControls: FormControlField[] = [
     },
   },
   {
+    id: 'meetingDate',
+    label: 'Meeting Date & Time',
+    type: 'datetime-local',
+    componentType: 'input',
+    placeholder: '',
+    validationMessages: {},
+  },
+  {
     id: 'description',
     label: 'Description',
     type: 'text',
     componentType: 'input',
     placeholder: 'Meeting description',
-    validationMessages: {},
-  },
-  {
-    id: 'meetingDate',
-    label: 'Meeting Date',
-    type: 'datetime-local',
-    componentType: 'input',
-    placeholder: '',
     validationMessages: {},
   },
 ];
