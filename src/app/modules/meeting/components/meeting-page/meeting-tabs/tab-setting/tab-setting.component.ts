@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Editor, Toolbar } from 'ngx-editor';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CollapsibleListService } from '@shared/components/collapsible-list/collapsible-list.service';
@@ -14,7 +15,36 @@ import { ToastrService } from 'ngx-toastr';
   standalone: false,
   providers: [CollapsibleListService],
 })
-export class TabSettingComponent implements OnInit {
+export class TabSettingComponent implements OnInit, OnDestroy {
+  editor!: Editor;
+  toolbar: Toolbar = [
+    [
+      'bold',
+      'italic',
+      'underline',
+      'strike',
+      'code',
+    ],
+    [
+      'blockquote',
+      'ordered_list',
+      'bullet_list',
+      'link',
+      'image',
+    ],
+    [
+      'text_color',
+      'background_color',
+      'align_left',
+      'align_center',
+      'align_right',
+      'align_justify',
+    ],
+    [
+      'undo',
+      'redo',
+    ],
+  ];
   @Input({ required: true }) topic!: MeetingTopic;
   form!: FormGroup;
   sectionIds: string[] = ['general'];
@@ -30,6 +60,7 @@ export class TabSettingComponent implements OnInit {
   ) {}
   
   ngOnInit(): void {
+    this.editor = new Editor();
     this.form = this.fb.group(meetingSettingFormSchema, { updateOn: 'submit' });
     this.collapsibleListService.setSectionIds(this.sectionIds);
     this.collapsibleListService.setCanEdit(false);
@@ -42,6 +73,10 @@ export class TabSettingComponent implements OnInit {
         meetingDate: this.topic.data?.meetingDate?.toISOString().slice(0, 16) || ''
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.editor?.destroy();
   }
 
   getDisabled(controlName: string): boolean {

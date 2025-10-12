@@ -1,4 +1,75 @@
 @use "styles/theme/theme.variables" as *;
+// Rich text editor container
+.rich-text-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  
+  ngx-editor-menu {
+    border-bottom: 1px solid #ddd;
+    
+    ::ng-deep .NgxEditor__MenuBar {
+      border: none;
+      border-radius: 0;
+      margin: 0;
+    }
+  }
+  
+  ngx-editor {
+    flex: 1;
+    
+    ::ng-deep .NgxEditor {
+      border: none;
+      border-radius: 0;
+      min-height: 220px;
+      height: 300px;
+      max-height: 400px;
+    }
+    
+    ::ng-deep .NgxEditor__Content {
+      min-height: 200px;
+      height: 280px;
+      max-height: 380px;
+      resize: vertical;
+    }
+  }
+}
+
+// Increase the height of the meeting description rich text editor
+.rich-text-editor {
+  min-height: 220px;
+  height: 300px;
+  max-height: 400px;
+  resize: vertical;
+  box-sizing: border-box;
+  
+  ::ng-deep .NgxEditor {
+    border-top: none !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+}
+
+// Style the editor container to align toolbar with editor
+::ng-deep ngx-editor-menu + ngx-editor {
+  .NgxEditor {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+
+::ng-deep ngx-editor-menu {
+  .NgxEditor__MenuBar {
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+  }
+}
 :host {
   display: flex;
   flex-direction: column;
@@ -48,21 +119,17 @@
 
 .submit-container {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 
   .submit-button {
-    min-width: 120px;
-  }
-}
-
-.settings-container {
-  padding: 1rem;
-  
-  card {
-    padding: 1.5rem;
-    border-radius: 8px;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    ::ng-deep {
+      button {
+        width: fit-content;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+    }
   }
 }
