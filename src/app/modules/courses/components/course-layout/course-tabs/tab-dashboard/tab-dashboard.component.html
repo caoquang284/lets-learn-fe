@@ -1,0 +1,134 @@
+<div
+  class="dashboard-container"
+  [ngStyle]="{
+    'background-color': selectedTab === 'quiz' ? '#FDF2F8' : '#FAF5FF'
+  }"
+>
+  <div class="dashboard-paper">
+    <div class="dashboard-header">
+      <div class="header-spacer"></div>
+      <div class="tab-switch-wrapper">
+        <div class="tab-switch" [ngClass]="selectedTab">
+          <button
+            class="quiz-button"
+            [class.active]="selectedTab === 'quiz'"
+            (click)="selectedTab = 'quiz'"
+          >
+            Quiz
+          </button>
+          <button
+            class="assignments-button"
+            [class.active]="selectedTab === 'assignments'"
+            (click)="selectedTab = 'assignments'"
+          >
+            Assignments
+          </button>
+        </div>
+      </div>
+      <div class="month-combobox-wrapper">
+        <app-combobox
+          class="month-combobox"
+          [options]="monthOptions"
+          placeholder="Select month"
+          (onSelect)="onMonthChange($event.value)"
+        ></app-combobox>
+      </div>
+    </div>
+
+    <ng-container *ngIf="selectedTab === 'assignments'">
+      <div class="stat-cards-row">
+        <stat-card
+          *ngFor="let stat of assignmentsStats"
+          [stat]="stat"
+        ></stat-card>
+      </div>
+      <div class="charts-container">
+        <div class="chart-card">
+          <app-donut-chart
+            [chartData]="fileTypeSegments"
+            title="File type submission"
+            [centerText]="assignmentReport?.assignmentCount?.toString() ?? '0'"
+            centerSubtext="Total submissions"
+          ></app-donut-chart>
+        </div>
+        <div class="chart-card">
+          <app-donut-chart
+            [chartData]="gradedSegments"
+            title="Graded submissions"
+            [centerText]="totalGradedSubmissions.toString()"
+            centerSubtext="Graded submissions"
+          ></app-donut-chart>
+        </div>
+      </div>
+      <div class="charts-container">
+        <div class="chart-card">
+          <app-bar-chart
+            [segments]="assignmentsAvgMarkSegments"
+            [maxValue]="10"
+            title="Average Mark"
+          ></app-bar-chart>
+        </div>
+        <div class="chart-card">
+          <app-bar-chart
+            [segments]="assignmentsCompletionRateSegments"
+            [maxValue]="100"
+            title="Completion Rate (%)"
+          ></app-bar-chart>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="selectedTab === 'quiz'">
+      <div class="stat-cards-row">
+        <stat-card *ngFor="let stat of quizStats" [stat]="stat"></stat-card>
+      </div>
+      <div class="charts-container">
+        <div class="chart-card">
+          <app-donut-chart
+            [chartData]="questionTypeSegments"
+            title="Question type distribution"
+            [centerText]="totalQuizQuestions.toString()"
+            centerSubtext="Total questions"
+          ></app-donut-chart>
+        </div>
+        <div class="chart-card">
+          <app-donut-chart
+            [chartData]="studentMarkSegments"
+            title="Student mark distribution"
+            [centerText]="totalQuizStudents.toString()"
+            centerSubtext="Total students"
+          ></app-donut-chart>
+        </div>
+      </div>
+      <div class="charts-container">
+        <div class="chart-card">
+          <app-bar-chart
+            [segments]="quizAvgMarkSegments"
+            [maxValue]="10"
+            title="Average Mark"
+          ></app-bar-chart>
+        </div>
+        <div class="chart-card">
+          <app-bar-chart
+            [segments]="quizCompletionRateSegments"
+            [maxValue]="100"
+            title="Completion Rate (%)"
+          ></app-bar-chart>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="grading-section">
+      <div class="grading-header">
+        <h3 class="grading-title">Student rank</h3>
+      </div>
+
+      <div class="grade-rows">
+        <rank-item rank="S" [students]="studentsS" />
+        <rank-item rank="A" [students]="studentsA" />
+        <rank-item rank="B" [students]="studentsB" />
+        <rank-item rank="C" [students]="studentsC" />
+      </div>
+    </div>
+  </div>
+</div>
