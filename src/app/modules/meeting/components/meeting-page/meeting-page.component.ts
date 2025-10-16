@@ -13,6 +13,7 @@ import { BreadcrumbService } from '@shared/services/breadcrumb.service';
 import { UserService } from '@shared/services/user.service';
 import { mockTopics } from '@shared/mocks/topic';
 import { mockCourses } from '@shared/mocks/course';
+import { mockMeetingData } from '@shared/mocks/meeting';
 // import { GetTopic } from '@modules/courses/api/topic.api';
 // import { GetCourseById } from '@modules/courses/api/courses.api';
 @Component({
@@ -28,7 +29,7 @@ export class MeetingPageComponent implements OnInit {
   tabs = MeetingTab;
   user: User | null = null;
   isStudent = true;
-  selectedTab = MeetingTab.MEETING;
+  selectedTab = MeetingTab.DETAIL;
   courseId: string | null = null;
   topicId: string | null = null;
 
@@ -61,19 +62,19 @@ export class MeetingPageComponent implements OnInit {
       }
     });
 
-    // Create mock teacher user for frontend preview
-    const mockTeacherUser: User = {
-      id: 'mock-teacher-id',
-      username: 'mockteacher',
-      email: 'teacher@example.com',
-      password: 'mock-password',
-      avatar: 'https://via.placeholder.com/150',
-      role: Role.TEACHER,
-      courses: []
-    };
+    // // Create mock teacher user for frontend preview
+    // const mockTeacherUser: User = {
+    //   id: 'mock-teacher-id',
+    //   username: 'mockteacher',
+    //   email: 'teacher@example.com',
+    //   password: 'mock-password',
+    //   avatar: 'https://via.placeholder.com/150',
+    //   role: Role.TEACHER,
+    //   courses: []
+    // };
     
-    // Set mock user to see both tabs
-    this.userService.setUser(mockTeacherUser);
+    // // Set mock user to see both tabs
+    // this.userService.setUser(mockTeacherUser);
 
     this.userService.user$.subscribe((user) => {
       this.user = user;
@@ -118,25 +119,18 @@ export class MeetingPageComponent implements OnInit {
   }
 
   createMockTopic() {
-    // Create mock topic for frontend preview when API is not available
+    // Create mock topic for frontend preview using mockMeetingData
+    const mockData = mockMeetingData[0]; // Use first mock meeting data
     this.topic = {
       id: this.topicId || 'mock-meeting-topic-id',
       sectionId: 'mock-section-id',
-      title: 'Sample Meeting Topic',
+      title: mockData.topic,
       type: TopicType.MEETING,
       course: {
         id: this.courseId || 'mock-course-id',
         title: 'Sample Course'
       } as Course,
-      data: {
-          id: this.topicId || 'mock-meeting-data-id',
-        topic: 'Sample Meeting Topic',
-        description: 'Sample meeting description',
-        meetingDate: new Date(),
-        meetingUrl: 'https://zoom.us/j/sample-meeting',
-        isActive: true,
-        comments: []
-      }
+      data: mockData
     };
   }
 }

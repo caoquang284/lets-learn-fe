@@ -5,6 +5,7 @@ import { mockPage } from './page';
 import { FileSizeOption } from '@shared/models/assignment';
 import { GradingMethod, TimeLimitType } from '@shared/models/quiz';
 import { mockQuestions } from './question';
+import { mockMeetingData, mockMeetingComments } from './meeting';
 
 export const mockTopics: Topic[] = [
   mockQuiz,
@@ -13,16 +14,8 @@ export const mockTopics: Topic[] = [
     id: '3',
     sectionId: '1',
     type: TopicType.MEETING,
-    title: 'Topic Meeting',
-    data: {
-      id: 'meeting-3',
-      topic: 'Topic Meeting',
-      description: 'Meeting description',
-      meetingDate: new Date(),
-      meetingUrl: 'https://zoom.us/j/1234567890',
-      isActive: true,
-      comments: []
-    },
+    title: 'The final project report meeting in Teams',
+    data: mockMeetingData[0], // Use the complete mock meeting data
   },
   {
     id: '4',

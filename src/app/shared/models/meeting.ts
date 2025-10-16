@@ -1,10 +1,8 @@
 export type MeetingComment = {
   id: string;
-  author: string;
+  userId: string; // Reference to User.id only
   time: string;
   text: string;
-  avatar: string;
-  userId: string;
 }
 
 export type MeetingData = {

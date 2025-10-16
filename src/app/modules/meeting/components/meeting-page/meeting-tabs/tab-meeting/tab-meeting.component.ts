@@ -1,7 +1,9 @@
 import { Component, Input, OnInit, OnChanges } from '@angular/core';
+import { formatDateString } from '@shared/helper/date.helper';
 import { MeetingTopic } from '@shared/models/topic';
 import { MeetingComment, MeetingData } from '@shared/models/meeting';
-import { mockMeetingData, mockMeetingComments } from '@shared/mocks/meeting';
+import { mockMeetingData, mockMeetingComments, getUserById } from '@shared/mocks/meeting';
+import { User } from '@shared/models/user';
 
 @Component({
   selector: 'tab-meeting',
@@ -22,6 +24,7 @@ export class TabMeetingComponent implements OnInit, OnChanges {
   meetingData: MeetingData | null = null;
   comments: MeetingComment[] = [];
   newCommentText: string = '';
+  currentUser: User | null = null;
 
   constructor() {}
 
@@ -39,6 +42,8 @@ export class TabMeetingComponent implements OnInit, OnChanges {
     // For now, use first mock data
     this.meetingData = mockMeetingData[0];
     this.comments = [...mockMeetingComments];
+    // Load current user (in real app, from auth service)
+    this.currentUser = getUserById('1') || null;
   }
 
   private updateMeetingInfo(): void {
@@ -49,54 +54,46 @@ export class TabMeetingComponent implements OnInit, OnChanges {
     this.hasMeeting = !!(this.meetingDescription || this.meetingOpenDate);
   }
 
-  addComment(): void {
-    if (this.newCommentText.trim()) {
+  formatDate(date: string | Date | null, pattern: string = 'EEEE, dd MMMM yyyy HH:mm a') {
+    if (!date) return '';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return formatDateString(dateObj.toISOString(), pattern);
+  }
+
+  // Helper method to get user info by userId
+  getUserById(userId: string): User | undefined {
+    return getUserById(userId);
+  }
+
+  // Helper method to get author name from userId
+  getAuthorName(userId: string): string {
+    const user = this.getUserById(userId);
+    return user?.username || 'Unknown User';
+  }
+
+  // Helper method to get avatar from userId
+  getAvatar(userId: string): string {
+    const user = this.getUserById(userId);
+    return user?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=?';
+  }
+
+  // Get current user avatar for comment input
+  getCurrentUserAvatar(): string {
+    return this.currentUser?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=You';
+  }
+
+    // Method to add new comment
+    addComment(): void {
+      if (!this.newCommentText.trim()) return;
+    
       const newComment: MeetingComment = {
-        id: Date.now().toString(),
-        author: 'You',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        text: this.newCommentText.trim(),
-        avatar: 'https://via.placeholder.com/40/607D8B/FFFFFF?text=You',
-        userId: 'current-user'
+        id: (this.comments.length + 1).toString(),
+        userId: '1', // Current user - in real app this would come from auth service
+        time: new Date().toLocaleString(),
+        text: this.newCommentText.trim()
       };
-      
-      this.comments.push(newComment);
+    
+      this.comments = [...this.comments, newComment];
       this.newCommentText = '';
     }
-  }
-
-  joinMeeting(): void {
-    if (this.meetingUrl) {
-      window.open(this.meetingUrl, '_blank');
-    } else {
-      console.log('Meeting URL not available');
-    }
-  }
-
-  isMeetingTime(): boolean {
-    if (!this.meetingOpenDate) return false;
-    const now = new Date();
-    const meetingTime = new Date(this.meetingOpenDate);
-    const timeDiff = meetingTime.getTime() - now.getTime();
-    // Meeting is considered "live" if it's within 15 minutes before or 2 hours after start time
-    return timeDiff >= -15 * 60 * 1000 && timeDiff <= 2 * 60 * 60 * 1000;
-  }
-
-  getMeetingStatus(): string {
-    if (!this.meetingOpenDate) return 'No date set';
-    
-    const now = new Date();
-    const meetingTime = new Date(this.meetingOpenDate);
-    const timeDiff = meetingTime.getTime() - now.getTime();
-    
-    if (timeDiff > 2 * 60 * 60 * 1000) {
-      return 'Scheduled';
-    } else if (timeDiff > 0) {
-      return 'Starting soon';
-    } else if (timeDiff >= -2 * 60 * 60 * 1000) {
-      return 'Live now';
-    } else {
-      return 'Ended';
-    }
-  }
 }

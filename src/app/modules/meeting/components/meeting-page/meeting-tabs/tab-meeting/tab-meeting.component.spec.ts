@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { TabMeetingComponent } from './tab-meeting.component';
 
 describe('TabMeetingComponent', () => {
@@ -10,7 +11,7 @@ describe('TabMeetingComponent', () => {
       declarations: [TabMeetingComponent]
     })
     .compileComponents();
-    
+
     fixture = TestBed.createComponent(TabMeetingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
