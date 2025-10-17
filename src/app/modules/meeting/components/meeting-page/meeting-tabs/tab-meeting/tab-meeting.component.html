@@ -14,7 +14,7 @@
     </div>
 
     <div class="meeting-actions" *ngIf="meetingOpenDate">
-      <button class="join-btn">Join</button>
+      <button class="join-btn" [routerLink]="['/meeting', topic.id, 'room']">Join</button>
     </div>
   </div>
 </card>

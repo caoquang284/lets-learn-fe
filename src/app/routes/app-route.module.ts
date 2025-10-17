@@ -44,6 +44,13 @@ const routes: Routes = [
         (m) => m.QuizAttemptingRoutingModule
       ),
   },
+  {
+    path: 'meeting',
+    loadChildren: () =>
+      import('@routes/meeting-room-route.module').then(
+        (m) => m.MeetingRoomRoutingModule
+      ),
+  },
   // { path: '**', redirectTo: 'auth/login' }, // Temporarily disabled for topic link testing
 ];
 
