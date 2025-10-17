@@ -72,3 +72,8 @@ $file-header-end-color: #396294;
 
 $link-header-start-color: $link-color;
 $link-header-end-color: #09524a;
+
+// === Generic Aliases ===
+// Provide a generic primary color token for components that expect $primary-color
+// Reuse tint primary to keep consistency; can be switched to $meeting-color if needed contextually
+$primary-color: $tint-color; // fallback primary

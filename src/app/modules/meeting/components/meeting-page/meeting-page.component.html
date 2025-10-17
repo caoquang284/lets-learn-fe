@@ -1,8 +1,8 @@
 @if(topic) {
 <topic-page-layout [topic]="topic">
-  @if(selectedTab === tabs.MEETING){
+  @if(selectedTab === tabs.DETAIL){
   <tab-meeting [topic]="topic" />
-  } @else if(selectedTab === tabs.SETTINGS) {
+  } @else if(selectedTab === tabs.SETTINGS && !isStudent) {
   <tab-setting [topic]="topic" />
   }
 </topic-page-layout>

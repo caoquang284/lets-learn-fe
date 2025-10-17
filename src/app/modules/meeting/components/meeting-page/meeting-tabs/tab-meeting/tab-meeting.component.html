@@ -1,78 +1,62 @@
-<div class="tab-meeting-container">
-
-  <!-- Meeting Information -->
-  @if (hasMeeting) {
-    <div class="meeting-card">
-      <div class="meeting-header">
-        <div class="meeting-status" [class]="getMeetingStatus().toLowerCase().replace(' ', '-')">
-          {{ getMeetingStatus() }}
-        </div>
-        @if (meetingOpenDate) {
-          <div class="meeting-info">
-            <span class="meeting-date">{{ meetingOpenDate | date:'medium' }}</span>
-          </div>
-        }
-      </div>
-      
-      @if (meetingDescription) {
-        <div class="meeting-description">
-          <p>{{ meetingDescription }}</p>
-        </div>
-      }
-      
-      <div class="meeting-actions">
-        @if (isMeetingTime() && meetingUrl) {
-          <button class="join-btn primary" (click)="joinMeeting()">Join Meeting</button>
-        } @else if (meetingUrl) {
-          <button class="join-btn secondary" disabled>Meeting Not Active</button>
-        } @else {
-          <button class="join-btn secondary" disabled>No Meeting Link</button>
-        }
-      </div>
-    </div>
-  } @else {
-    <div class="no-meeting">
-      <p>No meeting information available.</p>
-    </div>
-  }
-
-  <!-- Comments Section -->
-  <div class="comments-section">
-    <h3>Class Comments</h3>
-    
-    <div class="comments-list">
-      @for (comment of comments; track comment.id) {
-        <div class="comment">
-          <img [src]="comment.avatar" class="avatar" [alt]="comment.author + ' avatar'">
-          <div class="comment-content">
-            <div class="comment-header">
-              <strong class="author">{{ comment.author }}</strong>
-              <span class="timestamp">{{ comment.time }}</span>
-            </div>
-            <p class="comment-text">{{ comment.text }}</p>
-          </div>
-        </div>
-      }
+<card>
+  <div class="meeting-info">
+    <div class="meeting-date-section">
+      <span class="date-label">Open:</span>
+      <span class="date-value">{{
+        formatDate(meetingOpenDate, "EEEE, dd MMMM yyyy HH:mm a")
+      }}</span>
     </div>
     
-    <div class="comment-input">
-      <div class="input-container">
-        <img src="https://via.placeholder.com/40/607D8B/FFFFFF?text=You" class="avatar current-user" alt="Your avatar">
-        <input 
-          type="text" 
-          [(ngModel)]="newCommentText"
-          placeholder="Add class comment..." 
-          (keyup.enter)="addComment()"
-          class="comment-input-field"
-        >
-        <button 
-          class="send-btn" 
-          (click)="addComment()" 
-          [disabled]="!newCommentText.trim()"
-        >
-          Send
-        </button>
+    <div class="meeting-description-section">
+      <div class="description-content">
+        <p>{{ meetingDescription || 'No description available' }}</p>
       </div>
+    </div>
+
+    <div class="meeting-actions" *ngIf="meetingOpenDate">
+      <button class="join-btn">Join</button>
     </div>
   </div>
-</div>
+</card>
+
+<card>
+  <div class="comments-header">
+    <span class="material-symbols-outlined">group</span>
+    <h3>Class comments</h3>
+  </div>
+
+  <div class="meeting-comments-list">
+    @for(comment of comments; track comment.id) {
+      <div class="meeting-comment">
+        <img [src]="getAvatar(comment.userId)" class="avatar" [alt]="getAuthorName(comment.userId) + ' avatar'">
+        <div class="comment-content">
+          <div class="comment-header">
+            <strong class="author">{{ getAuthorName(comment.userId) }}</strong>
+            <span class="timestamp">{{ comment.time }}</span>
+          </div>
+          <p class="comment-text">{{ comment.text }}</p>
+        </div>
+      </div>
+    }
+  </div>
+  
+  <div class="meeting-comment-input">
+    <div class="input-container">
+      <img [src]="getCurrentUserAvatar()" class="avatar current-user" [alt]="(currentUser?.username || 'You') + ' avatar'">
+      <input 
+        type="text" 
+        [(ngModel)]="newCommentText"
+        placeholder="Add class comment..." 
+        (keyup.enter)="addComment()"
+        class="comment-input-field"
+      >
+      <button 
+        class="send-btn" 
+        (click)="addComment()" 
+        [disabled]="!newCommentText.trim()"
+      >
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </div>
+  </div>
+</card>
