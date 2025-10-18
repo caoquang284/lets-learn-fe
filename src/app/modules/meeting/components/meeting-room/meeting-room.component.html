@@ -150,3 +150,15 @@
     </div>
   </div>
 </div>
+
+<!-- Whiteboard Modal -->
+<div class="whiteboard-modal" *ngIf="isWhiteboardOpen">
+  <div class="whiteboard-header">
+    <h2>Whiteboard</h2>
+    <button class="close-whiteboard" (click)="openWhiteboard()" aria-label="Close whiteboard">×</button>
+  </div>
+  <app-whiteboard 
+    [currentUser]="currentUser"
+    (onAction)="onWhiteboardAction($event)">
+  </app-whiteboard>
+</div>

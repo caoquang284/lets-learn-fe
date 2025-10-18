@@ -2,6 +2,7 @@ import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu'; // Thêm nếu dùng Angular Material cho menu
+import { WhiteboardComponent } from '../whiteboard/whiteboard.component';
 
 interface Participant {
   name: string;
@@ -16,10 +17,17 @@ interface Message {
   time: string;
 }
 
+interface WhiteboardAction {
+  type: 'draw' | 'clear' | 'text' | 'shape';
+  data: any;
+  timestamp: number;
+  userId: string;
+}
+
 @Component({
   selector: 'app-meeting-room',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatMenuModule], // Thêm MatMenuModule nếu dùng
+  imports: [CommonModule, FormsModule, MatMenuModule, WhiteboardComponent], // Thêm MatMenuModule nếu dùng
   templateUrl: './meeting-room.component.html',
   styleUrls: ['./meeting-room.component.scss']
 })
@@ -30,7 +38,9 @@ export class MeetingRoomComponent implements OnDestroy {
   isParticipantsOpen = true; // Mặc định mở participants
   isScreenSharing = false;
   isSpeaking = false;
+  isWhiteboardOpen = false;
   messages: Message[] = [];
+  whiteboardActions: WhiteboardAction[] = []; // Store all whiteboard actions for real-time sync
   participants: Participant[] = [
     { name: 'You', color: '#3b82f6', isMicOn: true, role: 'Host' }
   ];
@@ -234,7 +244,14 @@ export class MeetingRoomComponent implements OnDestroy {
   }
 
   openWhiteboard() {
-    alert('Opening whiteboard...'); // Stub, có thể integrate iframe hoặc modal
+    this.isWhiteboardOpen = !this.isWhiteboardOpen;
+  }
+
+  // Handle whiteboard action from child component
+  onWhiteboardAction(action: WhiteboardAction) {
+    this.whiteboardActions.push(action);
+    // In real app: broadcast to other participants via WebSocket/WebRTC
+    console.log('Whiteboard action:', action);
   }
 
   leave() {

@@ -331,3 +331,52 @@
     .material-symbols-outlined { font-size: 20px; }
   }
 }
+
+// Whiteboard Modal
+.whiteboard-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.whiteboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #000;
+  border-bottom: 1px solid #333;
+
+  h2 {
+    color: #fff;
+    font-size: 20px;
+    margin: 0;
+  }
+}
+
+.close-whiteboard {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #222;
+  }
+}
