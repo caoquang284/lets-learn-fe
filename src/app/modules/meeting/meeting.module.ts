@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { SharedComponentsModule } from '@shared/components/shared-components.module';
 import { SharedModule } from '@shared/shared.module';
 import { MeetingPageComponent } from './components/meeting-page/meeting-page.component';
@@ -14,7 +14,7 @@ import { MeetingRichTextModule } from './meeting-rich-text.module';
     TabMeetingComponent, 
     TabSettingComponent
   ],
-  imports: [SharedModule, RouterOutlet, FormsModule, SharedComponentsModule, MeetingRichTextModule],
+  imports: [SharedModule, RouterOutlet, RouterLink, FormsModule, SharedComponentsModule, MeetingRichTextModule],
   exports: [],
 })
 

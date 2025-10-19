@@ -1,0 +1,181 @@
+<div class="whiteboard-container">
+  <div class="toolbar">
+    <div class="toolbar-section">
+      <h3>Tools</h3>
+      <div class="tool-buttons">
+        <button 
+          class="tool-btn" 
+          [class.active]="selectedTool === 'pen'"
+          (click)="selectTool('pen')"
+          title="Pen">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+          </svg>
+          <span>Pen</span>
+        </button>
+        
+        <button 
+          class="tool-btn" 
+          [class.active]="selectedTool === 'eraser'"
+          (click)="selectTool('eraser')"
+          title="Eraser">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53a4.008 4.008 0 0 1-5.66 0L2.81 17c-.78-.79-.78-2.05 0-2.84l10.6-10.6c.79-.78 2.05-.78 2.83 0M4.22 15.58l3.54 3.53c.78.79 2.04.79 2.83 0l3.53-3.53-6.36-6.36-3.54 3.53c-.78.79-.78 2.05 0 2.83z"/>
+          </svg>
+          <span>Eraser</span>
+        </button>
+
+        <button 
+          class="tool-btn" 
+          [class.active]="selectedTool === 'line'"
+          (click)="selectTool('line')"
+          title="Line">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 3l18 18"/>
+          </svg>
+          <span>Line</span>
+        </button>
+
+        <button 
+          class="tool-btn" 
+          [class.active]="selectedTool === 'rectangle'"
+          (click)="selectTool('rectangle')"
+          title="Rectangle">
+          <svg class="icon" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+          </svg>
+          <span>Rectangle</span>
+        </button>
+
+        <button 
+          class="tool-btn" 
+          [class.active]="selectedTool === 'circle'"
+          (click)="selectTool('circle')"
+          title="Circle">
+          <svg class="icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+          <span>Circle</span>
+        </button>
+
+        <button 
+          class="tool-btn" 
+          [class.active]="selectedTool === 'text'"
+          (click)="selectTool('text')"
+          title="Text">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M5 4h14M5 4v2M19 4v2M9 20h6M12 4v16"/>
+          </svg>
+          <span>Text</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-section">
+      <h3>Colors</h3>
+      <div class="color-palette">
+        <button 
+          *ngFor="let color of colors"
+          class="color-btn"
+          [class.active]="selectedColor === color"
+          [style.background-color]="color"
+          (click)="selectColor(color)"
+          [title]="color">
+        </button>
+        <input 
+          type="color" 
+          class="color-picker"
+          [(ngModel)]="selectedColor"
+          title="Custom color">
+      </div>
+    </div>
+
+    <div class="toolbar-section">
+      <h3>Line Width</h3>
+      <div class="line-widths">
+        <button 
+          *ngFor="let width of lineWidths"
+          class="line-width-btn"
+          [class.active]="lineWidth === width"
+          (click)="selectLineWidth(width)"
+          [title]="width + 'px'">
+          <div class="line-preview" [style.height.px]="width"></div>
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-section" *ngIf="selectedTool === 'text'">
+      <h3>Font Size</h3>
+      <div class="font-sizes">
+        <button 
+          *ngFor="let size of fontSizes"
+          class="font-size-btn"
+          [class.active]="fontSize === size"
+          (click)="selectFontSize(size)"
+          [title]="size + 'px'">
+          {{ size }}px
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-section">
+      <h3>Actions</h3>
+      <div class="action-buttons">
+        <button class="action-btn" (click)="undo()" [disabled]="!canUndo()" title="Undo">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/>
+          </svg>
+          <span>Undo</span>
+        </button>
+
+        <button class="action-btn" (click)="redo()" [disabled]="!canRedo()" title="Redo">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/>
+          </svg>
+          <span>Redo</span>
+        </button>
+        
+        <button class="action-btn" (click)="clearCanvas()" title="Clear">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+          <span>Clear</span>
+        </button>
+        
+        <button class="action-btn" (click)="downloadCanvas()" title="Download">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
+          </svg>
+          <span>Download</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-container">
+    <canvas 
+      #canvas
+      (mousedown)="startDrawing($event)"
+      (mousemove)="draw($event)"
+      (mouseup)="stopDrawing()"
+      (mouseleave)="stopDrawing()">
+    </canvas>
+
+    <!-- Text Input Overlay -->
+    <div class="text-input-overlay" *ngIf="showTextInput" [style.left.px]="textX" [style.top.px]="textY">
+      <input 
+        type="text" 
+        class="text-input"
+        [(ngModel)]="textInput"
+        (keyup.enter)="addText()"
+        (keyup.escape)="cancelText()"
+        placeholder="Enter text..."
+        [style.color]="selectedColor"
+        [style.font-size.px]="fontSize">
+      <div class="text-input-actions">
+        <button class="text-btn text-btn-ok" (click)="addText()">✓</button>
+        <button class="text-btn text-btn-cancel" (click)="cancelText()">✕</button>
+      </div>
+    </div>
+  </div>
+</div>
