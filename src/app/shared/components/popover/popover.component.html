@@ -4,6 +4,7 @@
 
 <ng-template
   cdkConnectedOverlay
+  #connectedOverlay="cdkConnectedOverlay"
   [cdkConnectedOverlayOrigin]="trigger"
   [cdkConnectedOverlayOpen]="isOpen"
   (detach)="isOpen = false"

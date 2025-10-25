@@ -13,6 +13,45 @@ span.material-symbols-outlined {
   color: $icon-color;
 }
 
+.notification-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  color: inherit;
+
+  &:focus-visible {
+    outline: 2px solid rgba(0, 0, 0, 0.2);
+    outline-offset: 2px;
+    border-radius: 50%;
+  }
+}
+
+.notification-trigger__badge {
+  position: absolute;
+  top: 2px;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background-color: #ff3b30;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .avatar {
   width: 36px;
   height: 36px;
@@ -26,4 +65,155 @@ span.material-symbols-outlined {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.notification-popover {
+  width: 320px;
+  max-height: 460px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notification-popover__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.notification-popover__header {
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.notification-popover__tabs {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.notification-tab {
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background-color: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.notification-tab--active {
+  background-color: rgba(76, 110, 245, 0.12);
+  border-color: rgba(76, 110, 245, 0.3);
+  color: rgba(38, 70, 223, 1);
+}
+
+.notification-item {
+  padding: 8px;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.notification-item--unread {
+  background-color: rgba(76, 110, 245, 0.12);
+}
+
+.notification-item__title {
+  font-weight: 600;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.notification-item__message {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.7);
+  font-family: inherit;
+}
+
+.notification-item__time {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.5);
+  font-family: inherit;
+}
+
+.notification-item__top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notification-item__menu-trigger {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.notification-item__menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16);
+  z-index: 10;
+}
+
+.notification-item__menu button {
+  border: none;
+  background: transparent;
+  padding: 6px 4px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  color: rgba(0, 0, 0, 0.75);
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.95);
+  }
+}
+
+.notification-item__menu-delete {
+  color: #d92d20;
+
+  &:hover {
+    color: #b42318;
+  }
+}
+
+.notification-empty {
+  padding: 16px 8px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  font-family: inherit;
 }
