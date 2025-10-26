@@ -6,7 +6,97 @@
   <span class="material-symbols-outlined" (click)="onCreateCourse()">
     add_circle
   </span>
-  <span class="material-symbols-outlined"> chat_bubble </span>
+  <app-popover
+    [isOpen]="showNotificationPopover"
+    (openChange)="onNotificationPopoverVisibleChange($event)"
+  >
+    <button class="notification-trigger" trigger>
+      <span class="material-symbols-outlined"> chat_bubble </span>
+      <span
+        class="notification-trigger__badge"
+        *ngIf="unreadCount > 0"
+        [attr.label]="unreadCount + ' unread notifications'"
+      >
+        {{ unreadCount }}
+      </span>
+    </button>
+    <div class="notification-popover" content>
+      <div class="notification-popover__header">Notifications</div>
+      <div class="notification-popover__tabs" role="tablist">
+        <button
+          class="notification-tab"
+          type="button"
+          role="tab"
+          [attr.aria-selected]="activeNotificationTab === 'all'"
+          [class.notification-tab--active]="activeNotificationTab === 'all'"
+          (click)="setNotificationTab('all')"
+        >
+          All
+        </button>
+        <button
+          class="notification-tab"
+          type="button"
+          role="tab"
+          [attr.aria-selected]="activeNotificationTab === 'unread'"
+          [class.notification-tab--active]="activeNotificationTab === 'unread'"
+          (click)="setNotificationTab('unread')"
+        >
+          Unread
+        </button>
+      </div>
+      <div
+        class="notification-popover__list"
+        *ngIf="filteredNotifications?.length; else noNotifications"
+      >
+        <div
+          class="notification-item"
+          [class.notification-item--unread]="!notification.isRead"
+          *ngFor="let notification of filteredNotifications"
+        >
+          <div class="notification-item__top-row">
+            <div class="notification-item__title">
+              {{ notification.title }}
+            </div>
+            <button
+              class="notification-item__menu-trigger"
+              type="button"
+              (click)="toggleNotificationMenu(notification.id); $event.stopPropagation()"
+            >
+              <span class="material-symbols-outlined"> more_vert </span>
+            </button>
+            <div
+              class="notification-item__menu"
+              *ngIf="activeNotificationMenuId === notification.id"
+              (click)="$event.stopPropagation()"
+            >
+              <button
+                type="button"
+                (click)="markNotification(notification.id, !notification.isRead)"
+              >
+                {{ notification.isRead ? 'Mark as unread' : 'Mark as read' }}
+              </button>
+              <button
+                type="button"
+                class="notification-item__menu-delete"
+                (click)="deleteNotification(notification.id)"
+              >
+                Delete this notification
+              </button>
+            </div>
+          </div>
+          <div class="notification-item__message">
+            {{ notification.message }}
+          </div>
+          <div class="notification-item__time">
+            {{ notification.timestamp }}
+          </div>
+        </div>
+      </div>
+      <ng-template #noNotifications>
+        <div class="notification-empty">You are all caught up!</div>
+      </ng-template>
+    </div>
+  </app-popover>
   <app-popover
     [isOpen]="showAccountPopover"
     (openChange)="onAccoutPopoverVisibleChange($event)"

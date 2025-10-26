@@ -5,7 +5,9 @@ import {
   HostListener,
   Input,
   Output,
+  ViewChild,
 } from '@angular/core';
+import { CdkConnectedOverlay } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-popover',
@@ -16,6 +18,7 @@ import {
 export class PopoverComponent {
   @Input() isOpen = false;
   @Output() openChange = new EventEmitter<boolean>();
+  @ViewChild('connectedOverlay') overlayDir?: CdkConnectedOverlay;
 
   constructor(private _eref: ElementRef) {}
 
@@ -25,8 +28,20 @@ export class PopoverComponent {
   }
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
-    if (!this._eref.nativeElement.contains(event.target)) {
-      this.isOpen = false; // close dropdown
+    if (!this.isOpen) {
+      return;
     }
+
+    const overlayElement = this.overlayDir?.overlayRef?.overlayElement;
+    const isInsideHost = this._eref.nativeElement.contains(event.target);
+    const isInsideOverlay =
+      overlayElement?.contains(event.target as Node) ?? false;
+
+    if (isInsideHost || isInsideOverlay) {
+      return;
+    }
+
+    this.isOpen = false;
+    this.openChange.emit(false);
   }
 }
