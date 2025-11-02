@@ -1,5 +1,6 @@
 import { Component, type OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { AuthService } from '@shared/services/auth.service';
 import { loginFormConfig } from './login-form.config';
 
 @Component({
@@ -14,7 +15,7 @@ export class LoginFormComponent implements OnInit {
   formConfig = loginFormConfig;
   loading = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.form = this.fb.group(this.formConfig.schema);
@@ -24,7 +25,7 @@ export class LoginFormComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  onSubmit(e: Event): void {
+  async onSubmit(e: Event): Promise<void> {
     e.preventDefault(); // Prevent default form submission
     // Stop here if form is invalid
     if (this.form.invalid) {
@@ -33,6 +34,10 @@ export class LoginFormComponent implements OnInit {
     }
     this.loading = true; // Set loading state to true
     const { email, password } = this.form.value;
+
+    this.authService.login(email, password).finally(() => {
+      this.loading = false;
+    });
 
     console.log('Login attempt with:', this.form.value);
   }

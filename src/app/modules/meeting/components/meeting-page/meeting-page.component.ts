@@ -62,20 +62,6 @@ export class MeetingPageComponent implements OnInit {
       }
     });
 
-    // // Create mock teacher user for frontend preview
-    // const mockTeacherUser: User = {
-    //   id: 'mock-teacher-id',
-    //   username: 'mockteacher',
-    //   email: 'teacher@example.com',
-    //   password: 'mock-password',
-    //   avatar: 'https://via.placeholder.com/150',
-    //   role: Role.TEACHER,
-    //   courses: []
-    // };
-    
-    // // Set mock user to see both tabs
-    // this.userService.setUser(mockTeacherUser);
-
     this.userService.user$.subscribe((user) => {
       this.user = user;
       if (user?.role === Role.TEACHER) {

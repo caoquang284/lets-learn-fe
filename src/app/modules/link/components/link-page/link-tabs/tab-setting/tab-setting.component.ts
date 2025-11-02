@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CollapsibleListService } from '@shared/components/collapsible-list/collapsible-list.service';
 import { linkGeneralSettingFormControls, linkSettingFormSchema, linkValidationMessages } from './link-setting-form.config';
 import { LinkTopic } from '@shared/models/topic';
-//import { UpdateTopic } from '@modules/courses/api/topic.api';
+import { UpdateTopic } from '@modules/courses/api/topic.api';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -88,26 +88,26 @@ export class TabSettingComponent implements OnInit {
     
     const courseId = this.activatedRoute.snapshot.paramMap.get('courseId');
     
-    // if (courseId) {
-    //   // Call the API to update the topic
-    //   await UpdateTopic(this.topic, courseId)
-    //     .then((updatedTopic) => {
-    //       this.topic = updatedTopic as LinkTopic;
-    //       this.toastrService.success('Link updated successfully!', 'Success');
+    if (courseId) {
+      // Call the API to update the topic
+      await UpdateTopic(this.topic, courseId)
+        .then((updatedTopic) => {
+          this.topic = updatedTopic as LinkTopic;
+          this.toastrService.success('Link updated successfully!', 'Success');
 
-    //       const topicId = this.activatedRoute.snapshot.paramMap.get('topicId');
-    //       if (topicId) {
-    //         this.router.navigate([`/courses/${courseId}/link/${topicId}`], {
-    //           queryParams: { tab: 'file' }
-    //         });
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.error('Error updating topic:', error);
-    //       this.toastrService.error('Failed to update link. Please try again.', 'Error');
-    //     });
-    // } else {
-    //   console.error('Course ID not found in route parameters');
-    // }
+          const topicId = this.activatedRoute.snapshot.paramMap.get('topicId');
+          if (topicId) {
+            this.router.navigate([`/courses/${courseId}/link/${topicId}`], {
+              queryParams: { tab: 'file' }
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error updating topic:', error);
+          this.toastrService.error('Failed to update link. Please try again.', 'Error');
+        });
+    } else {
+      console.error('Course ID not found in route parameters');
+    }
   }
 }
