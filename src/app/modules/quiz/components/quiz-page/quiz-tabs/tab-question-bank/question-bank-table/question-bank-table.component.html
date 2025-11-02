@@ -1,17 +1,24 @@
 <div class="table-header">
   <div class="filter-container">
-    <form-input placeholder="Search anything" size="xs" />
+    <input
+      class="filter-input"
+      matInput
+      placeholder="Search anything"
+      size="xs"
+      (keyup)="applyFilter($event)"
+    />
     <app-button label="Filter" variant="ghost">
       <span class="material-symbols-outlined" icon> filter_alt </span>
     </app-button>
   </div>
   <div class="actions-container">
-    <app-button label="New question">
+    <app-button label="New question" (onClick)="onCreateQuestion()">
+      <create-question-dialog />
       <span class="material-symbols-outlined" icon> add_circle </span>
     </app-button>
-    <app-button label="Columns" variant="ghost">
+    <!-- <app-button label="Columns" variant="ghost">
       <span class="material-symbols-outlined" icon> view_column_2 </span>
-    </app-button>
+    </app-button> -->
   </div>
 </div>
 
@@ -56,7 +63,9 @@
 
   <ng-container matColumnDef="modifiedBy">
     <th mat-header-cell *matHeaderCellDef>Modified by</th>
-    <td mat-cell *matCellDef="let element">{{ element.modifiedBy }}</td>
+    <td mat-cell *matCellDef="let element">
+      <circle-image [src]="element.modifiedBy.avatar" />
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="modifiedAt">
@@ -69,7 +78,7 @@
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
-      <action-column [rowData]="element" />
+      <action-column [rowData]="element" (addToQuiz)="onAddToQuiz($event)" />
     </td>
   </ng-container>
 

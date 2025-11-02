@@ -9,7 +9,7 @@
     <div class="date-item">
       <span class="date-label">Due:</span>
       <span class="date-value">{{
-        formatDate(topic.data.open, "EEEE, dd MMMM yyyy hh:mm a")
+        formatDate(topic.data.close, "EEEE, dd MMMM yyyy hh:mm a")
       }}</span>
     </div>
   </div>
@@ -26,7 +26,7 @@
     (onClick)="openConfirmMessage()"
   />
 
-  <div class="quiz-settings" (click)="startQuiz()">
+  <div class="quiz-settings">
     <div class="setting-item">
       <span class="setting-label">Attempts allowed:</span>
       <span class="setting-value">{{ topic.data.attemptAllowed }}</span>
@@ -35,6 +35,7 @@
       <span class="setting-label">Grading method:</span>
       <span class="setting-value">{{ topic.data.gradingMethod }}</span>
     </div>
+    @if(fullMarkOfQuiz != 0){
     <div class="setting-item">
       <span
         [class]="'setting-label ' + gradeColor"
@@ -44,13 +45,19 @@
         {{ `${gradeToShow} / ${fullMarkOfQuiz}` }}
       </span>
     </div>
+    }
   </div>
 
+  @if(studentResponses && studentResponses.length > 0) {
   <div class="attempts-section">
     <h3 class="attempts-title">Your attempts</h3>
 
-    <quiz-result-table [studentReponses]="studentResponses" />
+    <quiz-result-table
+      [studentReponses]="studentResponses"
+      (review)="onReviewClick($event)"
+    />
   </div>
+  }
 </card>
 
 <card>

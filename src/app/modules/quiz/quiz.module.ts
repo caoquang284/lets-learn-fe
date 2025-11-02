@@ -23,14 +23,20 @@ import { TabQuizComponent } from './components/quiz-page/quiz-tabs/tab-quiz/tab-
 import { ResultTableComponent } from './components/quiz-page/quiz-tabs/tab-result/result-table/result-table.component';
 import { TabResultComponent } from './components/quiz-page/quiz-tabs/tab-result/tab-result.component';
 import { TabSettingComponent } from './components/quiz-page/quiz-tabs/tab-setting/tab-setting.component';
-import { TabDashboardComponent } from './components/quiz-page/quiz-tabs/tab-dashboard/tab-dashboard.component';
-import { DashboardComponent } from './components/quiz-page/quiz-tabs/tab-dashboard/dashboard/dashboard.component';
 import { QuizResultTableComponent } from './components/quiz-result-table/quiz-result-table.component';
 import { ImageColumnComponent } from './components/quiz-page/quiz-tabs/tab-result/result-table/table-columns/image-column/image-column.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { QuestionBankTableComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/question-bank-table/question-bank-table.component';
 import { StatusColumnComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/question-bank-table/table-columns/status-column/status-column.component';
 import { ActionColumnComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/question-bank-table/table-columns/action-column/action-column.component';
+import { TabDashboardComponent } from './components/quiz-page/quiz-tabs/tab-dashboard/tab-dashboard.component';
+import { DashboardComponent } from './components/quiz-page/quiz-tabs/tab-dashboard/dashboard/dashboard.component';
+import { CreateTrueFalseQuestionComponent } from './components/quiz-page/create-question/create-true-false-question/create-true-false-question.component';
+import { CreateChoiceQuestionComponent } from './components/quiz-page/create-question/create-choice-question/create-choice-question.component';
+import { CreateShortAnswerQuestionComponent } from './components/quiz-page/create-question/create-short-answer-question/create-short-answer-question.component';
+import { CreateQuestionDialogComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/create-question-dialog/create-question-dialog.component';
+import { CreateQuestionDialogContentComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/create-question-dialog/create-question-dialog-content/create-question-dialog-content.component';
+import { MatDialogActions, MatDialogContent } from '@angular/material/dialog';
 @NgModule({
   declarations: [
     QuizResultTableComponent,
@@ -58,6 +64,11 @@ import { ActionColumnComponent } from './components/quiz-page/quiz-tabs/tab-ques
     ActionColumnComponent,
     TabDashboardComponent,
     DashboardComponent,
+    CreateTrueFalseQuestionComponent,
+    CreateChoiceQuestionComponent,
+    CreateShortAnswerQuestionComponent,
+    CreateQuestionDialogComponent,
+    CreateQuestionDialogContentComponent,
   ],
   imports: [
     SharedModule,
@@ -68,6 +79,8 @@ import { ActionColumnComponent } from './components/quiz-page/quiz-tabs/tab-ques
     CdkDrag,
     MatTableModule,
     MatPaginatorModule,
+    MatDialogContent,
+    MatDialogActions,
   ],
   exports: [QuizAttemptingComponent],
 })
