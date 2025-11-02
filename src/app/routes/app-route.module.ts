@@ -51,7 +51,14 @@ const routes: Routes = [
         (m) => m.MeetingRoomRoutingModule
       ),
   },
-  // { path: '**', redirectTo: 'auth/login' }, // Temporarily disabled for topic link testing
+  {
+    path: 'courses/:courseId/quiz',
+    loadChildren: () =>
+      import('@routes/quiz-attempting-route.module').then(
+        (m) => m.QuizAttemptingRoutingModule
+      ),
+  },
+  { path: '**', redirectTo: 'auth/login' }, // Temporarily disabled for topic link testing
 ];
 
 @NgModule({

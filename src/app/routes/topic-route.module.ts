@@ -30,7 +30,14 @@ const routes: Routes = [
   {
     path: 'meeting/:topicId',
     component: MeetingPageComponent,
-  }
+  },
+  {
+    path: 'question',
+    loadChildren: () =>
+      import('@routes/create-question-route.module').then(
+        (m) => m.CreateQuestionRoutingModule
+      ),
+  },
 ];
 
 @NgModule({

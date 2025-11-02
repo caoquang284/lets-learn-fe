@@ -1,0 +1,93 @@
+@use "styles/theme/theme.variables" as *;
+
+$hover-color: #e1eeff;
+$selected-color: #e1eeff;
+
+.container {
+  padding: 16px;
+
+  span.material-symbols-outlined {
+    font-size: 20px;
+    color: $icon-color;
+  }
+
+  .dialog-title {
+    font-weight: 600;
+    color: $tint-third-color;
+    font-family: Nunito;
+    margin-bottom: 16px;
+  }
+  .dialog-content {
+    min-height: 200px;
+    display: flex;
+    flex-direction: row;
+
+    .section-title {
+      font-weight: 600;
+      color: $text-color;
+      font-family: Nunito;
+      padding: 16px;
+    }
+
+    .content-left {
+      width: 40%;
+      .question-types {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .question-type-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px 0 0 8px;
+        color: $text-color;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+
+        &.selected {
+          background-color: $selected-color;
+        }
+        &:not(.selected):hover {
+          background-color: $hover-color;
+        }
+      }
+    }
+
+    .content-right {
+      width: 60%;
+      background-color: $selected-color;
+      border-radius: 8px;
+
+      .description-content {
+        font-size: 14px;
+        color: $text-color;
+        font-family: Nunito;
+        padding: 0 16px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .dialog-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+::ng-deep .mat-mdc-dialog-surface {
+  border-radius: 8px;
+}
+
+::ng-deep .mat-mdc-dialog-content {
+  padding: 0px !important;
+}
+
+::ng-deep .mat-mdc-dialog-actions {
+  padding: 0px !important;
+}

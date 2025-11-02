@@ -1,18 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { GetCourseById } from '@modules/courses/api/courses.api';
+import { GetTopic, UpdateTopic } from '@modules/courses/api/topic.api';
 import {
   QUIZ_STUDENT_TABS,
   QUIZ_TEACHER_TABS,
   QuizTab,
 } from '@modules/quiz/constants/quiz.constant';
 import { TabService } from '@shared/components/tab-list/tab-list.service';
-import { mockCourses } from '@shared/mocks/course';
 import { mockTopics } from '@shared/mocks/topic';
 import { Course } from '@shared/models/course';
-import { iconMap, QuizTopic } from '@shared/models/topic';
+import { QuizTopic } from '@shared/models/topic';
 import { Role, User } from '@shared/models/user';
 import { BreadcrumbService } from '@shared/services/breadcrumb.service';
 import { UserService } from '@shared/services/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'quiz-page',
@@ -23,34 +25,28 @@ import { UserService } from '@shared/services/user.service';
 })
 export class QuizPageComponent implements OnInit {
   course: Course | null = null;
-  topic: QuizTopic = mockTopics[0] as QuizTopic;
+  topic: QuizTopic | null = null;
   tabs = QuizTab;
   user: User | null = null;
   isStudent = true;
-  topicIcon = '';
   selectedTab = QuizTab.QUIZ;
 
   constructor(
     private breadcrumbService: BreadcrumbService,
     private tabService: TabService<QuizTab>,
     private userService: UserService,
-    private activedRoute: ActivatedRoute
-  ) {
-    const topicId = this.activedRoute.snapshot.paramMap.get('topicId');
-    const courseId = this.activedRoute.snapshot.paramMap.get('courseId');
-    if (courseId) this.fetchCourseData(courseId);
-    if (topicId) this.fetchTopicData(topicId);
-    if (courseId && topicId) {
-      this.updateBreadcrumb(this.course as Course, this.topic);
-    }
-  }
+    private activedRoute: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private toastrService: ToastrService
+  ) {}
 
   ngOnInit(): void {
-    this.topicIcon = iconMap[this.topic.type];
-    this.tabService.selectTab(this.selectedTab);
-    this.tabService.setTabs(QUIZ_STUDENT_TABS);
+    this.InitData();
     this.tabService.selectedTab$.subscribe((tab) => {
-      if (tab) this.selectedTab = tab;
+      if (tab) {
+        this.selectedTab = tab;
+        this.cdr.detectChanges();
+      }
     });
     this.userService.user$.subscribe((user) => {
       this.user = user;
@@ -64,14 +60,39 @@ export class QuizPageComponent implements OnInit {
     });
   }
 
-  fetchTopicData(topicId: string) {
-    const res = mockTopics.find((topic) => topic.id === topicId);
-    if (res) this.topic = res as QuizTopic;
+  InitData() {
+    const topicId = this.activedRoute.snapshot.paramMap.get('topicId');
+    const courseId = this.activedRoute.snapshot.paramMap.get('courseId');
+    if (courseId) this.fetchCourseData(courseId);
+    if (topicId && courseId) this.fetchTopicData(topicId, courseId);
   }
 
-  fetchCourseData(courseId: string) {
-    const res = mockCourses.find((course) => course.id === courseId);
-    if (res) this.course = res;
+  async fetchTopicData(topicId: string, courseId: string) {
+    try {
+      const topic = await GetTopic(topicId, courseId);
+      if (topic) {
+        this.topic = topic as QuizTopic;
+        if (this.course) {
+          this.updateBreadcrumb(this.course, this.topic);
+        }
+      }
+    } catch (error) {
+      this.toastrService.error('Failed to fetch topic', 'Error');
+    }
+  }
+
+  async fetchCourseData(courseId: string) {
+    try {
+      const course = await GetCourseById(courseId);
+      if (course) {
+        this.course = course;
+        if (this.topic) {
+          this.updateBreadcrumb(this.course, this.topic);
+        }
+      }
+    } catch (error) {
+      this.toastrService.error('Failed to fetch course', 'Error');
+    }
   }
 
   updateBreadcrumb(course: Course, topic: QuizTopic) {
@@ -87,5 +108,21 @@ export class QuizPageComponent implements OnInit {
         active: true,
       },
     ]);
+  }
+
+  async onTopicChange(updatedQuiz: QuizTopic) {
+    if (!this.course) {
+      console.error('Course is not defined');
+      return;
+    }
+    await UpdateTopic(updatedQuiz, this.course.id)
+      .then((res) => {
+        this.topic = res as QuizTopic;
+        this.cdr.detectChanges();
+        this.toastrService.success('Topic updated successfully');
+      })
+      .catch((error) => {
+        this.toastrService.error(error.message);
+      });
   }
 }

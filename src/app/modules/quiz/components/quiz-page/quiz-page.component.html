@@ -1,23 +1,21 @@
-@if (topic) {
-  <topic-page-layout [topic]="topic">
-    @if (selectedTab === tabs.QUIZ) {
-      @if (!isStudent) {
-        <tab-quiz [topic]="topic" />
-      } @else {
-        <tab-quiz-student [topic]="topic" />
-      }
-    } @else if (selectedTab === tabs.SETTINGS) {
-      <tab-setting [topic]="topic" />
-    } @else if (selectedTab === tabs.QUESTIONS) {
-      <tab-question [topic]="topic" />
-    } @else if (selectedTab === tabs.RESULTS) {
-      <tab-result [topic]="topic" />
-    } @else if (selectedTab === tabs.QUESTION_BANK) {
-      <tab-question-bank [topic]="topic"/>
-    } @else if (selectedTab === tabs.DASHBOARD) {
-      <tab-dashboard [topic]="topic" />
-    }
-  </topic-page-layout>
+@if(topic) {
+<topic-page-layout [topic]="topic">
+  @if(selectedTab === tabs.QUIZ){ @if(!isStudent){
+  <tab-quiz [topic]="topic" />
+  } @else {
+  <tab-quiz-student [topic]="topic" [course]="course!" />
+  } } @else if(selectedTab === tabs.SETTINGS) {
+  <tab-setting [topic]="topic" />
+  } @else if(selectedTab === tabs.QUESTIONS) {
+  <tab-question [topic]="topic" />
+  }@else if(selectedTab === tabs.RESULTS) {
+  <tab-result [topic]="topic" />
+  } @else if(selectedTab === tabs.QUESTION_BANK) {
+  <tab-question-bank [topic]="topic" (topicChange)="onTopicChange($event)" />
+  } @else if(selectedTab === tabs.DASHBOARD) {
+  <tab-dashboard [topic]="topic" />
+  }
+</topic-page-layout>
 } @else {
-  <img src="images/no-item-found.jpg" alt="No topic found" />
+<img src="images/no-item-found.jpg" alt="No topic found" />
 }
