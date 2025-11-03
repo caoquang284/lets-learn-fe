@@ -3,7 +3,7 @@ import axios from 'axios';
 import { environment } from 'environments/environment.development';
 import { GET } from './utils.api';
 
-const backendUrl = environment.BACKEND_URL || 'http://localhost:8080';
+const backendUrl = environment.BACKEND_URL || '/api';
 console.log('Backend URL:', backendUrl);
 
 const Axios = axios.create({
@@ -29,9 +29,13 @@ function addRefreshSubscriber(callback: () => void) {
 
 // No request interceptor needed — cookies are sent automatically
 Axios.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('Axios response:', response);
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
+    console.error('Axios error:', error);
 
     if (
       (error.response?.status === 401 || error.response?.status === 403) &&
