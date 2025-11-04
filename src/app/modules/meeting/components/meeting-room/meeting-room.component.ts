@@ -1,4 +1,8 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+// import { ActivatedRoute } from '@angular/router';
+// import { environment } from 'environments/environment.development';
+// import { UserService } from '@shared/services/user.service';
+// import { GetMeetingToken } from '@modules/meeting/api/meeting.api';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu'; // Thêm nếu dùng Angular Material cho menu
@@ -253,6 +257,15 @@ export class MeetingRoomComponent implements OnDestroy {
     // In real app: broadcast to other participants via WebSocket/WebRTC
     console.log('Whiteboard action:', action);
   }
+
+  // TODO(LiveKit): When enabling LiveKit, use the environment flag to decide
+  // whether to fetch a token and connect. Example flow:
+  //  - const topicId = this.route.snapshot.paramMap.get('topicId')!;
+  //  - const identity = this.userService.getUser()?.id || 'guest-' + Date.now();
+  //  - const { token, url } = await GetMeetingToken(topicId, identity);
+  //  - const wsUrl = url || environment.LIVEKIT_WS_URL;
+  //  - connect(wsUrl, token) ... and wire mic/cam toggles to the room APIs
+  // Leave disabled by default so `ng serve` works without backend.
 
   leave() {
     if (confirm('Are you sure you want to leave the meeting?')) {
