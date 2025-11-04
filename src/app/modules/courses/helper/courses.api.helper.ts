@@ -11,6 +11,7 @@ import { GetRandomCourseBackground } from '@shared/helper/image.helpter';
 
 export const convertCourseToCreateRequestData = (data: INewCourseFormData) => {
   return {
+    id: data.courseId,
     title: data.title,
     description: '',
     imageUrl: GetRandomCourseBackground(),

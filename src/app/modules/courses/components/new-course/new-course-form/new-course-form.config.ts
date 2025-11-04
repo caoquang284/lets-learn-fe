@@ -5,6 +5,7 @@ import {
 } from '@shared/helper/form.helper';
 
 export interface INewCourseFormSchema {
+  courseId: FormControl<string>;
   title: FormControl<string>;
   category: FormControl<string>;
   level: FormControl<string>;
@@ -14,6 +15,10 @@ export interface INewCourseFormSchema {
 export type INewCourseFormData = UnpackedFormGroup<INewCourseFormSchema>;
 
 export const newCourseFormSchema: INewCourseFormSchema = {
+  courseId: new FormControl('', {
+    validators: [Validators.required, Validators.minLength(2)],
+    nonNullable: true,
+  }),
   title: new FormControl('', {
     validators: [Validators.required, Validators.minLength(3)],
     nonNullable: true,
@@ -33,6 +38,18 @@ export const newCourseFormSchema: INewCourseFormSchema = {
 };
 
 export const newCourseFormControls: FormControlField[] = [
+  {
+    id: 'courseId',
+    label: 'Course ID',
+    type: 'text',
+    componentType: 'input',
+    placeholder: 'E.g. CS101',
+    description: 'Enter the unique Course ID/code',
+    validationMessages: {
+      required: 'Course ID is required',
+      minlength: 'Course ID must be at least 2 characters',
+    },
+  },
   {
     id: 'title',
     label: 'Name',
