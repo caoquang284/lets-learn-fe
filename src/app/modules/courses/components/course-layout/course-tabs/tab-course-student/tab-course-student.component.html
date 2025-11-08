@@ -1,0 +1,40 @@
+<div class="course-banner">
+  <div class="course-info">
+    <div>
+      <h1 class="course-title">{{ course.title }}</h1>
+      <p>{{ course.category }}</p>
+    </div>
+    <div class="course-code" (click)="onCopyCourseId()">
+      <p>cPquskdja</p>
+      <span class="material-symbols-outlined"> content_copy </span>
+    </div>
+  </div>
+  <img [src]="course.imageUrl" />
+</div>
+
+<div class="course-content">
+  <app-collapsible-list>
+    @for(section of course.sections; track section.id) {
+    <app-collapsible-section [sectionId]="section.id" [title]="section.title">
+      <!-- Section dynamic title -->
+      <span class="title" title>{{ section.title }}</span>
+
+      <!-- Section dynamic content -->
+      <div class="section-content" content>
+        @if(section.description) {
+        <div class="section-description">
+          {{ section.description }}
+        </div>
+        } @if(section.topics.length > 0) { @for(topic of section.topics; track
+        topic.id) {
+        <app-topic [topic]="topic" />
+        } } @else {
+        <div class="no-topics">
+          <img src="images/no-item-found.jpg" alt="No topic found" />
+        </div>
+        }
+      </div>
+    </app-collapsible-section>
+    }
+  </app-collapsible-list>
+</div>

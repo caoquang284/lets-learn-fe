@@ -1,9 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import {
+  GetPublicCourses,
+  GetTeacherCourses,
+  JoinCourse,
+} from '@modules/courses/api/courses.api';
 import { mockCourses } from '@shared/mocks/course';
+import { Course } from '@shared/models/course';
 import { Role, User } from '@shared/models/user';
 import { UserService } from '@shared/services/user.service';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+
 @Component({
   selector: 'course-list',
   standalone: false,
@@ -11,7 +18,7 @@ import { Router } from '@angular/router';
   styleUrl: './course-list.component.scss',
 })
 export class CourseListComponent implements OnInit {
-  courses = mockCourses;
+  courses: Course[] = [];
   isStudent = true;
 
   constructor(
@@ -28,26 +35,27 @@ export class CourseListComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    // this.updateCourses();
+  ngOnInit(): void {
+    this.updateCourses();
   }
-  // async updateCourses() {
-  //   const user = this.userService.getUser();
-  //   if (!user) return;
-  //   let res: Course[] = [];
-  //   if (user.role === Role.TEACHER) res = await GetTeacherCourses(user.id);
-  //   else res = await GetPublicCourses();
-  //   this.courses = res;
-  // }
 
-  // async onSubmitCode(code: string) {
-  //   await JoinCourse(code)
-  //     .then(() => {
-  //       this.router.navigate([`/courses/${code}`]);
-  //       this.toastr.success('You have successfully joined the course!');
-  //     })
-  //     .catch((error) => {
-  //       this.toastr.error(error.message);
-  //     });
-  // }
+  async updateCourses() {
+    const user = this.userService.getUser();
+    if (!user) return;
+    let res: Course[] = [];
+    if (user.role === Role.TEACHER) res = await GetTeacherCourses(user.id);
+    else res = await GetPublicCourses();
+    this.courses = res;
+  }
+
+  async onSubmitCode(code: string) {
+    await JoinCourse(code)
+      .then(() => {
+        this.router.navigate([`/courses/${code}`]);
+        this.toastr.success('You have successfully joined the course!');
+      })
+      .catch((error) => {
+        this.toastr.error(error.message);
+      });
+  }
 }

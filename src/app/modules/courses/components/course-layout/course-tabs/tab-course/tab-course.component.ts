@@ -1,14 +1,32 @@
-import { Component, inject, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import {
+  CreateSection,
+  GetSection,
+  UpdateSection,
+} from '@modules/courses/api/section.api';
+import { UpdateCourse } from '@modules/courses/api/courses.api';
+import { CreateTopic, DeleteTopic } from '@modules/courses/api/topic.api';
 import { CollapsibleListService } from '@shared/components/collapsible-list/collapsible-list.service';
 import { Course, Section } from '@shared/models/course';
 import { Topic } from '@shared/models/topic';
+import { CourseService } from '@shared/services/course.service';
+import {
+  CreateTopicRequest,
+  TopicService,
+} from '@shared/services/topic.service';
 import { ToastrService } from 'ngx-toastr';
 import { AddTopicDialogResult } from '../../../add-topic-dialog/add-topic-dialog.component';
 import { UpdateCourseImageResult } from '../../../update-course-image-dialog/update-course-image-dialog.component';
-import { CreateTopicRequest, TopicService } from '@shared/services/topic.service';
-import { CreateTopic } from '@modules/courses/api/topic.api';
-import { CourseService } from '@shared/services/course.service';
-import { UpdateCourse } from '@modules/courses/api/courses.api';
 
 @Component({
   selector: 'tab-course',
@@ -17,11 +35,11 @@ import { UpdateCourse } from '@modules/courses/api/courses.api';
   styleUrl: './tab-course.component.scss',
   providers: [CollapsibleListService],
 })
-export class TabCourseComponent implements OnInit {
+export class TabCourseComponent implements OnInit, OnChanges {
   @Input({ required: true }) course!: Course;
   @Input() canEdit = true;
   @Output() updateSectionList = new EventEmitter<Section[]>();
-  edittingSectionIds: string[] = [];
+  @Output() cancelChange = new EventEmitter();
 
   showAddTopicDialog = false;
   selectedSectionId = '';
@@ -38,12 +56,24 @@ export class TabCourseComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.InitData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['course'] && changes['course'].currentValue) {
+      this.course = changes['course'].currentValue;
+      this.InitData();
+    }
+  }
+
+  InitData() {
     this.collapsibleListService.setCanEdit(this.canEdit);
     const ids = this.course.sections.map((s) => s.id);
     this.collapsibleListService.setSectionIds(ids);
-    this.collapsibleListService.editingSectionIds$.subscribe((ids) => {
-      this.edittingSectionIds = ids;
-    });
+    this.sections = this.course.sections
+      .map((s) => s)
+      .sort((a, b) => a.position - b.position);
+    console.log('Initialized sections: ', this.sections);
   }
 
   onCopyCourseId() {
@@ -51,27 +81,15 @@ export class TabCourseComponent implements OnInit {
       this.toastr.success('Copied to clipboard');
     });
   }
+  onCustomizeCourse() {
+    this.showUpdateImageDialog = true;
+  }
 
   isEditingSection(id: string): boolean {
-    return this.edittingSectionIds.includes(id);
+    return this.collapsibleListService.isEditingSection(id);
   }
 
-  addTopic(sectionId: string, topic: Topic) {
-    const currentSection = this.course.sections.find(
-      (section) => section.id === sectionId
-    );
-    if (!currentSection) return;
-
-    const updatedSection: Section = {
-      ...currentSection,
-      topics: [...currentSection.topics, topic],
-    };
-
-    this.course.sections = this.course.sections.map((section) =>
-      section.id === updatedSection.id ? updatedSection : section
-    );
-  }
-
+  // Dialog methods
   openAddTopicDialog(sectionId: string) {
     this.selectedSectionId = sectionId;
     this.showAddTopicDialog = true;
@@ -80,6 +98,22 @@ export class TabCourseComponent implements OnInit {
   closeAddTopicDialog() {
     this.showAddTopicDialog = false;
     this.selectedSectionId = '';
+  }
+
+  closeUpdateImageDialog() {
+    this.showUpdateImageDialog = false;
+  }
+
+  async onUpdateImage(result: UpdateCourseImageResult) {
+    if (result && result.success) {
+      try {
+        this.course.imageUrl = result.imageUrl;
+        await UpdateCourse(this.course);
+        this.toastr.success(result.message);
+      } catch (error: any) {
+        this.toastr.error(error.message || 'Failed to update course image');
+      }
+    }
   }
 
   async onAddNewTopic(result: AddTopicDialogResult) {
@@ -113,19 +147,91 @@ export class TabCourseComponent implements OnInit {
     }
   }
 
-  closeUpdateImageDialog() {
-    this.showUpdateImageDialog = false;
+  async onAddNewSection() {
+    const newSection = this.courseService.getNewSection(this.course);
+    this.loadingToAddSection = true;
+    await CreateSection(newSection)
+      .then((res) => {
+        this.updateSectionList.emit([...this.course.sections, res]);
+        this.toastr.success('New section added successfully');
+      })
+      .catch((error) => {
+        this.toastr.error(error.message);
+      })
+      .finally(() => {
+        this.loadingToAddSection = false;
+      });
   }
 
-  async onUpdateImage(result: UpdateCourseImageResult) {
-    if (result && result.success) {
-      try {
-        this.course.imageUrl = result.imageUrl;
-        await UpdateCourse(this.course);
-        this.toastr.success(result.message);
-      } catch (error: any) {
-        this.toastr.error(error.message || 'Failed to update course image');
+  async handleUpdateSectionSuccess(sectionId: string) {
+    await GetSection(sectionId)
+      .then((section) => {
+        const updatedSections =
+          this.courseService.updateSectionListByUpdatingSection(
+            this.course,
+            section
+          );
+        this.updateSectionList.emit(updatedSections);
+        this.toastr.success('Section updated successfully');
+      })
+      .finally(() => {
+        console.log(this.collapsibleListService.getAllStates());
+      });
+  }
+
+  async updateSection(sectionId: string) {
+    const section = this.course.sections.find((s) => s.id === sectionId);
+    if (!section) {
+      this.toastr.error('Section not found');
+      return;
+    }
+    this.loadingToUpdateSection = true;
+    console.log('Updating section: ', section);
+    await UpdateSection(section)
+      .then((updatedSection) => {
+        this.handleUpdateSectionSuccess(updatedSection.id);
+      })
+      .catch((error) => {
+        this.toastr.error(error.message);
+      })
+      .finally(() => {
+        this.loadingToUpdateSection = false;
+      });
+  }
+
+  onCancelChange() {
+    this.cancelChange.emit();
+  }
+
+  onUpdateSectionTitle(sectionId: string, newTitle: string) {
+    const updatedSection = this.sections.map((section) => {
+      if (section.id === sectionId) {
+        return { ...section, title: newTitle };
       }
+      return section;
+    });
+    this.updateSectionList.emit(updatedSection);
+  }
+
+  async onDeleteTopic(topicId: string, sectionId: string) {
+    const section = this.course.sections.find((s) => s.id === sectionId);
+    if (!section) return;
+
+    try {
+      await DeleteTopic(topicId, this.course.id);
+      const updatedSection = this.courseService.updateSectionByDeletingTopic(
+        section,
+        topicId
+      );
+      const updatedSections =
+        this.courseService.updateSectionListByUpdatingSection(
+          this.course,
+          updatedSection
+        );
+      this.updateSectionList.emit(updatedSections);
+      this.toastr.success('Topic deleted successfully');
+    } catch (error: any) {
+      this.toastr.error(error.message || 'Failed to delete topic');
     }
   }
 }

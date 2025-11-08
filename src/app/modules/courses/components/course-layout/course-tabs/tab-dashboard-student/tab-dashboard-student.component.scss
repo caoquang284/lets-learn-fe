@@ -1,0 +1,152 @@
+@use "styles/theme/theme.variables" as *;
+
+// Mixins
+@mixin card {
+  background-color: $background-color;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0px;
+}
+
+// Main container
+.dashboard-container {
+  width: 100%;
+  height: 100%;
+  padding: 16px 0px;
+  background-color: #dbeafe;
+}
+
+.dashboard-paper {
+  max-width: 1200px;
+  margin: 0 auto;
+  color: $text-color;
+}
+
+// Charts Container
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.bar-chart-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+.chart-card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Grading Section
+.grading-section {
+  @include card;
+}
+
+.grading-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .grading-title {
+    color: $tint-third-color;
+  }
+}
+
+// Dashboard layout
+.dashboard-row {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.dashboard-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.chart-col {
+  min-width: 0;
+  flex: 2;
+  justify-content: center;
+}
+
+.stats-col {
+  min-width: 0;
+  flex: 1;
+  justify-content: center;
+}
+
+.stat-cards-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: center;
+}
+
+// Responsive styles
+@media (max-width: 992px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .chart-col,
+  .stats-col {
+    flex: unset;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .grade-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .grade-avatars {
+    margin-top: 12px;
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.stat-cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 992px) {
+  .stat-cards-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .stat-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 576px) {
+  .stat-cards-row {
+    grid-template-columns: 1fr;
+  }
+}
