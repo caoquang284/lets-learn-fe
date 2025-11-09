@@ -15,7 +15,14 @@ export const GetTopic = (id: string, courseId: string) => {
 
 export const CreateTopic = (topic: Topic, courseId: string) => {
   const data = convertTopicToRequestData(topic);
-  return POST(`/course/${courseId}/topic`, data).then(
+  const { /* id, */ ...rest } = data as any;
+  const payload = {
+    title: (rest as any).title,
+    type: (rest as any).type,
+    sectionId: (rest as any).sectionId,
+    data: (rest as any).data ?? null,
+  };
+  return POST(`/course/${courseId}/topic`, payload).then(
     convertTopicFromResponseData
   );
 };
