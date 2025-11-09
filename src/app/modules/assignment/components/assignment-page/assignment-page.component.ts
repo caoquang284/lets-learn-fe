@@ -41,8 +41,8 @@ export class AssignmentPageComponent implements OnInit {
     const courseId = this.activedRoute.snapshot.paramMap.get('courseId');
     if (courseId) this.fetchCourseData(courseId);
     if (topicId) this.fetchTopicData(topicId);
-    if (courseId && topicId) {
-      this.updateBreadcrumb(this.course as Course, this.topic);
+    if (courseId && topicId && this.course && this.topic) {
+      this.updateBreadcrumb(this.course, this.topic);
     }
   }
 
@@ -78,6 +78,7 @@ export class AssignmentPageComponent implements OnInit {
   }
 
   updateBreadcrumb(course: Course, topic: AssignmentTopic) {
+    if (!course || !topic) return;
     this.breadcrumbService.setBreadcrumbs([
       {
         label: course.title,
