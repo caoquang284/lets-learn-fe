@@ -8,9 +8,7 @@ import {
 import { GetCourseWork } from './courses.api';
 
 export const GetTopic = (id: string, courseId: string) => {
-  return GET(`/course/${courseId}/topic/${id}`).then(
-    convertTopicFromResponseData
-  );
+  return GET(`/course/${courseId}/topic/${id}`)
 };
 
 export const CreateTopic = (topic: Topic, courseId: string) => {
@@ -22,16 +20,14 @@ export const CreateTopic = (topic: Topic, courseId: string) => {
     sectionId: (rest as any).sectionId,
     data: (rest as any).data ?? null,
   };
-  return POST(`/course/${courseId}/topic`, payload).then(
-    convertTopicFromResponseData
-  );
+  // Return raw backend response to avoid conversion-related rejections
+  return POST(`/course/${courseId}/topic`, payload);
 };
 
 export const UpdateTopic = (topic: Topic, courseId: string) => {
   const data = convertTopicToRequestData(topic);
-  return PUT(`/course/${courseId}/topic/${topic.id}`, data).then(
-    convertTopicFromResponseData
-  );
+  // Return raw backend response to avoid conversion-related rejections
+  return PUT(`/course/${courseId}/topic/${topic.id}`, data);
 };
 
 export const DeleteTopic = (topicId: string, courseId: string): Promise<void> => {
