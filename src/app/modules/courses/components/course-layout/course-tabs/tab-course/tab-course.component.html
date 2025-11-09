@@ -2,25 +2,31 @@
   <div class="course-info">
     <div>
       <h1 class="course-title">{{ course.title }}</h1>
-      <p>{{ course.title }}</p>
+      <p>{{ course.category }}</p>
     </div>
     <div class="course-code" (click)="onCopyCourseId()">
-      <p>cPquskdja</p>
+      <p>{{ course.id }}</p>
       <span class="material-symbols-outlined"> content_copy </span>
     </div>
   </div>
-  <button class="customize-btn" (click)="showUpdateImageDialog = true">
+  <button class="customize-btn" (click)="onCustomizeCourse()">
     <span class="material-symbols-outlined"> stylus </span> Customize
   </button>
-  <img [src]="course.imageUrl" />
+  <img [src]="course.imageUrl" class="course-background-image" />
 </div>
 
 <div class="course-content">
   <app-collapsible-list>
-    @for(section of course.sections; track section.id) {
-    <app-collapsible-section [sectionId]="section.id">
+    @for(section of sections; track section.id) {
+    <app-collapsible-section
+      [sectionId]="section.id"
+      [title]="section.title"
+      (cancel)="onCancelChange()"
+      (save)="updateSection($event)"
+      (titleChange)="onUpdateSectionTitle(section.id, $event)"
+    >
       <!-- Section dynamic title -->
-      <span class="title" title>{{ section.title }}</span>
+      <span title class="title">{{ section.title }}</span>
 
       <!-- Section dynamic content -->
       <div class="section-content" content>
@@ -37,15 +43,18 @@
           [topic]="topic"
           [isEditing]="isEditingSection(section.id)"
           [class.editting]="isEditingSection(section.id)"
+          (delete)="onDeleteTopic($event, section.id)"
         />
         } } @else {
         <div class="no-topics">
           <img src="images/no-item-found.jpg" alt="No topic found" />
         </div>
-        } @if(canEdit) {
-
+        } @if(canEdit && isEditingSection(section.id)) {
         <div class="topic-action-buttons">
-          <app-button label="Add new topic" (click)="openAddTopicDialog(section.id)">
+          <app-button
+            label="Add new topic"
+            (onClick)="openAddTopicDialog(section.id)"
+          >
             <span class="material-symbols-outlined" icon> add_circle </span>
           </app-button>
         </div>
@@ -57,12 +66,12 @@
 
   @if(canEdit) {
   <div class="action-buttons">
-    <app-button label="Cancel changes" variant="secondary" />
-    <app-button label="Add new section">
+    <app-button
+      label="Add new section"
+      (onClick)="onAddNewSection()"
+      [loading]="loadingToAddSection"
+    >
       <span class="material-symbols-outlined" icon> add_circle </span>
-    </app-button>
-    <app-button label="Save">
-      <span class="material-symbols-outlined" icon> save </span>
     </app-button>
   </div>
   }

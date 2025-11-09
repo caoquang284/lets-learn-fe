@@ -2,8 +2,12 @@
 @if(course) {
 <main>
   @if(selectedTab === tabs.COURSE) {
-  <tab-course [course]="course" />
-  } @else if(selectedTab === tabs.ACTIVITIES) {
+  <tab-course
+    [course]="course"
+    (updateSectionList)="onSectionListChange($event)"
+    (cancelChange)="onCancelChange()"
+    [canEdit]="!isStudent"
+  />} @else if(selectedTab === tabs.ACTIVITIES) {
   <tab-activities
     [course]="course"
     [isStudent]="isStudent"
@@ -11,10 +15,12 @@
   />
   } @else if(selectedTab === tabs.PEOPLE) {
   <tab-people [course]="course" />
-  } @else if(selectedTab === tabs.DASHBOARD) {
+  } @else if(selectedTab === tabs.DASHBOARD) { @if(!isStudent){
   <tab-dashboard [course]="course" />
-  } @else if(selectedTab === tabs.SETTINGS) {
-  <tab-settings [course]="course" />
+  } @else {
+  <tab-dashboard-student [course]="course" />
+  } } @else if(selectedTab === tabs.SETTINGS) {
+  <tab-setting [course]="course" />
   }
 </main>
 } @else {

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { environment } from 'environments/environment.development';
 import { GET } from './utils.api';
 
-const backendUrl = environment.BACKEND_URL || '/api';
+const backendUrl = environment.BACKEND_URL || 'http://localhost:8080';
 console.log('Backend URL:', backendUrl);
 
 const Axios = axios.create({
@@ -35,7 +35,6 @@ Axios.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    console.error('Axios error:', error);
 
     if (
       (error.response?.status === 401 || error.response?.status === 403) &&

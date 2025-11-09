@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CreateCourse } from '@modules/courses/api/courses.api';
 import { ComboboxService } from '@shared/components/combobox/combobox.service';
 import { ToastrService } from 'ngx-toastr';
 import {
@@ -43,7 +44,7 @@ export class NewCourseFormComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  onSubmit(e: Event) {
+  async onSubmit(e: Event) {
     e.preventDefault(); // Prevent default form submission
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -52,6 +53,16 @@ export class NewCourseFormComponent implements OnInit {
 
     const data: INewCourseFormData = this.form.getRawValue();
     this.loading = true;
-   
+    await CreateCourse(data)
+      .then((course) => {
+        this.toastService.success(`Course created successfully!`);
+        this.router.navigate(['/courses', course.id]);
+      })
+      .catch((error) => {
+        this.toastService.error(error.message);
+      })
+      .finally(() => {
+        this.loading = false;
+      });
   }
 }

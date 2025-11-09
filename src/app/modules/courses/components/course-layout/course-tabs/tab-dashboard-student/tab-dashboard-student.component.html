@@ -1,0 +1,73 @@
+<div class="dashboard-container">
+  <div class="dashboard-paper">
+    <ng-container>
+      <!-- First row: 4 general stats -->
+      <div class="stat-cards-row">
+        <stat-card
+          *ngFor="let stat of generalStats"
+          [stat]="stat"
+          size="small"
+        ></stat-card>
+      </div>
+      <!-- Second row: quiz line chart left, 3 quiz stats right -->
+      <div class="dashboard-row">
+        <div class="dashboard-col chart-col">
+          <div class="chart-card">
+            <app-line-chart
+              [chartData]="avgQuizMarkSegments"
+              [labels]="monthLabels"
+              title="Avg quiz mark last 6 months"
+            ></app-line-chart>
+          </div>
+        </div>
+        <div class="dashboard-col stats-col">
+          <div class="stat-cards-col">
+            <stat-card
+              *ngFor="let stat of quizStats"
+              [stat]="stat"
+              size="small"
+            ></stat-card>
+          </div>
+        </div>
+      </div>
+      <!-- Third row: 3 assignment stats left, assignment line chart right -->
+      <div class="dashboard-row">
+        <div class="dashboard-col stats-col">
+          <div class="stat-cards-col">
+            <stat-card
+              *ngFor="let stat of assignmentsStats"
+              [stat]="stat"
+              size="small"
+            ></stat-card>
+          </div>
+        </div>
+        <div class="dashboard-col chart-col">
+          <div class="chart-card">
+            <app-line-chart
+              [chartData]="avgAssignmentsMarkSegments"
+              [labels]="monthLabels"
+              title="Avg assignments mark last 6 months"
+            ></app-line-chart>
+          </div>
+        </div>
+      </div>
+      <!-- Fourth row: two bar charts -->
+      <div class="charts-container">
+        <div class="bar-chart-card">
+          <app-bar-chart
+            [segments]="topQuizMarkSegments"
+            [maxValue]="10"
+            title="Top quiz mark"
+          ></app-bar-chart>
+        </div>
+        <div class="bar-chart-card">
+          <app-bar-chart
+            [segments]="topAssignmentsMarkSegments"
+            [maxValue]="10"
+            title="Top assignment mark"
+          ></app-bar-chart>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
