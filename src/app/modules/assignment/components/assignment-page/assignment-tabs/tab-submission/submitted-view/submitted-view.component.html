@@ -19,5 +19,5 @@
 
 <div class="detail-sections">
   <file-upload-view [studentResponse]="studentResponse" />
-  <note-view [note]="getNoteOfResponse()" />
+  <note-view [note]="getNoteOfResponse()" (saveNote)="onSaveNote($event)" />
 </div>
