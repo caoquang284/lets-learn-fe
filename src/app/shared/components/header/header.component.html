@@ -3,9 +3,11 @@
   <app-breadcrumb [items]="breadcrumbItems" />
 </div>
 <div class="right-header">
+  @if(!isStudent){
   <span class="material-symbols-outlined" (click)="onCreateCourse()">
     add_circle
   </span>
+}
   <app-popover
     [isOpen]="showNotificationPopover"
     (openChange)="onNotificationPopoverVisibleChange($event)"

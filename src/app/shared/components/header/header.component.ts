@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { LayoutService } from '../layout/layout.service';
 import { BreadcrumbService } from '@shared/services/breadcrumb.service';
 import { BreadcrumbItem } from '../breadcrumb/breadcrumb.component';
-import { User } from '@shared/models/user';
+import { Role, User } from '@shared/models/user';
 import { UserService } from '@shared/services/user.service';
 
 @Component({
@@ -18,6 +18,7 @@ export class HeaderComponent implements OnInit {
   showAccountPopover = false;
   showNotificationPopover = false;
   currentUser: User | null = null;
+  isStudent = true;
   notifications: NotificationItem[] = [
     {
       id: 1,
@@ -103,6 +104,11 @@ export class HeaderComponent implements OnInit {
     });
     this.userService.user$.subscribe((user) => {
       this.currentUser = user;
+      if (user) {
+        this.isStudent = user.role === Role.STUDENT;
+      } else {
+        this.isStudent = true;
+      }
     });
   }
 
