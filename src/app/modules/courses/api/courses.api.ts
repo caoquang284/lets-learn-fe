@@ -10,26 +10,24 @@ import { INewCourseFormData } from '../components/new-course/new-course-form/new
 
 export const CreateCourse = (newCourseFormData: INewCourseFormData) => {
   let data = convertCourseToCreateRequestData(newCourseFormData);
-  return POST('/course', data).then(convertCourseFromResponseData);
+  return POST('/course', data);
 };
 
 export const GetCourseById = (courseId: string): Promise<Course> => {
-  return GET(`/course/${courseId}`).then(convertCourseFromResponseData);
+  return GET(`/course/${courseId}`);
 };
 
 export const GetPublicCourses = (): Promise<Course[]> => {
-  return GET('/course').then((res) => res.map(convertCourseFromResponseData));
+  return GET('/course');
 };
 
 export const GetTeacherCourses = (userId: string): Promise<Course[]> => {
-  return GET(`/course?userId=${userId}`).then((res) =>
-    res.map(convertCourseFromResponseData)
-  );
+  return GET(`/course?userId=${userId}`);
 };
 
 export const UpdateCourse = (course: Course) => {
   const data = convertCourseToUpdateRequestData(course);
-  return PUT(`/course/${course.id}`, data).then(convertCourseFromResponseData);
+  return PUT(`/course/${course.id}`, data);
 };
 
 export const JoinCourse = (courseId: string): Promise<void> => {
