@@ -89,10 +89,10 @@ export class TabSettingComponent implements OnInit {
 
   private getFormValuesFromCourse(course: Course) {
     return {
+      courseId: course.id,
       name: course.title || '',
       category: course.category || '',
       level: (course.level || 'beginner').toLowerCase(),
-      price: course.price ?? '',
     };
   }
 
@@ -112,7 +112,6 @@ export class TabSettingComponent implements OnInit {
       ...this.course,
       ...this.form.value,
       title: this.form.value.name,
-      price: this.form.value.price !== '' ? Number(this.form.value.price) : undefined, // Ensure price is a number or undefined
     };
     delete updatedCourse.name;
     try {
