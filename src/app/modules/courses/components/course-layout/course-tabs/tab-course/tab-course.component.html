@@ -9,9 +9,11 @@
       <span class="material-symbols-outlined"> content_copy </span>
     </div>
   </div>
-  <button class="customize-btn" (click)="onCustomizeCourse()">
-    <span class="material-symbols-outlined"> stylus </span> Customize
-  </button>
+  @if (canEdit) {
+    <button class="customize-btn" (click)="onCustomizeCourse()">
+      <span class="material-symbols-outlined"> stylus </span> Customize
+    </button>
+  }
   <img [src]="course.imageUrl" class="course-background-image" />
 </div>
 
@@ -37,8 +39,8 @@
           <span class="material-symbols-outlined"> stylus </span>
           }
         </div>
-        } @if(section.topics.length > 0) { @for(topic of section.topics; track
-        topic.id) {
+        } @if(section.topics.length > 0) { 
+          @for(topic of section.topics; track topic.id) {
         <app-topic
           [topic]="topic"
           [isEditing]="isEditingSection(section.id)"
@@ -87,10 +89,12 @@
 </app-add-topic-dialog>
 
 <!-- Update Course Image Dialog Component -->
-<app-update-course-image-dialog
-  [show]="showUpdateImageDialog"
-  [course]="course"
-  (closeDialog)="closeUpdateImageDialog()"
-  (updateImage)="onUpdateImage($event)"
->
-</app-update-course-image-dialog>
+@if (canEdit) {
+  <app-update-course-image-dialog
+    [show]="showUpdateImageDialog"
+    [course]="course"
+    (closeDialog)="closeUpdateImageDialog()"
+    (updateImage)="onUpdateImage($event)"
+  >
+  </app-update-course-image-dialog>
+}
