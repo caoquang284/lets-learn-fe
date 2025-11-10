@@ -20,13 +20,11 @@ export const CreateTopic = (topic: Topic, courseId: string) => {
     sectionId: (rest as any).sectionId,
     data: (rest as any).data ?? null,
   };
-  // Return raw backend response to avoid conversion-related rejections
   return POST(`/course/${courseId}/topic`, payload);
 };
 
 export const UpdateTopic = (topic: Topic, courseId: string) => {
   const data = convertTopicToRequestData(topic);
-  // Return raw backend response to avoid conversion-related rejections
   return PUT(`/course/${courseId}/topic/${topic.id}`, data);
 };
 
