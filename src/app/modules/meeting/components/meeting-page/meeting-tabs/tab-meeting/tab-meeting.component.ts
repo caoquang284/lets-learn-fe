@@ -1,9 +1,12 @@
 import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import { formatDateString } from '@shared/helper/date.helper';
 import { MeetingTopic } from '@shared/models/topic';
-import { MeetingComment, MeetingData } from '@shared/models/meeting';
-import { mockMeetingData, mockMeetingComments, getUserById } from '@shared/mocks/meeting';
+import { MeetingData } from '@shared/models/meeting';
 import { User } from '@shared/models/user';
+import { Comment } from '@shared/models/comment';
+import { getComments, createComment } from '@shared/api/comment.api';
+import { UserService } from '@shared/services/user.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'tab-meeting',
@@ -16,41 +19,46 @@ export class TabMeetingComponent implements OnInit, OnChanges {
 
   hasMeeting: boolean = false;
   meetingDescription: string | null = null;
-  meetingOpenDate: Date | null = null;
-  meetingUrl: string | null = null;
-  isActive: boolean = false;
+  meetingOpenDate: string | null = null;
   
   // Meeting data and comments
-  meetingData: MeetingData | null = null;
-  comments: MeetingComment[] = [];
+  comments: Comment[] = [];
   newCommentText: string = '';
   currentUser: User | null = null;
+  courseId: string | null = null;
 
-  constructor() {}
+  constructor(
+    private userService: UserService,
+    private activatedRoute: ActivatedRoute
+  ) {
+    this.courseId = this.activatedRoute.snapshot.paramMap.get('courseId');
+  }
 
   ngOnInit(): void {
-    this.loadMeetingData();
+    this.currentUser = this.userService.getUser();
     this.updateMeetingInfo();
+    this.fetchComments();
   }
 
   ngOnChanges(): void {
     this.updateMeetingInfo();
   }
 
-  private loadMeetingData(): void {
-    // In real app, this would fetch data based on topic.id
-    // For now, use first mock data
-    this.meetingData = mockMeetingData[0];
-    this.comments = [...mockMeetingComments];
-    // Load current user (in real app, from auth service)
-    this.currentUser = getUserById('1') || null;
+  async fetchComments(): Promise<void> {
+    if (!this.courseId || !this.topic?.id) return;
+    
+    try {
+      this.comments = await getComments(this.courseId, this.topic.id);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      this.comments = [];
+    }
   }
 
   private updateMeetingInfo(): void {
-    this.meetingDescription = this.topic?.data?.description || this.meetingData?.description || null;
-    this.meetingOpenDate = this.topic?.data?.meetingDate || this.meetingData?.meetingDate || null;
-    this.meetingUrl = this.meetingData?.meetingUrl || null;
-    this.isActive = this.meetingData?.isActive || false;
+    const meetingData = this.topic?.data as MeetingData;
+    this.meetingDescription = meetingData?.description || null;
+    this.meetingOpenDate = meetingData?.open || null;
     this.hasMeeting = !!(this.meetingDescription || this.meetingOpenDate);
   }
 
@@ -60,21 +68,14 @@ export class TabMeetingComponent implements OnInit, OnChanges {
     return formatDateString(dateObj.toISOString(), pattern);
   }
 
-  // Helper method to get user info by userId
-  getUserById(userId: string): User | undefined {
-    return getUserById(userId);
+  // Helper method to get author name from comment
+  getAuthorName(comment: Comment): string {
+    return comment.user?.username || 'Unknown User';
   }
 
-  // Helper method to get author name from userId
-  getAuthorName(userId: string): string {
-    const user = this.getUserById(userId);
-    return user?.username || 'Unknown User';
-  }
-
-  // Helper method to get avatar from userId
-  getAvatar(userId: string): string {
-    const user = this.getUserById(userId);
-    return user?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=?';
+  // Helper method to get avatar from comment
+  getAvatar(comment: Comment): string {
+    return comment.user?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=?';
   }
 
   // Get current user avatar for comment input
@@ -82,18 +83,21 @@ export class TabMeetingComponent implements OnInit, OnChanges {
     return this.currentUser?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=You';
   }
 
-    // Method to add new comment
-    addComment(): void {
-      if (!this.newCommentText.trim()) return;
+  // Method to add new comment
+  async addComment(): Promise<void> {
+    if (!this.newCommentText.trim() || !this.courseId || !this.topic?.id) return;
     
-      const newComment: MeetingComment = {
-        id: (this.comments.length + 1).toString(),
-        userId: '1', // Current user - in real app this would come from auth service
-        time: new Date().toLocaleString(),
-        text: this.newCommentText.trim()
-      };
-    
+    try {
+      const newComment = await createComment(
+        this.courseId,
+        this.topic.id,
+        { text: this.newCommentText.trim() }
+      );
+      
       this.comments = [...this.comments, newComment];
       this.newCommentText = '';
+    } catch (error) {
+      console.error('Error creating comment:', error);
     }
+  }
 }

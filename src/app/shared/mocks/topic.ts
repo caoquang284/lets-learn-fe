@@ -5,7 +5,6 @@ import { mockPage } from './page';
 import { FileSizeOption } from '@shared/models/assignment';
 import { GradingMethod, TimeLimitType } from '@shared/models/quiz';
 import { mockQuestions } from './question';
-import { mockMeetingData, mockMeetingComments } from './meeting';
 
 export const mockTopics: Topic[] = [
   mockQuiz,
@@ -15,7 +14,11 @@ export const mockTopics: Topic[] = [
     sectionId: '1',
     type: TopicType.MEETING,
     title: 'The final project report meeting in Teams',
-    data: mockMeetingData[0], // Use the complete mock meeting data
+    data: {
+      description: 'The final project report meeting in Teams will cover an in-depth review of our project outcomes, focusing on key accomplishments, challenges, and future recommendations. Each team member will present their contributions, followed by a Q&A session for feedback and clarifications. The meeting will conclude with a discussion on next steps and final documentation handover.',
+      open: new Date('2024-12-07T13:00:00').toISOString(),
+      close: null,
+    },
   },
   {
     id: '4',
