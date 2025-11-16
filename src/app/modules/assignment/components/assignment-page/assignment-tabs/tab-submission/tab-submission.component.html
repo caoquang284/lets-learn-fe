@@ -28,7 +28,15 @@
             <span class="student-name">{{ res.student.username }}</span>
           </div>
           <div class="student-score">
-            <span>{{ getMarkOfResponse(res) }}/100</span>
+            <input
+              type="number"
+              [value]="getMarkOfResponse(res)"
+              min="0"
+              max="100"
+              (keydown.enter)="onScoreInputEnter($event, res)"
+              (click)="$event.stopPropagation()"
+            />
+            <span>/100</span>
           </div>
         </div>
       </div>
@@ -46,7 +54,7 @@
         [studentResponse]="selectedStudentResponse"
       />
       } @else {
-      <default-view [topic]="topic" [studentResponses]="studentResponses" />}
+      <default-view [topic]="topic" [studentResponses]="studentResponses" [studentAssigned]="assignedCount" />}
     </div>
   </div>
 </card>

@@ -29,5 +29,5 @@ export const RefreshToken = () => {
 };
 
 export const Logout = () => {
-  return GET('/auth/logout');
+  return POST('/auth/logout');
 };

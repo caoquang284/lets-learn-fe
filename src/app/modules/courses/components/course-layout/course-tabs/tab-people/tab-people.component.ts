@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
   selector: 'tab-people',
   standalone: false,
   templateUrl: './tab-people.component.html',
-  styleUrl: './tab-people.component.scss',
+  styleUrl: './tab-people.component.scss'
 })
 export class TabPeopleComponent implements OnInit {
   @Input({ required: true }) course!: Course;
@@ -25,3 +25,4 @@ export class TabPeopleComponent implements OnInit {
 
   ngOnInit(): void {}
 }
+

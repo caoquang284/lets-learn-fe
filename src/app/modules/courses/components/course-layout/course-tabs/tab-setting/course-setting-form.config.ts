@@ -2,14 +2,21 @@ import { FormControl, Validators } from '@angular/forms';
 import { FormControlField } from '@shared/helper/form.helper';
 
 export const courseSettingFormSchema = {
+  courseId: new FormControl({ value: '', disabled: true }),
   name: new FormControl('', [Validators.required, Validators.minLength(2)]),
   category: new FormControl('', [Validators.required, Validators.minLength(2)]),
   level: new FormControl('beginner', [Validators.required]),
-  // price: new FormControl('', [Validators.required, Validators.min(0)])
-  price: new FormControl('', []),
 };
 
 export const courseGeneralSettingFormControls: FormControlField[] = [
+  {
+    id: 'courseId',
+    label: 'Course ID',
+    type: 'text',
+    componentType: 'input',
+    placeholder: 'Course ID',
+    validationMessages: null,
+  },
   {
     id: 'name',
     label: 'Name',
@@ -45,17 +52,6 @@ export const courseGeneralSettingFormControls: FormControlField[] = [
     ],
     validationMessages: {
       required: 'Level name is required',
-    },
-  },
-  {
-    id: 'price',
-    label: 'Price',
-    type: 'number',
-    componentType: 'input',
-    placeholder: '0',
-    validationMessages: {
-      required: 'Price is required',
-      min: 'Price must be a positive number',
     },
   },
 ];

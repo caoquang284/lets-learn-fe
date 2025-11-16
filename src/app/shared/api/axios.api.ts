@@ -29,7 +29,10 @@ function addRefreshSubscriber(callback: () => void) {
 
 // No request interceptor needed — cookies are sent automatically
 Axios.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('Axios response:', response);
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 

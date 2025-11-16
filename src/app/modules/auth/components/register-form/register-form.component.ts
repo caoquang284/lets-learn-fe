@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SignUp } from '@modules/auth/api/auth.api';
 import { Role } from '@shared/models/user';
 import { Router } from '@angular/router';
+import { AuthService } from '@shared/services/auth.service';
 
 @Component({
   selector: 'register-form',
@@ -22,7 +23,8 @@ export class RegisterFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private toastService: ToastrService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -35,7 +37,7 @@ export class RegisterFormComponent implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  onSubmit(e: Event): void {
+  async onSubmit(e: Event): Promise<void> {
     e.preventDefault(); // Prevent default form submission
     // Stop here if form is invalid
     if (this.form.invalid) {
@@ -45,6 +47,11 @@ export class RegisterFormComponent implements OnInit {
 
     this.loading = true;
     const { email, password, username, isTeacher } = this.form.value;
+    await this.authService
+      .signup(username, email, password, isTeacher)
+      .finally(() => {
+        this.loading = false;
+      });
     console.log('Register:', this.form.value);
   }
 }

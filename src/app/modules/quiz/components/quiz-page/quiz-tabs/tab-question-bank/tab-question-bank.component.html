@@ -1,4 +1,4 @@
 <card>
-  <h3 class="card-title">Question bank</h3>
-  <question-bank-table />
+  <h3 class="title">Question bank</h3>
+  <question-bank-table [topic]="topic" (topicChange)="onTopicChange($event)" />
 </card>

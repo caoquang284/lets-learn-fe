@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Course } from '@shared/models/course';
 import { DonutChartSegment } from '@shared/components/charts/donut-chart/donut-chart.component';
 import { DashboardStat } from '@shared/models/dashboard-stats';
+import { getMonthName } from '@shared/helper/date.helper';
 import { generateMonthOptions } from '@shared/helper/date.helper';
 import { ComboboxService } from '@shared/components/combobox/combobox.service';
 import { BarChartSegment } from '@shared/components/charts/bar-chart/bar-chart.component';

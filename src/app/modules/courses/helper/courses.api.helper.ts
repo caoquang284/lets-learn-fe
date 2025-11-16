@@ -11,6 +11,7 @@ import { GetRandomCourseBackground } from '@shared/helper/image.helpter';
 
 export const convertCourseToCreateRequestData = (data: INewCourseFormData) => {
   return {
+    id: data.courseId,
     title: data.title,
     description: '',
     imageUrl: GetRandomCourseBackground(),
@@ -23,13 +24,13 @@ export const convertCourseToCreateRequestData = (data: INewCourseFormData) => {
 
 export const convertCourseToUpdateRequestData = (course: Course) => {
   return {
+    id: course.id,
     title: course.title,
     price: course.price,
     category: course.category,
     level: course.level,
     isPublished: course.isPublished,
     imageUrl: course.imageUrl,
-    sections: course.sections.map(convertSectionToUpdateRequestData),
   };
 };
 

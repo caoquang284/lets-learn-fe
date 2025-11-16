@@ -68,8 +68,8 @@ export const mockReviewItems: ReviewItem[] = [
         price: 0,
         category: 'Science',
         level: 'Beginner',
-        students: Array(22).fill(null).map((_, i) => ({ id: `student-${i}`, username: `student${i}`, email: `student${i}@example.com`, password: '', avatar: '', role: 'STUDENT' as any, courses: [] })),
-        creator: { id: 'teacher-1', username: 'teacher1', email: 'teacher1@example.com', password: '', avatar: '', role: 'TEACHER' as any, courses: [] },
+        students: Array(22).fill(null).map((_, i) => ({ id: `student-${i}`, username: `student${i}`, email: `student${i}@example.com`, password: '', avatar: '', role: 'STUDENT' as any })),
+        creator: { id: 'teacher-1', username: 'teacher1', email: 'teacher1@example.com', password: '', avatar: '', role: 'TEACHER' as any },
         sections: [],
         isPublished: true
       },
@@ -101,8 +101,8 @@ export const mockReviewItems: ReviewItem[] = [
         price: 0,
         category: 'History',
         level: 'Intermediate',
-        students: Array(30).fill(null).map((_, i) => ({ id: `student-${i}`, username: `student${i}`, email: `student${i}@example.com`, password: '', avatar: '', role: 'STUDENT' as any, courses: [] })),
-        creator: { id: 'teacher-2', username: 'teacher2', email: 'teacher2@example.com', password: '', avatar: '', role: 'TEACHER' as any, courses: [] },
+        students: Array(30).fill(null).map((_, i) => ({ id: `student-${i}`, username: `student${i}`, email: `student${i}@example.com`, password: '', avatar: '', role: 'STUDENT' as any })),
+        creator: { id: 'teacher-2', username: 'teacher2', email: 'teacher2@example.com', password: '', avatar: '', role: 'TEACHER' as any },
         sections: [],
         isPublished: true
       },
@@ -134,8 +134,8 @@ export const mockReviewItems: ReviewItem[] = [
         price: 0,
         category: 'Technology',
         level: 'Beginner',
-        students: Array(18).fill(null).map((_, i) => ({ id: `student-${i}`, username: `student${i}`, email: `student${i}@example.com`, password: '', avatar: '', role: 'STUDENT' as any, courses: [] })),
-        creator: { id: 'teacher-3', username: 'teacher3', email: 'teacher3@example.com', password: '', avatar: '', role: 'TEACHER' as any, courses: [] },
+        students: Array(18).fill(null).map((_, i) => ({ id: `student-${i}`, username: `student${i}`, email: `student${i}@example.com`, password: '', avatar: '', role: 'STUDENT' as any })),
+        creator: { id: 'teacher-3', username: 'teacher3', email: 'teacher3@example.com', password: '', avatar: '', role: 'TEACHER' as any },
         sections: [],
         isPublished: true
       },

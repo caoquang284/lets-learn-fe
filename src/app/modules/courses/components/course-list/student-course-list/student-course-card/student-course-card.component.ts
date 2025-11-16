@@ -28,7 +28,9 @@ export class StudentCourseCardComponent {
 
   get hasJoined(): boolean {
     if (!this.currentUser) return false;
-    return this.currentUser.courses.some((c) => c.id === this.course.id);
+    const enrollments = this.currentUser.enrollments;
+    if (!Array.isArray(enrollments)) return false;
+    return enrollments.some((e: any) => String(e?.courseId) === this.course.id);
   }
 
   handleClick() {
@@ -50,8 +52,14 @@ export class StudentCourseCardComponent {
 
   onJoinCourseSuccess() {
     if (!this.currentUser) return;
-    const updatedCourses = [...this.currentUser.courses, this.course];
-    this.userService.updateUser({ courses: updatedCourses });
+    const currentEnrollments = Array.isArray(this.currentUser.enrollments)
+      ? this.currentUser.enrollments
+      : [];
+    const updatedEnrollments = [
+      ...currentEnrollments,
+      { courseId: this.course.id },
+    ];
+    this.userService.updateUser({ enrollments: updatedEnrollments });
     this.toastr.success('You have successfully joined the course!');
     this.router.navigate(['/courses', this.course.id]);
   }

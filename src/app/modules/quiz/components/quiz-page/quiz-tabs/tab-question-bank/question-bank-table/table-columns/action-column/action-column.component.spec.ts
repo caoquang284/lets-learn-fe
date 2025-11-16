@@ -1,17 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MeetingPageComponent } from './meeting-page.component';
 
-describe('MeetingPageComponent', () => {
-  let component: MeetingPageComponent;
-  let fixture: ComponentFixture<MeetingPageComponent>;
+import { ActionColumnComponent } from './action-column.component';
+
+describe('ActionColumnComponent', () => {
+  let component: ActionColumnComponent;
+  let fixture: ComponentFixture<ActionColumnComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [MeetingPageComponent]
+      imports: [ActionColumnComponent]
     })
     .compileComponents();
-    
-    fixture = TestBed.createComponent(MeetingPageComponent);
+
+    fixture = TestBed.createComponent(ActionColumnComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,16 +1,17 @@
-import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { GetCourseById } from '@modules/courses/api/courses.api';
+import { GetTopic } from '@modules/courses/api/topic.api';
 import { getCharacter } from '@shared/helper/string.helper';
-import { mockTopics } from '@shared/mocks/topic';
-import { mockUsers } from '@shared/mocks/user';
+import { Course } from '@shared/models/course';
 import { Question, QuestionType } from '@shared/models/question';
 import { getSecondFromTimeLimitType } from '@shared/models/quiz';
 import { QuizTopic } from '@shared/models/topic';
-import { RouteService } from '@shared/services/route.service';
-import { UserService } from '@shared/services/user.service';
 import { debounceTime } from 'rxjs';
 import { QuizAttemptingService } from './quiz-attempting.service';
+import { GetQuizResponse } from '@modules/quiz/api/quiz-response.api';
+import { ToastrService } from 'ngx-toastr';
+import { QuizResponseData } from '@shared/models/student-response';
 
 @Component({
   selector: 'quiz-attempting',
@@ -22,12 +23,11 @@ import { QuizAttemptingService } from './quiz-attempting.service';
 export class QuizAttemptingComponent implements OnInit {
   constructor(
     private quizAttemptingService: QuizAttemptingService,
-    private userService: UserService,
-    private routeService: RouteService,
     private activedRoute: ActivatedRoute,
-    private location: Location
+    private toastr: ToastrService
   ) {}
   topic: QuizTopic | null = null;
+  course: Course | null = null;
   questions: Question[] = [];
   questionTypes = QuestionType;
 
@@ -56,26 +56,81 @@ export class QuizAttemptingComponent implements OnInit {
     this.quizAttemptingService.flaggedQuestions$.subscribe((flagged) => {
       this.flaggedQuestions = flagged;
     });
-
-    this.userService.setUser(mockUsers[0]);
-    this.fetchQuiz();
+    this.InitData();
   }
 
-  fetchQuiz() {
-    const topicId = this.routeService.getParam(this.activedRoute, 'topicId');
-    const topic = mockTopics.find((topic) => topic.id === topicId);
-    if (!topic) {
-      this.location.back();
-      return;
+  async InitData() {
+    const topicId = this.activedRoute.snapshot.paramMap.get('topicId');
+    const courseId = this.activedRoute.snapshot.paramMap.get('courseId');
+    const quizResponseId =
+      this.activedRoute.snapshot.paramMap.get('quizResponseId');
+    if (topicId && courseId && quizResponseId) {
+      await this.InitReviewModeData(courseId, topicId, quizResponseId);
+    } else {
+      await this.InitAttemptingModeData(courseId!, topicId!);
     }
-    const quiz = topic as QuizTopic;
-    this.topic = quiz;
-    this.quizAttemptingService.setQuestions(this.topic.data.questions);
+  }
+
+  async InitReviewModeData(
+    courseId: string,
+    topicId: string,
+    quizResponseId: string
+  ) {
+    const resQuizResponse = this.FetchQuizResponse(topicId, quizResponseId);
+    const resCourseAndTopicData = this.FetchCourseAndTopicData(
+      courseId,
+      topicId
+    );
+    await Promise.all([resQuizResponse, resCourseAndTopicData]).then(
+      ([quizResponse, topic]) => {
+        const quiz = topic as QuizTopic;
+        this.InitFirstQuizDisplayData(quiz);
+        if (quizResponse) {
+          const quizResponseData = quizResponse.data as QuizResponseData;
+          this.quizAttemptingService.setAnswerRecordFromQuizAnswers(
+            quizResponseData.answers
+          );
+          this.quizAttemptingService.setStudentResponse(quizResponse);
+          this.quizAttemptingService.setShowAnswer(true);
+          this.isReviewMode = true;
+        }
+      }
+    );
+  }
+
+  InitFirstQuizDisplayData(topic: QuizTopic) {
+    this.quizAttemptingService.setQuestions(topic.data.questions);
     this.quizAttemptingService.setCurrentQuestionId(this.questions[0].id);
-    if (this.hasLimitTime(quiz)) {
-      const countDown = this.getCountDown(quiz);
-      this.quizAttemptingService.startQuiz(topicId, countDown);
-    } else this.quizAttemptingService.startQuiz(topicId);
+  }
+
+  async InitAttemptingModeData(courseId: string, topicId: string) {
+    await this.FetchCourseAndTopicData(courseId, topicId).then((topic) => {
+      const quiz = topic as QuizTopic;
+      this.InitFirstQuizDisplayData(quiz);
+      if (this.hasLimitTime(quiz)) {
+        const countDown = this.getCountDown(quiz);
+        this.quizAttemptingService.startQuiz(topicId, countDown);
+      } else {
+        this.quizAttemptingService.startQuiz(topicId);
+      }
+    });
+  }
+
+  async FetchCourseAndTopicData(courseId: string, topicId: string) {
+    return await GetCourseById(courseId).then(async (course) => {
+      this.course = course;
+      return await GetTopic(topicId, courseId).then((topic) => {
+        this.topic = topic as QuizTopic;
+        return topic;
+      });
+    });
+  }
+
+  async FetchQuizResponse(topicId: string, id: string) {
+    return await GetQuizResponse(topicId, id).catch((error) => {
+      this.toastr.error(error.message);
+      console.error('Error fetching quiz response:', error);
+    });
   }
 
   hasLimitTime(quiz: QuizTopic): boolean {

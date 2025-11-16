@@ -5,6 +5,7 @@ import { LayoutService } from '../layout/layout.service';
 import { SidebarGroupComponent } from './sidebar-group/sidebar-group.component';
 import { SidebarItemCollapseComponent } from './sidebar-item-collapse/sidebar-item-collapse.component';
 import { SidebarItemComponent } from './sidebar-item/sidebar-item.component';
+import { GetTeacherCourses } from '@modules/courses/api/courses.api';
 import { UserService } from '@shared/services/user.service';
 import { Role, User } from '@shared/models/user';
 
@@ -29,6 +30,9 @@ export class SidebarComponent implements OnInit {
 
     this.userService.user$.subscribe(async (user) => {
       this.currentUser = user;
+      if (user && user.role === Role.TEACHER) {
+        this.courses = await GetTeacherCourses(user.id);
+      }
     });
   }
 }

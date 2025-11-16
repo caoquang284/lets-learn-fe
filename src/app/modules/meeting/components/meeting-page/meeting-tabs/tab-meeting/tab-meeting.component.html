@@ -28,11 +28,11 @@
   <div class="meeting-comments-list">
     @for(comment of comments; track comment.id) {
       <div class="meeting-comment">
-        <img [src]="getAvatar(comment.userId)" class="avatar" [alt]="getAuthorName(comment.userId) + ' avatar'">
+        <img [src]="getAvatar(comment)" class="avatar" [alt]="getAuthorName(comment) + ' avatar'">
         <div class="comment-content">
           <div class="comment-header">
-            <strong class="author">{{ getAuthorName(comment.userId) }}</strong>
-            <span class="timestamp">{{ comment.time }}</span>
+            <strong class="author">{{ getAuthorName(comment) }}</strong>
+            <span class="timestamp">{{ formatDate(comment.createdAt, 'MM/dd/yyyy HH:mm a') }}</span>
           </div>
           <p class="comment-text">{{ comment.text }}</p>
         </div>

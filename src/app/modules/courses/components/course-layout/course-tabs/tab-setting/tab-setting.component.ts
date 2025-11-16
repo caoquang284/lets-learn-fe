@@ -1,28 +1,23 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { CollapsibleListService } from '@shared/components/collapsible-list/collapsible-list.service';
-import { openAlertDialog } from '@shared/helper/alert.helper';
-import { FormControlField } from '@shared/helper/form.helper';
-import { Course } from '@shared/models/course';
-import { ToastrService } from 'ngx-toastr';
 import {
   courseGeneralSettingFormControls,
+  courseDangerZoneSettingFormControls,
   courseSettingFormSchema,
 } from './course-setting-form.config';
-
-// Mock function for updating course - replace with actual API call
-async function UpdateCourse(course: Course): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), 1000);
-  });
-}
+import { Course } from '@shared/models/course';
+import { FormControlField } from '@shared/helper/form.helper';
+import { openAlertDialog } from '@shared/helper/alert.helper';
+import { UpdateCourse } from '@modules/courses/api/courses.api';
+import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'tab-settings',
+  selector: 'tab-setting',
   standalone: false,
-  templateUrl: './tab-settings.component.html',
-  styleUrl: './tab-settings.component.scss',
+  templateUrl: './tab-setting.component.html',
+  styleUrl: './tab-setting.component.scss',
   providers: [CollapsibleListService],
 })
 export class TabSettingComponent implements OnInit {
@@ -89,10 +84,10 @@ export class TabSettingComponent implements OnInit {
 
   private getFormValuesFromCourse(course: Course) {
     return {
+      courseId: course.id,
       name: course.title || '',
       category: course.category || '',
       level: (course.level || 'beginner').toLowerCase(),
-      price: course.price ?? '',
     };
   }
 
@@ -112,7 +107,6 @@ export class TabSettingComponent implements OnInit {
       ...this.course,
       ...this.form.value,
       title: this.form.value.name,
-      price: this.form.value.price !== '' ? Number(this.form.value.price) : undefined, // Ensure price is a number or undefined
     };
     delete updatedCourse.name;
     try {

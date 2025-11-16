@@ -11,6 +11,8 @@ import {
 } from '@shared/models/student-response';
 import { AssignmentTopic } from '@shared/models/topic';
 import { format } from 'date-fns';
+import { UpdateAssignmentResponse } from '@modules/assignment/api/assignment-response.api';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'submitted-view',
@@ -26,6 +28,8 @@ export class SubmittedViewComponent implements OnInit, OnChanges {
   submissionStatus: SubmissionStatus = SubmissionStatus.NOT_SUBMITTED;
   submissionStatusText: string = '';
   submissionStatusType = SubmissionStatus;
+
+  constructor(private toastr: ToastrService) {}
 
   ngOnInit(): void {
     this.initValues(this.topic, this.studentResponse);
@@ -74,5 +78,21 @@ export class SubmittedViewComponent implements OnInit, OnChanges {
   getNoteOfResponse() {
     const data = this.studentResponse.data as AssignmentResponseData;
     return data.note;
+  }
+
+  async onSaveNote(note: string) {
+    const updatedResponse = {
+      ...this.studentResponse,
+      data: {
+        ...this.studentResponse.data,
+        note,
+      },
+    };
+    try {
+      await UpdateAssignmentResponse(this.topic.id, updatedResponse);
+      this.toastr.success('Note updated successfully');
+    } catch (error) {
+      this.toastr.error('Failed to update note');
+    }
   }
 }
