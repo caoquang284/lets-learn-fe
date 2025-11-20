@@ -36,9 +36,16 @@ export class AssignmentPageComponent implements OnInit {
     private userService: UserService,
     private breadcrumbService: BreadcrumbService,
     private activedRoute: ActivatedRoute,
-    private cdr: ChangeDetectorRef,
-    private toastr: ToastrService
-  ) {}
+    private cdr: ChangeDetectorRef
+  ) {
+    const topicId = this.activedRoute.snapshot.paramMap.get('topicId');
+    const courseId = this.activedRoute.snapshot.paramMap.get('courseId');
+    if (courseId) this.fetchCourseData(courseId);
+    if (topicId) this.fetchTopicData(topicId);
+    if (courseId && topicId && this.course && this.topic) {
+      this.updateBreadcrumb(this.course, this.topic);
+    }
+  }
 
   ngOnInit(): void {
     this.InitData();
@@ -96,6 +103,7 @@ export class AssignmentPageComponent implements OnInit {
   }
 
   updateBreadcrumb(course: Course, topic: AssignmentTopic) {
+    if (!course || !topic) return;
     this.breadcrumbService.setBreadcrumbs([
       {
         label: course.title,

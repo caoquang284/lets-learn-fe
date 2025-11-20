@@ -7,7 +7,7 @@ import {
 export const convertChoicesInQuestionToRequestData = (
   choices: QuestionChoice[]
 ) => {
-  return choices.map((choice) => {
+  return (choices ?? []).map((choice) => {
     return {
       id: choice.id.length === 4 ? null : choice.id,
       text: choice.text,
