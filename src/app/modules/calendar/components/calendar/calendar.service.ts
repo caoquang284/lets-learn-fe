@@ -70,12 +70,13 @@ export class CalendarService {
   };
 
   canGetThisMeetingTopic = (date: Date, topic: MeetingTopic) => {
-    const openDate = new Date(topic.data.meetingDate);
+    if (!topic.data.open) return false;
+    const openDate = new Date(topic.data.open);
     return isInDate(date, openDate);
   };
 
   handleGetThisMeetingTopic = (topic: MeetingTopic): TopicItem => {
-    const openDate = new Date(topic.data.meetingDate);
+    const openDate = topic.data.open ? new Date(topic.data.open) : new Date();
     return {
       startTime: openDate,
       endTime: null,

@@ -11,11 +11,8 @@ import { MeetingTopic, TopicType } from '@shared/models/topic';
 import { Role, User } from '@shared/models/user';
 import { BreadcrumbService } from '@shared/services/breadcrumb.service';
 import { UserService } from '@shared/services/user.service';
-import { mockTopics } from '@shared/mocks/topic';
-import { mockCourses } from '@shared/mocks/course';
-import { mockMeetingData } from '@shared/mocks/meeting';
-// import { GetTopic } from '@modules/courses/api/topic.api';
-// import { GetCourseById } from '@modules/courses/api/courses.api';
+import { GetCourseById } from '@modules/courses/api/courses.api';
+import { GetTopic } from '@modules/courses/api/topic.api';
 @Component({
   selector: 'app-meeting-page',
   standalone: false,
@@ -43,14 +40,8 @@ export class MeetingPageComponent implements OnInit {
     this.topicId = this.activedRoute.snapshot.paramMap.get('topicId');
     this.courseId = this.activedRoute.snapshot.paramMap.get('courseId');
     
-    // Fetch mock data based on route params
     if (this.courseId) this.fetchCourseData(this.courseId);
-    if (this.topicId) {
-      this.fetchTopicData(this.topicId);
-    } else {
-      // If no topicId in route, create a mock topic
-      this.createMockTopic();
-    }
+    if (this.topicId && this.courseId) this.fetchTopicData(this.topicId, this.courseId);
   }
 
   ngOnInit(): void {
@@ -74,20 +65,31 @@ export class MeetingPageComponent implements OnInit {
     });
   }
 
-  fetchTopicData(topicId: string) {
-    const res = mockTopics.find((topic) => topic.id === topicId);
-    if (res && res.type === TopicType.MEETING) {
-      this.topic = res as MeetingTopic;
-    } else {
-      // If no topic found with the given ID, create a mock topic
-      this.createMockTopic();
+  async fetchTopicData(topicId: string, courseId: string) {
+      try {
+        this.topic = await GetTopic(topicId, courseId) as MeetingTopic;
+        // Update breadcrumb after both course and topic are loaded
+        if (this.course && this.topic) {
+          this.updateBreadcrumb(this.course, this.topic);
+        }
+      } catch (error) {
+        console.error('Error fetching topic data:', error);
+        this.topic = null;
+      }
     }
-  }
 
-  fetchCourseData(courseId: string) {
-    const res = mockCourses.find((course) => course.id === courseId);
-    if (res) this.course = res;
-  }
+  async fetchCourseData(courseId: string) {
+      try {
+        this.course = await GetCourseById(courseId);
+        // Update breadcrumb after both course and topic are loaded
+        if (this.course && this.topic) {
+          this.updateBreadcrumb(this.course, this.topic);
+        }
+      } catch (error) {
+        console.error('Error fetching course data:', error);
+        this.course = null;
+      }
+    }
 
   updateBreadcrumb(course: Course, topic: MeetingTopic) {
     this.breadcrumbService.setBreadcrumbs([
@@ -102,21 +104,5 @@ export class MeetingPageComponent implements OnInit {
         active: true,
       },
     ]);
-  }
-
-  createMockTopic() {
-    // Create mock topic for frontend preview using mockMeetingData
-    const mockData = mockMeetingData[0]; // Use first mock meeting data
-    this.topic = {
-      id: this.topicId || 'mock-meeting-topic-id',
-      sectionId: 'mock-section-id',
-      title: mockData.topic,
-      type: TopicType.MEETING,
-      course: {
-        id: this.courseId || 'mock-course-id',
-        title: 'Sample Course'
-      } as Course,
-      data: mockData
-    };
   }
 }

@@ -5,7 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CollapsibleListService } from '@shared/components/collapsible-list/collapsible-list.service';
 import { meetingGeneralSettingFormControls, meetingSettingFormSchema, meetingValidationMessages } from './meeting-setting-form.config';
 import { MeetingTopic } from '@shared/models/topic';
-//import { UpdateTopic } from '@modules/courses/api/topic.api';
+import { MeetingData } from '@shared/models/meeting';
+import { UpdateTopic } from '@modules/courses/api/topic.api';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -67,10 +68,16 @@ export class TabSettingComponent implements OnInit, OnDestroy {
     this.collapsibleListService.expandAll();
     // Initialize form with existing topic data
     if (this.topic) {
+      const meetingData = this.topic.data as MeetingData;
+      // Convert ISO string to datetime-local format (YYYY-MM-DDTHH:mm)
+      const meetingDateValue = meetingData?.open 
+        ? new Date(meetingData.open).toISOString().slice(0, 16)
+        : '';
+      
       this.form.patchValue({
         name: this.topic.title || '',
-        description: this.topic.data?.description || '',
-        meetingDate: this.topic.data?.meetingDate?.toISOString().slice(0, 16) || ''
+        description: meetingData?.description || '',
+        meetingDate: meetingDateValue
       });
     }
   }
@@ -116,37 +123,37 @@ export class TabSettingComponent implements OnInit, OnDestroy {
     this.topic.title = formValues.name;
     
     // Ensure topic.data exists
-    this.topic.data = this.topic.data || {};
+    this.topic.data = this.topic.data || { description: '', open: null, close: null };
     
     // Update topic data with form values
-    this.topic.data.description = formValues.description;
-    this.topic.data.meetingDate = new Date(formValues.meetingDate);
+    const meetingData = this.topic.data as MeetingData;
+    meetingData.description = formValues.description;
+    // Convert datetime-local value to ISO string if present
+    meetingData.open = formValues.meetingDate 
+      ? new Date(formValues.meetingDate).toISOString() 
+      : null;
     
     const courseId = this.activatedRoute.snapshot.paramMap.get('courseId');
     
-    // if (courseId) {
-    //   // Call the API to update the topic
-    //   await UpdateTopic(this.topic, courseId)
-    //     .then((updatedTopic) => {
-    //       this.topic = updatedTopic as MeetingTopic;
-    //       this.toastrService.success('Meeting updated successfully!', 'Success');
+    if (courseId) {
+      await UpdateTopic(this.topic, courseId)
+        .then((updatedTopic) => {
+          this.topic = updatedTopic as MeetingTopic;
+          this.toastrService.success('Meeting updated successfully!', 'Success');
 
-    //       const topicId = this.activatedRoute.snapshot.paramMap.get('topicId');
-    //       if (topicId) {
-    //         this.router.navigate([`/courses/${courseId}/meeting/${topicId}`], {
-    //           queryParams: { tab: 'meeting' }
-    //         });
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.error('Error updating topic:', error);
-    //       this.toastrService.error('Failed to update meeting. Please try again.', 'Error');
-    //     });
-    // } else {
-    //   console.error('Course ID not found in route parameters');
-    // }
-    
-    // For now, just show success message
-    this.toastrService.success('Meeting updated successfully!', 'Success');
+          const topicId = this.activatedRoute.snapshot.paramMap.get('topicId');
+          if (topicId) {
+            this.router.navigate([`/courses/${courseId}/meeting/${topicId}`], {
+              queryParams: { tab: 'meeting' }
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error updating topic:', error);
+          this.toastrService.error('Failed to update meeting. Please try again.', 'Error');
+        });
+    } else {
+      this.toastrService.error('Course ID not found in route parameters', 'Error');
+    }
   }
 }

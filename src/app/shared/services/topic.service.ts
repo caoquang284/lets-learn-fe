@@ -12,7 +12,6 @@ import { LinkData } from '@shared/models/link';
 import { PageData } from '@shared/models/page';
 import { FileTopicData } from '@shared/models/file-topic';
 import { MeetingData } from '@shared/models/meeting';
-import { mockMeetingData } from '@shared/mocks/meeting';
 import { generateId } from '@shared/helper/string.helper';
 import {
   getEndDateOfWeek,
@@ -64,17 +63,6 @@ export class TopicService {
 
   getTopicsBySection(sectionId: string): Observable<Topic[]> {
     return of([]);
-  }
-
-  getMeetingData(topicId: string): Observable<MeetingData | null> {
-    // In real app, this would call API
-    // For now, return first mock data or find by ID
-    const meetingData = mockMeetingData.find(data => data.id === topicId) || mockMeetingData[0];
-    return of(meetingData || null);
-  }
-
-  getAllMeetingData(): Observable<MeetingData[]> {
-    return of(mockMeetingData);
   }
 
   getNewTopic(request: CreateTopicRequest): Topic {
@@ -134,13 +122,9 @@ export class TopicService {
         break;
       case TopicType.MEETING:
         topicData = {
-          id: generateId(4),
-          topic: title || `New ${type}`,
           description: 'Join online meetings and participate in class discussions.',
-          meetingDate: new Date(),
-          meetingUrl: undefined,
-          isActive: false,
-          comments: []
+          open: getStartDateOfWeek(new Date()).toISOString(),
+          close: getEndDateOfWeek(new Date()).toISOString(),
         } as MeetingData;
         break;
 

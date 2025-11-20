@@ -5,14 +5,16 @@ import {
   ASSIGNMENT_TEACHER_TABS,
   AssignmentTab,
 } from '@modules/assignment/constants/assignment.constant';
+import { GetCourseById } from '@modules/courses/api/courses.api';
+import { GetTopic } from '@modules/courses/api/topic.api';
 import { TabService } from '@shared/components/tab-list/tab-list.service';
-import { mockCourses } from '@shared/mocks/course';
 import { mockTopics } from '@shared/mocks/topic';
 import { Course } from '@shared/models/course';
-import { AssignmentTopic, iconMap } from '@shared/models/topic';
+import { AssignmentTopic } from '@shared/models/topic';
 import { Role, User } from '@shared/models/user';
 import { BreadcrumbService } from '@shared/services/breadcrumb.service';
 import { UserService } from '@shared/services/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'assignment-page',
@@ -23,11 +25,10 @@ import { UserService } from '@shared/services/user.service';
 })
 export class AssignmentPageComponent implements OnInit {
   course: Course | null = null;
-  topic: AssignmentTopic = mockTopics[1] as AssignmentTopic;
+  topic: AssignmentTopic | null = null;
   tabs = AssignmentTab;
   user: User | null = null;
   isStudent = true;
-  topicIcon = '';
   selectedTab = AssignmentTab.ASSIGNMENT;
 
   constructor(
@@ -47,8 +48,7 @@ export class AssignmentPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.topicIcon = iconMap[this.topic.type];
-    this.tabService.setTabs(ASSIGNMENT_STUDENT_TABS);
+    this.InitData();
     this.tabService.selectedTab$.subscribe((tab) => {
       if (tab) {
         this.selectedTab = tab;
@@ -67,14 +67,39 @@ export class AssignmentPageComponent implements OnInit {
     });
   }
 
-  fetchTopicData(topicId: string) {
-    const res = mockTopics.find((topic) => topic.id === topicId);
-    if (res) this.topic = res as AssignmentTopic;
+  InitData() {
+    const topicId = this.activedRoute.snapshot.paramMap.get('topicId');
+    const courseId = this.activedRoute.snapshot.paramMap.get('courseId');
+    if (courseId) this.fetchCourseData(courseId);
+    if (topicId && courseId) this.fetchTopicData(topicId, courseId);
   }
 
-  fetchCourseData(courseId: string) {
-    const res = mockCourses.find((course) => course.id === courseId);
-    if (res) this.course = res;
+  async fetchTopicData(topicId: string, courseId: string) {
+    try {
+      const topic = await GetTopic(topicId, courseId);
+      if (topic) {
+        this.topic = topic as AssignmentTopic;
+        if (this.course) {
+          this.updateBreadcrumb(this.course, this.topic);
+        }
+      }
+    } catch (error) {
+      this.toastr.error('Failed to fetch topic', 'Error');
+    }
+  }
+
+  async fetchCourseData(courseId: string) {
+    try {
+      const course = await GetCourseById(courseId);
+      if (course) {
+        this.course = course;
+        if (this.topic) {
+          this.updateBreadcrumb(this.course, this.topic);
+        }
+      }
+    } catch (error) {
+      this.toastr.error('Failed to fetch course', 'Error');
+    }
   }
 
   updateBreadcrumb(course: Course, topic: AssignmentTopic) {
@@ -91,5 +116,12 @@ export class AssignmentPageComponent implements OnInit {
         active: true,
       },
     ]);
+  }
+  onTopicChange(topic: AssignmentTopic) {
+    this.topic = topic;
+    if (this.course) {
+      this.updateBreadcrumb(this.course, this.topic);
+    }
+    this.cdr.detectChanges();
   }
 }

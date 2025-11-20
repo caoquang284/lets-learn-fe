@@ -18,6 +18,7 @@ import {
   convertQuizFromResponseData,
   convertQuizToRequestData,
 } from '@modules/quiz/helper/quiz.api.helper';
+import { convertMeetingToRequestData } from '@modules/meeting/helper/meeting.api.helper';
 import {
   AssignmentTopic,
   FileTopic,
@@ -26,6 +27,7 @@ import {
   QuizTopic,
   Topic,
   TopicType,
+  MeetingTopic,
 } from '@shared/models/topic';
 
 export const convertTopicToRequestData = (topic: Topic) => {
@@ -41,6 +43,8 @@ export const convertTopicToRequestData = (topic: Topic) => {
     reqData = convertLinkToRequestData(topic as LinkTopic);
   } else if (type === TopicType.PAGE) {
     reqData = convertPageToRequestData(topic as PageTopic);
+  }else if (type === TopicType.MEETING) {
+    reqData = convertMeetingToRequestData(topic as MeetingTopic);
   }
   return reqData;
 };
