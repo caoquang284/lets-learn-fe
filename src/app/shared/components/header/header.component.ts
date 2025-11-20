@@ -1,10 +1,12 @@
-import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { LayoutService } from '../layout/layout.service';
 import { BreadcrumbService } from '@shared/services/breadcrumb.service';
 import { BreadcrumbItem } from '../breadcrumb/breadcrumb.component';
 import { Role, User } from '@shared/models/user';
 import { UserService } from '@shared/services/user.service';
+import { NotificationService } from '@shared/services/notification.service';
+import { NotificationItem } from '@shared/models/notification';
 
 @Component({
   selector: 'app-header',
@@ -12,92 +14,23 @@ import { UserService } from '@shared/services/user.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   router = inject(Router);
   breadcrumbItems: BreadcrumbItem[] = [];
   showAccountPopover = false;
   showNotificationPopover = false;
   currentUser: User | null = null;
-  isStudent = true;
-  notifications: NotificationItem[] = [
-    {
-      id: 1,
-      title: 'New course published',
-      message: 'Your course "Intro to Angular" is live. Check it out!',
-      timestamp: '2 minutes ago',
-      isRead: false,
-    },
-    {
-      id: 2,
-      title: 'Assignment submitted',
-      message: 'Anna Nguyen submitted Homework 2 for Web Development.',
-      timestamp: '8 minutes ago',
-      isRead: false,
-    },
-    {
-      id: 3,
-      title: 'Reminder',
-      message: 'Prepare slides for Friday workshop with the mentor team.',
-      timestamp: '22 minutes ago',
-      isRead: false,
-    },
-    {
-      id: 4,
-      title: 'Comment added',
-      message: 'David Tran left feedback on Chapter 4 of your course.',
-      timestamp: '35 minutes ago',
-      isRead: true,
-    },
-    {
-      id: 5,
-      title: 'New follower',
-      message: 'Jane Le just followed your instructor profile.',
-      timestamp: '1 hour ago',
-      isRead: true,
-    },
-    {
-      id: 6,
-      title: 'Quiz graded',
-      message: 'Auto-grading is complete for Quiz 3 in React Basics.',
-      timestamp: '2 hours ago',
-      isRead: true,
-    },
-    {
-      id: 7,
-      title: 'Support ticket',
-      message: 'Support team replied to your request about billing.',
-      timestamp: '3 hours ago',
-      isRead: false,
-    },
-    {
-      id: 8,
-      title: 'Class starting soon',
-      message: 'Live session for Backend Fundamentals begins in 15 minutes.',
-      timestamp: '4 hours ago',
-      isRead: true,
-    },
-    {
-      id: 9,
-      title: 'Payment received',
-      message: 'Your payout for April has been processed successfully.',
-      timestamp: '6 hours ago',
-      isRead: true,
-    },
-    {
-      id: 10,
-      title: 'System update',
-      message: 'We will deploy a platform update tonight at 11:00 PM.',
-      timestamp: 'Yesterday',
-      isRead: false,
-    },
-  ];
+  notifications: NotificationItem[] = [];
   activeNotificationTab: NotificationTab = 'all';
-  activeNotificationMenuId: number | null = null;
+  activeNotificationMenuId: string | null = null;
+  private refreshIntervalId: any = null;
 
   constructor(
     private layoutService: LayoutService,
     private breadcrumbService: BreadcrumbService,
     private userService: UserService
+    ,
+    private notificationService: NotificationService
   ) {
     this.breadcrumbService.breadcrumbs$.subscribe((items) => {
       this.breadcrumbItems = items;
@@ -112,7 +45,18 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadNotifications();
+    // auto-refresh every 30s
+    this.refreshIntervalId = setInterval(() => this.loadNotifications(), 30000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId);
+      this.refreshIntervalId = null;
+    }
+  }
 
   onMenuClick() {
     this.layoutService.toggleSidebar();
@@ -131,8 +75,7 @@ export class HeaderComponent implements OnInit {
   }
 
   get unreadCount(): number {
-    return this.notifications.filter((notification) => !notification.isRead)
-      .length;
+    return this.notifications.filter((notification) => !notification.isRead).length;
   }
 
   get filteredNotifications(): NotificationItem[] {
@@ -147,25 +90,56 @@ export class HeaderComponent implements OnInit {
     this.activeNotificationMenuId = null;
   }
 
-  toggleNotificationMenu(notificationId: number) {
-    this.activeNotificationMenuId =
-      this.activeNotificationMenuId === notificationId ? null : notificationId;
+  toggleNotificationMenu(notificationId: string | number) {
+    const id = String(notificationId);
+    this.activeNotificationMenuId = this.activeNotificationMenuId === id ? null : id;
   }
 
-  markNotification(notificationId: number, isRead: boolean) {
-    this.notifications = this.notifications.map((notification) =>
-      notification.id === notificationId
-        ? { ...notification, isRead }
-        : notification
-    );
-    this.activeNotificationMenuId = null;
+  markNotification(notificationId: string | number, isRead: boolean) {
+    const id = String(notificationId);
+    this.notificationService
+      .markAsRead(id, isRead)
+      .then((updated) => {
+        this.notifications = this.notifications.map((notification) =>
+          String(notification.id) === String(updated.id)
+            ? { ...notification, isRead: updated.isRead }
+            : notification
+        );
+      })
+      .catch((err) => console.error('Failed to mark notification', err))
+      .finally(() => {
+        this.activeNotificationMenuId = null;
+      });
   }
 
-  deleteNotification(notificationId: number) {
-    this.notifications = this.notifications.filter(
-      (notification) => notification.id !== notificationId
-    );
-    this.activeNotificationMenuId = null;
+  deleteNotification(notificationId: string | number) {
+    const id = String(notificationId);
+    this.notificationService
+      .deleteNotification(id)
+      .then(() => {
+        this.notifications = this.notifications.filter(
+          (notification) => String(notification.id) !== id
+        );
+      })
+      .catch((err) => console.error('Failed to delete notification', err))
+      .finally(() => {
+        this.activeNotificationMenuId = null;
+      });
+  }
+
+  loadNotifications() {
+    this.notificationService
+      .getNotifications()
+      .then((data) => {
+        this.notifications = data;
+        this.updateFilteredNotifications();
+      })
+      .catch((err) => console.error('Failed to load notifications', err));
+  }
+
+  updateFilteredNotifications() {
+    // kept for compatibility with previous calls — computed getter handles filtering
+    this.activeNotificationMenuId = this.activeNotificationMenuId;
   }
 
   @HostListener('document:click')
@@ -176,12 +150,6 @@ export class HeaderComponent implements OnInit {
   }
 }
 
-interface NotificationItem {
-  id: number;
-  title: string;
-  message: string;
-  timestamp: string;
-  isRead: boolean;
-}
+// NotificationItem type is imported from shared models
 
 type NotificationTab = 'all' | 'unread';
