@@ -20,6 +20,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showAccountPopover = false;
   showNotificationPopover = false;
   currentUser: User | null = null;
+  isStudent = true;
   notifications: NotificationItem[] = [];
   activeNotificationTab: NotificationTab = 'all';
   activeNotificationMenuId: string | null = null;
