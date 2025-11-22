@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import {
   ConfirmMessageData,
   ConfirmMessageService,
@@ -15,6 +15,8 @@ import { ToastrService } from 'ngx-toastr';
 import { GetAllQuizResponsesOfTopic } from '@modules/quiz/api/quiz-response.api';
 import { StudentResponse } from '@shared/models/student-response';
 import { UserService } from '@shared/services/user.service';
+import { Comment } from '@shared/models/comment';
+import { getComments, createComment } from '@shared/api/comment.api';
 
 @Component({
   selector: 'tab-quiz-student',
@@ -33,14 +35,23 @@ export class TabQuizStudentComponent implements OnInit {
   fullMarkOfQuiz = 100;
   gradeColor = 'green';
 
+  // Comment functionality
+  comments: Comment[] = [];
+  newCommentText: string = '';
+  currentUser: any = null;
+  courseId: string | null = null;
+
   constructor(
     private tabQuizService: TabQuizService,
     private studentResponseService: StudentResponseService,
     private router: Router,
     private confirmMessageService: ConfirmMessageService,
     private toastr: ToastrService,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private activatedRoute: ActivatedRoute
+  ) {
+    this.courseId = this.activatedRoute.snapshot.paramMap.get('courseId');
+  }
 
   confirmMessageData: ConfirmMessageData = {
     title: 'This quiz has time limit',
@@ -64,6 +75,7 @@ export class TabQuizStudentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.currentUser = this.userService.getUser();
     this.fetchData();
     this.confirmMessageService.setData(this.confirmMessageData);
     this.confirmMessageService.setCancelAction(() =>
@@ -78,6 +90,7 @@ export class TabQuizStudentComponent implements OnInit {
       this.updateGradingDisplayData(this.studentResponses);
     });
     this.tabQuizService.setTopic(this.topic);
+    this.fetchComments();
   }
 
   async fetchData() {
@@ -159,5 +172,45 @@ export class TabQuizStudentComponent implements OnInit {
     this.router.navigate([
       `courses/${this.course.id}/quiz/${this.topic.id}/${responseId}/reviewing`,
     ]);
+  }
+
+  async fetchComments(): Promise<void> {
+    if (!this.courseId || !this.topic?.id) return;
+    
+    try {
+      this.comments = await getComments(this.courseId, this.topic.id);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      this.comments = [];
+    }
+  }
+
+  getAuthorName(comment: Comment): string {
+    return comment.user?.username || 'Unknown User';
+  }
+
+  getAvatar(comment: Comment): string {
+    return comment.user?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=?';
+  }
+
+  getCurrentUserAvatar(): string {
+    return this.currentUser?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=You';
+  }
+
+  async addComment(): Promise<void> {
+    if (!this.newCommentText.trim() || !this.courseId || !this.topic?.id) return;
+    
+    try {
+      const newComment = await createComment(
+        this.courseId,
+        this.topic.id,
+        { text: this.newCommentText.trim() }
+      );
+      
+      this.comments = [...this.comments, newComment];
+      this.newCommentText = '';
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
   }
 }

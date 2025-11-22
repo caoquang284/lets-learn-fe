@@ -87,3 +87,121 @@
     margin: 0;
   }
 }
+
+.meeting-comments-list {
+  padding: 0 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+
+  .meeting-comment {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .comment-content {
+      flex: 1;
+
+      .comment-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+
+        .author {
+          color: $text-color;
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+
+        .timestamp {
+          color: $text-secondary-color;
+          font-size: 0.8rem;
+        }
+      }
+
+      .comment-text {
+        margin: 0;
+        color: $text-color;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+    }
+  }
+}
+
+.meeting-comment-input {
+  padding: 1rem;
+  border-top: 1px solid $border-color;
+  background-color: $background-secondary-color;
+
+  .input-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .comment-input-field {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid $border-color;
+      border-radius: 24px;
+      background-color: $background-color;
+      color: $text-color;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+
+      &:focus {
+        border-color: $primary-color;
+      }
+
+      &::placeholder {
+        color: $text-secondary-color;
+      }
+    }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background-color: $primary-color;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      flex-shrink: 0;
+
+      &:hover:not(:disabled) {
+        background-color: darken($primary-color, 10%);
+      }
+
+      &:disabled {
+        background-color: $text-secondary-color;
+        cursor: not-allowed;
+      }
+
+      .material-symbols-outlined {
+        font-size: 20px;
+      }
+    }
+  }
+}

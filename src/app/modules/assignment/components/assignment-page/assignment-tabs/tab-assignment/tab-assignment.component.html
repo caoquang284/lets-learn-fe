@@ -52,6 +52,38 @@
     <h3>Class comments</h3>
   </div>
 
-  <comment-list />
-  <comment-input />
+  <div class="meeting-comments-list">
+    @for(comment of comments; track comment.id) {
+      <div class="meeting-comment">
+        <img [src]="getAvatar(comment)" class="avatar" [alt]="getAuthorName(comment) + ' avatar'" [title]="getAuthorName(comment)">
+        <div class="comment-content">
+          <div class="comment-header">
+            <strong class="author">{{ getAuthorName(comment) }}</strong>
+            <span class="timestamp">{{ formatDate(comment.createdAt, 'MM/dd/yyyy HH:mm a') }}</span>
+          </div>
+          <p class="comment-text">{{ comment.text }}</p>
+        </div>
+      </div>
+    }
+  </div>
+  
+  <div class="meeting-comment-input">
+    <div class="input-container">
+      <img [src]="getCurrentUserAvatar()" class="avatar current-user" [alt]="(currentUser?.username || 'You') + ' avatar'" [title]="currentUser?.username || 'You'">
+      <input 
+        type="text" 
+        [(ngModel)]="newCommentText"
+        placeholder="Add class comment..." 
+        (keyup.enter)="addComment()"
+        class="comment-input-field"
+      >
+      <button 
+        class="send-btn" 
+        (click)="addComment()" 
+        [disabled]="!newCommentText.trim()"
+      >
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </div>
+  </div>
 </card>
