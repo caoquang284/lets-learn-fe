@@ -92,44 +92,40 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   markNotification(notificationId: string | number, isRead: boolean) {
     const id = String(notificationId);
-    this.notificationService
-      .markAsRead(id, isRead)
-      .then((updated) => {
+    this.notificationService.markAsRead(id, isRead).subscribe(
+      (updated) => {
         this.notifications = this.notifications.map((notification) =>
           String(notification.id) === String(updated.id)
             ? { ...notification, isRead: updated.isRead }
             : notification
         );
-      })
-      .catch((err) => console.error('Failed to mark notification', err))
-      .finally(() => {
-        this.activeNotificationMenuId = null;
-      });
+      },
+      (err) => console.error('Failed to mark notification', err),
+      () => (this.activeNotificationMenuId = null)
+    );
   }
 
   deleteNotification(notificationId: string | number) {
     const id = String(notificationId);
-    this.notificationService
-      .deleteNotification(id)
-      .then(() => {
+    this.notificationService.deleteNotification(id).subscribe(
+      () => {
         this.notifications = this.notifications.filter(
           (notification) => String(notification.id) !== id
         );
-      })
-      .catch((err) => console.error('Failed to delete notification', err))
-      .finally(() => {
-        this.activeNotificationMenuId = null;
-      });
+      },
+      (err) => console.error('Failed to delete notification', err),
+      () => (this.activeNotificationMenuId = null)
+    );
   }
 
   loadNotifications() {
-    this.notificationService
-      .getNotifications()
-      .then((data) => {
+    this.notificationService.getNotifications().subscribe(
+      (data) => {
         this.notifications = data;
         this.updateFilteredNotifications();
-      })
-      .catch((err) => console.error('Failed to load notifications', err));
+      },
+      (err) => console.error('Failed to load notifications', err)
+    );
   }
 
   updateFilteredNotifications() {
