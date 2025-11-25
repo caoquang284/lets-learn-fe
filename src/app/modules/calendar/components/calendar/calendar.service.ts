@@ -76,7 +76,7 @@ export class CalendarService {
   };
 
   handleGetThisMeetingTopic = (topic: MeetingTopic): TopicItem => {
-    const openDate = topic.data.open ? new Date(topic.data.open) : new Date();
+    const openDate = topic.data.open ? new Date(topic.data.open) : null;
     return {
       startTime: openDate,
       endTime: null,

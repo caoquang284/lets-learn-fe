@@ -1,7 +1,7 @@
 <header>
   <form>
     <app-combobox
-      [options]="courseOptions || []"
+      [options]="courseOptions()"
       (onSelect)="onSelectOption($event)"
       placeholder="Select a course"
     />
@@ -11,6 +11,7 @@
       class="nav-button"
       (click)="navigatePrevious()"
       aria-label="Previous week"
+      [disabled]="isLoading()"
     >
       <span class="material-symbols-outlined"> chevron_left </span>
     </button>
@@ -21,4 +22,4 @@
   </div>
   <div class="temp"></div>
 </header>
-<calendar [range]="calendarRange()" [topics]="topics" />
+<calendar [range]="calendarRange()" [topics]="filteredTopics()" />
