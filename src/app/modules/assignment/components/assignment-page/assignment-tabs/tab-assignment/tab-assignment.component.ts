@@ -15,6 +15,11 @@ import { StudentResponse } from '@shared/models/student-response';
 import { Course } from '@shared/models/course';
 import { CloudinaryFile } from '@shared/models/cloudinary-file';
 import { AssignmentData } from '@shared/models/assignment';
+import { Comment } from '@shared/models/comment';
+import { getComments, createComment } from '@shared/api/comment.api';
+import { User } from '@shared/models/user';
+import { UserService } from '@shared/services/user.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'tab-assignment',
@@ -30,10 +35,24 @@ export class TabAssignmentComponent implements OnInit, OnChanges {
   studentResponses: StudentResponse[] = [];
   uploadedFiles: CloudinaryFile[] = [];
 
-  constructor(private tabService: TabService<string>) {}
+  // Comment functionality
+  comments: Comment[] = [];
+  newCommentText: string = '';
+  currentUser: User | null = null;
+  courseId: string | null = null;
+
+  constructor(
+    private tabService: TabService<string>,
+    private userService: UserService,
+    private activatedRoute: ActivatedRoute
+  ) {
+    this.courseId = this.activatedRoute.snapshot.paramMap.get('courseId');
+  }
 
   ngOnInit(): void {
+    this.currentUser = this.userService.getUser();
     this.fetchAssignmentResponses();
+    this.fetchComments();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -76,5 +95,45 @@ export class TabAssignmentComponent implements OnInit, OnChanges {
 
   onGradeBtnClick() {
     this.tabService.selectTab(AssignmentTab.SUBMISSIONS);
+  }
+
+  async fetchComments(): Promise<void> {
+    if (!this.courseId || !this.topic?.id) return;
+    
+    try {
+      this.comments = await getComments(this.courseId, this.topic.id);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      this.comments = [];
+    }
+  }
+
+  getAuthorName(comment: Comment): string {
+    return comment.user?.username || 'Unknown User';
+  }
+
+  getAvatar(comment: Comment): string {
+    return comment.user?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=?';
+  }
+
+  getCurrentUserAvatar(): string {
+    return this.currentUser?.avatar || 'https://via.placeholder.com/40/607D8B/FFFFFF?text=You';
+  }
+
+  async addComment(): Promise<void> {
+    if (!this.newCommentText.trim() || !this.courseId || !this.topic?.id) return;
+    
+    try {
+      const newComment = await createComment(
+        this.courseId,
+        this.topic.id,
+        { text: this.newCommentText.trim() }
+      );
+      
+      this.comments = [...this.comments, newComment];
+      this.newCommentText = '';
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
   }
 }

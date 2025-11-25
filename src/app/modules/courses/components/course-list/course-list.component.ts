@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   GetPublicCourses,
+  GetStudentCourses,
   GetTeacherCourses,
   JoinCourse,
 } from '@modules/courses/api/courses.api';
@@ -44,6 +45,9 @@ export class CourseListComponent implements OnInit {
     if (!user) return;
     let res: Course[] = [];
     if (user.role === Role.TEACHER) res = await GetTeacherCourses(user.id);
+    else if (user.role === Role.STUDENT) res = await GetStudentCourses(user.id);
+    //Nen cho la` neu' role STUDENT thi` se hien thi. ca course public va` course da~ dang ky
+    //Hien tai. chi hien course da dang ky
     else res = await GetPublicCourses();
     this.courses = res;
   }

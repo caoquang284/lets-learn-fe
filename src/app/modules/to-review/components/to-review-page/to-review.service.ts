@@ -14,100 +14,82 @@ import { GetCourseWork } from '@modules/courses/api/courses.api';
 import { GetTeacherCourses } from '@modules/courses/api/courses.api';
 import { UserService } from '@shared/services/user.service';
 import { GetAllQuizResponsesOfTopic } from '@modules/quiz/api/quiz-response.api';
-//import { GetAllAssignmentResponsesOfTopic } from '@modules/assignment/api/assignment-response.api';
+import { GetAllAssignmentResponsesOfTopic } from '@modules/assignment/api/assignment-response.api';
 import {
   StudentResponse,
   QuizResponseData,
   AssignmentResponseData,
 } from '@shared/models/student-response';
 import { isWorkingInProgressTopic, isClosedTopic, isNoDueDateTopic } from '../../helper/to-review.util';
-import { mockReviewItems } from '@shared/mocks/to-review';
 
 @Injectable()
 export class ToReviewService {
   constructor(private userService: UserService) {}
 
-  // Mock version for frontend development
   async getReviewItems(courseId?: string): Promise<ReviewItem[]> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let filteredItems = mockReviewItems;
-    
-    // Filter by course if specified
+    const user = this.userService.getUser();
+    if (!user) throw new Error('User not found');
+
+    let topics: Topic[] = [];
     if (courseId && courseId !== 'all') {
-      filteredItems = mockReviewItems.filter(item => 
-        item.topic.course?.id === courseId
-      );
+      topics = await GetCourseWork(courseId, null);
+    } else {
+      // All courses for teacher
+      const courses: Course[] = await GetTeacherCourses(user.id);
+      let allTopics: Topic[] = [];
+      for (const course of courses) {
+        const courseTopics = await GetCourseWork(course.id, null);
+        // Attach course info to each topic
+        courseTopics.forEach(topic => {
+          topic.course = {
+            id: course.id,
+            title: course.title,
+            description: course.description || '',
+            imageUrl: course.imageUrl || '',
+            price: course.price || 0,
+            category: course.category || '',
+            level: course.level || '',
+            students: course.students || [],
+            creator: course.creator || { id: '', username: '', email: '', password: '', avatar: '', role: undefined, courses: [] },
+            sections: course.sections || [],
+            isPublished: course.isPublished || false
+          };
+        });
+        allTopics = allTopics.concat(courseTopics);
+      }
+      topics = allTopics;
     }
-    
-    return filteredItems;
+
+    // Filter topics and fetch responses for each topic
+    const reviewableTopics = topics.filter(
+      (topic) =>
+        topic.type === TopicType.ASSIGNMENT || topic.type === TopicType.QUIZ
+    );
+
+    const reviewItems = await Promise.all(
+      reviewableTopics.map(async (topic) => {
+        let responses: StudentResponse[] = [];
+        try {
+          if (topic.type === TopicType.QUIZ) {
+            const allResponses = await GetAllQuizResponsesOfTopic(topic.id);
+            responses = allResponses;
+          } else if (topic.type === TopicType.ASSIGNMENT) {
+            const allResponses = await GetAllAssignmentResponsesOfTopic(topic.id);
+            responses = allResponses;
+          }
+        } catch (error) {
+          console.error(
+            `Failed to fetch responses for topic ${topic.id}:`,
+            error
+          );
+          responses = [];
+        }
+        return this.convertTopicToReviewItem(topic, responses);
+      })
+    );
+
+    return reviewItems;
   }
-
-  // async getReviewItems(courseId?: string): Promise<ReviewItem[]> {
-  //   const user = this.userService.getUser();
-  //   if (!user) throw new Error('User not found');
-
-  //   let topics: Topic[] = [];
-  //   if (courseId && courseId !== 'all') {
-  //     topics = await GetCourseWork(courseId, null);
-  //   } else {
-  //     // All courses for teacher
-  //     const courses: Course[] = await GetTeacherCourses(user.id);
-  //     let allTopics: Topic[] = [];
-  //     for (const course of courses) {
-  //       const courseTopics = await GetCourseWork(course.id, null);
-  //       // Attach course info to each topic
-  //       courseTopics.forEach(topic => {
-  //         topic.course = {
-  //           id: course.id,
-  //           title: course.title,
-  //           description: course.description || '',
-  //           imageUrl: course.imageUrl || '',
-  //           price: course.price || 0,
-  //           category: course.category || '',
-  //           level: course.level || '',
-  //           students: course.students || [],
-  //           creator: course.creator || { id: '', username: '', email: '', password: '', avatar: '', role: undefined, courses: [] },
-  //           sections: course.sections || [],
-  //           isPublished: course.isPublished || false
-  //         };
-  //       });
-  //       allTopics = allTopics.concat(courseTopics);
-  //     }
-  //     topics = allTopics;
-  //   }
-
-  //   // Filter topics and fetch responses for each topic
-  //   const reviewableTopics = topics.filter(
-  //     (topic) =>
-  //       topic.type === TopicType.ASSIGNMENT || topic.type === TopicType.QUIZ
-  //   );
-
-  //   // const reviewItems = await Promise.all(
-  //   //   reviewableTopics.map(async (topic) => {
-  //   //     let responses: StudentResponse[] = [];
-  //   //     try {
-  //   //       if (topic.type === TopicType.QUIZ) {
-  //   //         const allResponses = await GetAllQuizResponsesOfTopic(topic.id);
-  //   //         responses = allResponses;
-  //   //       } else if (topic.type === TopicType.ASSIGNMENT) {
-  //   //         const allResponses = await GetAllAssignmentResponsesOfTopic(topic.id);
-  //   //         responses = allResponses;
-  //   //       }
-  //   //     } catch (error) {
-  //   //       console.error(
-  //   //         `Failed to fetch responses for topic ${topic.id}:`,
-  //   //         error
-  //   //       );
-  //   //       responses = [];
-  //   //     }
-  //   //     return this.convertTopicToReviewItem(topic, responses);
-  //   //   })
-  //   // );
-
-  //   // return reviewItems;
-  // }
 
   private isQuizResponse(
     data: QuizResponseData | AssignmentResponseData

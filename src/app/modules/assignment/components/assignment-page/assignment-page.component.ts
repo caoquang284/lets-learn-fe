@@ -36,12 +36,13 @@ export class AssignmentPageComponent implements OnInit {
     private userService: UserService,
     private breadcrumbService: BreadcrumbService,
     private activedRoute: ActivatedRoute,
+    private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) {
     const topicId = this.activedRoute.snapshot.paramMap.get('topicId');
     const courseId = this.activedRoute.snapshot.paramMap.get('courseId');
     if (courseId) this.fetchCourseData(courseId);
-    if (topicId) this.fetchTopicData(topicId);
+    if (topicId) this.fetchTopicData(topicId, courseId!);
     if (courseId && topicId && this.course && this.topic) {
       this.updateBreadcrumb(this.course, this.topic);
     }

@@ -21,6 +21,10 @@ export const GetPublicCourses = (): Promise<Course[]> => {
   return GET('/course');
 };
 
+export const GetStudentCourses = (studentId: string): Promise<Course[]> => {
+  return GET(`/course?studentId=${studentId}`);
+};
+
 export const GetTeacherCourses = (userId: string): Promise<Course[]> => {
   return GET(`/course?userId=${userId}`);
 };
