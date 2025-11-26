@@ -54,11 +54,27 @@ export const convertQuizToRequestData = (quiz: QuizTopic) => {
 };
 
 export const convertQuizFromResponseData = (quiz: any): QuizTopic => {
-  const parsedData = quiz.data ? JSON.parse(quiz.data) : null;
-  const convertedQuestions = parsedData
+  // Handle data - can be JSON string or direct object
+  const parsedData = quiz.data 
+    ? (typeof quiz.data === 'string' ? JSON.parse(quiz.data) : quiz.data)
+    : null;
+  
+  const convertedQuestions = parsedData && parsedData.questions
     ? parsedData.questions.map((q: any) => convertQuestionFromResponseData(q))
     : [];
-  const parsedResponse = quiz.response ? JSON.parse(quiz.response) : undefined;
+  
+  // Handle response - can be JSON string, array, or direct object
+  let parsedResponse;
+  if (quiz.response) {
+    if (typeof quiz.response === 'string') {
+      parsedResponse = JSON.parse(quiz.response);
+    } else if (Array.isArray(quiz.response)) {
+      parsedResponse = quiz.response;
+    } else {
+      parsedResponse = [quiz.response];
+    }
+  }
+  
   let res = {
     ...quiz,
     data: {

@@ -13,9 +13,16 @@ export const convertAssignmentToRequestData = (assignment: AssignmentTopic) => {
 export const convertAssignmentFromResponseData = (
   assignment: any
 ): AssignmentTopic => {
-  const parsedData = JSON.parse(assignment.data);
+  // Handle data - can be JSON string or direct object
+  const parsedData = typeof assignment.data === 'string' 
+    ? JSON.parse(assignment.data) 
+    : assignment.data;
+  
+  // Handle response - can be JSON string or direct object
   const parsedResponse = assignment.response
-    ? JSON.parse(assignment.response)
+    ? (typeof assignment.response === 'string' 
+        ? JSON.parse(assignment.response) 
+        : assignment.response)
     : undefined;
 
   return {
