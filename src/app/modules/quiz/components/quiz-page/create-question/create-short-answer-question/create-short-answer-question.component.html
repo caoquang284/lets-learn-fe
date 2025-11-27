@@ -1,5 +1,5 @@
 <div class="container">
-  <h3 class="title">Adding a Choice question</h3>
+  <h3 class="title">Adding a Short Answer question</h3>
   <form [formGroup]="form" (submit)="onSubmit($event)">
     <app-collapsible-list>
       <app-collapsible-section [sectionId]="sectionIds[0]" [hasBorder]="false">
@@ -22,21 +22,39 @@
       </app-collapsible-section>
       <app-collapsible-section [sectionId]="sectionIds[1]" [hasBorder]="false">
         <!-- Section dynamic title -->
-        <span class="section-title" title>Answers</span>
+        <span class="section-title" title>Answer</span>
 
         <!-- Section dynamic content -->
         <div class="content" content>
           @for(controls of answerFormControls; track controls; let i = $index) {
-          <div class="flex-row">
-            @for(control of controls; track control.id) {
-            <app-form-field
-              [showLabel]="true"
-              labelPosition="top"
-              [control]="control"
-              [controlName]="control.id"
-              [form]="getFormGroupFromForm(i)"
-            />
-            }
+          <div class="answer-section">
+            <h4 class="answer-title">Answer {{ i + 1 }}</h4>
+            <div class="answer-row">
+              <setting-row [label]="controls[0].label" [id]="controls[0].id" class="answer-input">
+                <app-form-field
+                  [control]="controls[0]"
+                  [controlName]="controls[0].id"
+                  [form]="getFormGroupFromForm(i)"
+                  [showLabel]="false"
+                />
+              </setting-row>
+              <setting-row [label]="controls[1].label" [id]="controls[1].id" class="grade-percent">
+                <app-form-field
+                  [control]="controls[1]"
+                  [controlName]="controls[1].id"
+                  [form]="getFormGroupFromForm(i)"
+                  [showLabel]="false"
+                />
+              </setting-row>
+            </div>
+            <setting-row [label]="controls[2].label" [id]="controls[2].id">
+              <app-form-field
+                [control]="controls[2]"
+                [controlName]="controls[2].id"
+                [form]="getFormGroupFromForm(i)"
+                [showLabel]="false"
+              />
+            </setting-row>
           </div>
           }
         </div>
@@ -45,7 +63,7 @@
     <div class="action-container">
       <app-button
         type="button"
-        label="Add answer"
+        label="Add acceptable answer"
         variant="ghost"
         (onClick)="addQuestionChoice()"
       />

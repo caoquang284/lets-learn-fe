@@ -1,0 +1,28 @@
+@use "styles/theme/theme.variables" as *;
+
+.rich-text-editor-container {
+  width: 100%;
+  
+  ::ng-deep {
+    .NgxEditor {
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      min-height: 200px;
+      
+      &:focus-within {
+        border-color: $tint-color;
+      }
+    }
+
+    .NgxEditor__MenuBar {
+      border-bottom: 1px solid $border-color;
+      background-color: $background-secondary-color;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .NgxEditor__Content {
+      padding: 12px;
+      min-height: 150px;
+    }
+  }
+}

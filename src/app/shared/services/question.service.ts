@@ -16,10 +16,10 @@ export class QuestionService {
     let choices: QuestionChoice[] = [];
     if (question.type == QuestionType.CHOICE) {
       const data = question.data as ChoiceQuestion;
-      choices = [...data.choices];
+      if (data?.choices) choices = [...data.choices];
     } else if (question.type == QuestionType.SHORT_ANSWER) {
       const data = question.data as ShortAnswerQuestion;
-      choices = [...data.choices];
+      if (data?.choices) choices = [...data.choices];
     }
 
     return choices;
@@ -28,6 +28,7 @@ export class QuestionService {
   convertToHashAnswer(question: Question, answer: string | string[]): string {
     if (question.type === QuestionType.CHOICE) {
       const data = question.data as ChoiceQuestion;
+      if (!data) return answer as string;
       if (data.multiple) {
         answer = answer as string[];
         return this.convertMultipleChoiceAnswerToHashAnswer(data, answer);
@@ -39,6 +40,7 @@ export class QuestionService {
   parseFromHashAnswer(question: Question, answer: string): string | string[] {
     if (question.type === QuestionType.CHOICE) {
       const data = question.data as ChoiceQuestion;
+      if (!data) return answer;
       if (data.multiple) {
         return this.parseMultipleChoiceAnswerFromHashAnswer(data, answer);
       }
@@ -117,6 +119,7 @@ export class QuestionService {
   getTrueFalseQuestionMark = (question: Question, answer: string) => {
     if (answer !== '1' && answer !== '0') return 0;
     const data = question.data as TrueFalseQuestion;
+    if (!data) return 0;
     const correctAnswer = data.correctAnswer;
     const userAnswer = answer === '1';
     return userAnswer === correctAnswer ? question.defaultMark : 0;
@@ -125,6 +128,7 @@ export class QuestionService {
   getQuestionMark = (question: Question, answer: string | string[]) => {
     if (question.type === QuestionType.CHOICE) {
       const data = question.data as ChoiceQuestion;
+      if (!data) return 0;
       if (data.multiple) {
         return this.getMultipleChoiceQuestionMark(question, answer as string[]);
       } else {

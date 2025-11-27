@@ -59,5 +59,11 @@
     [onClick]="control.onClick"
   ></form-button>
   <span class="description">{{ control.description }}</span>
+  } @else if(control.componentType === 'richtext') {
+  <app-rich-text-editor
+    [form]="form"
+    [controlName]="controlName"
+    [placeholder]="control.placeholder"
+  />
   }
 </div>

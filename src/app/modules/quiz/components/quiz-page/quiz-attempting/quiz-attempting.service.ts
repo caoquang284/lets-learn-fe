@@ -106,7 +106,7 @@ export class QuizAttemptingService {
   isMultipleChoice(question: Question): boolean {
     if (question.type !== QuestionType.CHOICE) return false;
     const data = question.data as ChoiceQuestion;
-    return data.multiple;
+    return data?.multiple ?? false;
   }
 
   isSelectedChoice(questionId: string, answer: string): boolean {

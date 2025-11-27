@@ -11,7 +11,8 @@ type ComponentType =
   | 'datetime'
   | 'checkbox'
   | 'file-upload'
-  | 'button';
+  | 'button'
+  | 'richtext';
 
 export interface FormControlField {
   id: string;

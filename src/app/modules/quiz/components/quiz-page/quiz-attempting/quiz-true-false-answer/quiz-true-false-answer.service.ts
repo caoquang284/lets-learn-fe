@@ -31,6 +31,7 @@ export class QuizTrueFalseAnswerService {
   isChoiceCorrect(): boolean {
     if (!this.question) return false;
     const data = this.question.data as TrueFalseQuestion;
+    if (!data) return false;
     return this.choiceValue === data.correctAnswer;
   }
 

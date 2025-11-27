@@ -63,6 +63,8 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { PopoverComponent } from './popover/popover.component';
 import { AccountPopoverComponent } from './header/account-popover/account-popover.component';
 import { AlertComponent } from './alert/alert.component';
+import { RichTextEditorComponent } from './rich-text-editor/rich-text-editor.component';
+import { NgxEditorModule } from 'ngx-editor';
 
 @NgModule({
   declarations: [
@@ -111,6 +113,7 @@ import { AlertComponent } from './alert/alert.component';
     PopoverComponent,
     AccountPopoverComponent,
     AlertComponent,
+    RichTextEditorComponent,
   ],
   imports: [
     CommonModule,
@@ -128,6 +131,7 @@ import { AlertComponent } from './alert/alert.component';
     FormsModule,
     MatIconModule,
     OverlayModule,
+    NgxEditorModule,
   ],
   exports: [
     FormWarningComponent,
@@ -171,6 +175,7 @@ import { AlertComponent } from './alert/alert.component';
     PopoverComponent,
     AccountPopoverComponent,
     AlertComponent,
+    RichTextEditorComponent,
   ],
 })
 export class SharedComponentsModule {}

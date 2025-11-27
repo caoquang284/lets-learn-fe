@@ -12,11 +12,11 @@ import { CreateQuestion, GetQuestion } from '@modules/quiz/api/question.api';
 import { CollapsibleListService } from '@shared/components/collapsible-list/collapsible-list.service';
 import { generateId } from '@shared/helper/string.helper';
 import {
-  ChoiceQuestion,
   Question,
   QuestionChoice,
   QuestionStatus,
   QuestionType,
+  ShortAnswerQuestion,
 } from '@shared/models/question';
 import { ToastrService } from 'ngx-toastr';
 import {
@@ -51,7 +51,7 @@ export class CreateShortAnswerQuestionComponent {
   ) {}
 
   initForm(question: Question | null): void {
-    const questionData = question ? (question.data as ChoiceQuestion) : null;
+    const questionData = question ? (question.data as ShortAnswerQuestion) : null;
     this.form = this.fb.group(
       {
         questionName: new FormControl<string>(question?.questionName ?? '', [
@@ -102,7 +102,7 @@ export class CreateShortAnswerQuestionComponent {
 
   getDefaultAnswerFormGroup(index: number) {
     return this.fb.group({
-      text: new FormControl<string>(`Choice ${index + 1}`, [
+      text: new FormControl<string>(`Answer ${index + 1}`, [
         Validators.required,
         Validators.minLength(1),
       ]),

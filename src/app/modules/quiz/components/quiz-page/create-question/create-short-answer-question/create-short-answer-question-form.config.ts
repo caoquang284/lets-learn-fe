@@ -19,7 +19,7 @@ export const createShortAnswerQuestionGeneralFormControls: FormControlField[] =
       id: 'questionText',
       label: 'Question text',
       type: 'text',
-      componentType: 'input',
+      componentType: 'richtext',
       placeholder: 'E.g. Is the sky blue?',
       validationMessages: {
         required: 'Question text is required',
@@ -63,10 +63,10 @@ export const getShortAnswerQuestionAnswerFormControls = (
       label: `Answer ${index + 1}`,
       type: 'text',
       componentType: 'input',
-      placeholder: 'E.g. Blue',
+      placeholder: 'Enter an acceptable answer',
       validationMessages: {
-        required: 'Choice text is required',
-        minlength: 'Choice text must be at least 1 character',
+        required: 'Answer text is required',
+        minlength: 'Answer text must be at least 1 character',
       },
     },
     {
@@ -82,8 +82,8 @@ export const getShortAnswerQuestionAnswerFormControls = (
       id: 'feedback',
       label: 'Feedback',
       type: 'text',
-      componentType: 'input',
-      placeholder: 'E.g. Good choice',
+      componentType: 'richtext',
+      placeholder: 'Tiny editor content',
       validationMessages: {},
     },
   ];

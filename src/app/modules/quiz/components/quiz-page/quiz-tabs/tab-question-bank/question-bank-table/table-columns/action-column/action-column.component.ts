@@ -41,10 +41,10 @@ export class ActionColumnComponent implements OnInit {
 
   onEditRow(id: string): void {
     let type = 'choice';
-    if (this.rowData.type === QuestionType.CHOICE) {
-      type = 'true_false';
+    if (this.rowData.type === QuestionType.SHORT_ANSWER) {
+      type = 'short-answer';
     } else if (this.rowData.type === QuestionType.TRUE_FALSE) {
-      type = 'short_answer';
+      type = 'true-false';
     }
     this.router.navigate([
       `courses/${this.courseId}/question/${type}/${id}/edit`,
