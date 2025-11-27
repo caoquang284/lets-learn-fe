@@ -105,8 +105,10 @@ export class QuizAttemptingService {
 
   isMultipleChoice(question: Question): boolean {
     if (question.type !== QuestionType.CHOICE) return false;
+    // Handle both nested data structure and flat structure from API
     const data = question.data as ChoiceQuestion;
-    return data?.multiple ?? false;
+    const flatMultiple = (question as any).multiple;
+    return data?.multiple ?? flatMultiple ?? false;
   }
 
   isSelectedChoice(questionId: string, answer: string): boolean {

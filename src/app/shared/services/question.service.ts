@@ -15,11 +15,22 @@ export class QuestionService {
   getChoices(question: Question) {
     let choices: QuestionChoice[] = [];
     if (question.type == QuestionType.CHOICE) {
+      // Handle both nested data structure and flat structure from API
       const data = question.data as ChoiceQuestion;
-      if (data?.choices) choices = [...data.choices];
+      const flatChoices = (question as any).choices;
+      if (data?.choices) {
+        choices = [...data.choices];
+      } else if (flatChoices) {
+        choices = [...flatChoices];
+      }
     } else if (question.type == QuestionType.SHORT_ANSWER) {
       const data = question.data as ShortAnswerQuestion;
-      if (data?.choices) choices = [...data.choices];
+      const flatChoices = (question as any).choices;
+      if (data?.choices) {
+        choices = [...data.choices];
+      } else if (flatChoices) {
+        choices = [...flatChoices];
+      }
     }
 
     return choices;
@@ -27,24 +38,40 @@ export class QuestionService {
 
   convertToHashAnswer(question: Question, answer: string | string[]): string {
     if (question.type === QuestionType.CHOICE) {
+      // Handle both nested data structure and flat structure from API
       const data = question.data as ChoiceQuestion;
-      if (!data) return answer as string;
-      if (data.multiple) {
+      const flatMultiple = (question as any).multiple;
+      const flatChoices = (question as any).choices;
+      
+      const choices = data?.choices || flatChoices || [];
+      const multiple = data?.multiple ?? flatMultiple ?? false;
+      
+      const choiceQuestion: ChoiceQuestion = { choices, multiple };
+      
+      if (multiple) {
         answer = answer as string[];
-        return this.convertMultipleChoiceAnswerToHashAnswer(data, answer);
+        return this.convertMultipleChoiceAnswerToHashAnswer(choiceQuestion, answer);
       }
-      return this.convertSingleChoiceAnswerToHashAnswer(data, answer as string);
+      return this.convertSingleChoiceAnswerToHashAnswer(choiceQuestion, answer as string);
     }
     return answer as string;
   }
   parseFromHashAnswer(question: Question, answer: string): string | string[] {
     if (question.type === QuestionType.CHOICE) {
+      // Handle both nested data structure and flat structure from API
       const data = question.data as ChoiceQuestion;
-      if (!data) return answer;
-      if (data.multiple) {
-        return this.parseMultipleChoiceAnswerFromHashAnswer(data, answer);
+      const flatMultiple = (question as any).multiple;
+      const flatChoices = (question as any).choices;
+      
+      const choices = data?.choices || flatChoices || [];
+      const multiple = data?.multiple ?? flatMultiple ?? false;
+      
+      const choiceQuestion: ChoiceQuestion = { choices, multiple };
+      
+      if (multiple) {
+        return this.parseMultipleChoiceAnswerFromHashAnswer(choiceQuestion, answer);
       }
-      return this.parseSingleChoiceAnswerFromHashAnswer(data, answer);
+      return this.parseSingleChoiceAnswerFromHashAnswer(choiceQuestion, answer);
     }
     return answer;
   }
@@ -127,9 +154,12 @@ export class QuestionService {
 
   getQuestionMark = (question: Question, answer: string | string[]) => {
     if (question.type === QuestionType.CHOICE) {
+      // Handle both nested data structure and flat structure from API
       const data = question.data as ChoiceQuestion;
-      if (!data) return 0;
-      if (data.multiple) {
+      const flatMultiple = (question as any).multiple;
+      const multiple = data?.multiple ?? flatMultiple ?? false;
+      
+      if (multiple) {
         return this.getMultipleChoiceQuestionMark(question, answer as string[]);
       } else {
         return this.getSingleChoiceQuestionMark(question, answer as string);
