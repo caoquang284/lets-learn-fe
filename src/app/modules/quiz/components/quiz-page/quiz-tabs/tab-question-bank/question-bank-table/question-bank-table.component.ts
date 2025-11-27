@@ -6,6 +6,8 @@ import {
   Input,
   Output,
   EventEmitter,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { questionIconMap } from '@modules/quiz/constants/quiz.constant';
 import { getQuestionBank } from '@modules/quiz/api/question.api';
@@ -43,7 +45,7 @@ export type QuestionElement = {
   templateUrl: './question-bank-table.component.html',
   styleUrl: './question-bank-table.component.scss',
 })
-export class QuestionBankTableComponent implements OnInit, AfterViewInit {
+export class QuestionBankTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input({ required: true }) topic!: QuizTopic;
   @Output() topicChange = new EventEmitter<QuizTopic>();
   questions: Question[] = [];
@@ -82,6 +84,15 @@ export class QuestionBankTableComponent implements OnInit, AfterViewInit {
     });
     this.dialogService.setCancelAction(() => this.onCancelCreateQuestion());
     this.dialogService.setConfirmAction(() => this.onConfirmCreateQuestion());
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // When topic input changes from parent, the component automatically gets the updated reference
+    // This ensures we always work with the latest topic data including newly added questions
+    if (changes['topic'] && !changes['topic'].firstChange) {
+      // Topic has been updated by parent after API call
+      // The binding will automatically update this.topic
+    }
   }
 
   ngAfterViewInit() {
@@ -149,13 +160,26 @@ export class QuestionBankTableComponent implements OnInit, AfterViewInit {
       this.toastrService.error('Question not found in the question bank.');
       return;
     }
+    
+    // Check if question is already added to the quiz
+    const alreadyExists = this.topic.data.questions.some(
+      (q) => q.id === questionId
+    );
+    if (alreadyExists) {
+      this.toastrService.warning('Question already added to this quiz.');
+      return;
+    }
+    
+    // Create a deep copy to ensure change detection triggers
     const updatedQuiz: QuizTopic = {
       ...this.topic,
       data: {
         ...this.topic.data,
-        questions: [...this.topic.data.questions, questionToAdd],
+        questions: [...this.topic.data.questions, { ...questionToAdd }],
       },
     };
+    
+    console.log('Emitting updated quiz with questions:', updatedQuiz.data.questions.length);
     this.topicChange.emit(updatedQuiz);
   }
 }

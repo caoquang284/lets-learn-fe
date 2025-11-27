@@ -8,12 +8,15 @@ export const convertChoicesInQuestionToRequestData = (
   choices: QuestionChoice[]
 ) => {
   return (choices ?? []).map((choice) => {
+    // Handle both frontend (questionId) and backend (quizQuestionId) structures
+    const qId = choice.questionId || (choice as any).quizQuestionId;
+    
     return {
-      id: choice.id.length === 4 ? null : choice.id,
+      id: choice.id && choice.id.length === 4 ? null : choice.id,
       text: choice.text,
       gradePercent: choice.gradePercent,
       feedback: choice.feedback,
-      questionId: choice.questionId.length === 4 ? null : choice.questionId,
+      questionId: qId && qId.length === 4 ? null : qId,
     };
   });
 };
@@ -35,7 +38,11 @@ export const convertChoiceQuestionToRequestData = (
     createdBy,
     modifiedBy,
   } = question;
-  const { choices, multiple } = question.data as ChoiceQuestion;
+  
+  // Handle both cases: question.data exists or choices/multiple are at top level
+  const choiceData = question.data as ChoiceQuestion;
+  const choices = choiceData?.choices || (question as any).choices || [];
+  const multiple = choiceData?.multiple ?? (question as any).multiple ?? false;
 
   let reqData = {
     id: id.length === 4 ? null : id,

@@ -12,6 +12,7 @@ export class TabQuestionBankComponent {
   @Output() topicChange = new EventEmitter<QuizTopic>();
 
   onTopicChange(topic: QuizTopic): void {
+    console.log('tab-question-bank: Emitting topic change with questions:', topic.data.questions.length);
     this.topicChange.emit(topic);
   }
 }

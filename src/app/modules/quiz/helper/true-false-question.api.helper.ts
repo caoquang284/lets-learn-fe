@@ -17,8 +17,12 @@ export const convertTrueFalseQuestionToRequestData = (
     createdBy,
     modifiedBy,
   } = question;
-  const { correctAnswer, feedbackOfFalse, feedbackOfTrue } =
-    question.data as TrueFalseQuestion;
+  
+  // Handle both cases: question.data exists or fields are at top level
+  const trueFalseData = question.data as TrueFalseQuestion;
+  const correctAnswer = trueFalseData?.correctAnswer ?? (question as any).correctAnswer ?? false;
+  const feedbackOfFalse = trueFalseData?.feedbackOfFalse ?? (question as any).feedbackOfFalse ?? null;
+  const feedbackOfTrue = trueFalseData?.feedbackOfTrue ?? (question as any).feedbackOfTrue ?? null;
 
   let reqData = {
     id: id.length === 4 ? null : id,

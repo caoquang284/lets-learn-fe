@@ -18,7 +18,10 @@ export const convertShortAnswerQuestionToRequestData = (
     createdBy,
     modifiedBy,
   } = question;
-  const { choices } = question.data as ShortAnswerQuestion;
+  
+  // Handle both cases: question.data exists or choices are at top level
+  const shortAnswerData = question.data as ShortAnswerQuestion;
+  const choices = shortAnswerData?.choices || (question as any).choices || [];
 
   let reqData = {
     id: id.length === 4 ? null : id,

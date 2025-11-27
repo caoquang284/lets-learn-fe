@@ -111,17 +111,20 @@ export class QuizPageComponent implements OnInit {
   }
 
   async onTopicChange(updatedQuiz: QuizTopic) {
+    console.log('quiz-page: onTopicChange called with questions:', updatedQuiz.data.questions.length);
     if (!this.course) {
       console.error('Course is not defined');
       return;
     }
     await UpdateTopic(updatedQuiz, this.course.id)
       .then((res) => {
+        console.log('quiz-page: API response received with questions:', (res as QuizTopic).data.questions.length);
         this.topic = res as QuizTopic;
         this.cdr.detectChanges();
         this.toastrService.success('Topic updated successfully');
       })
       .catch((error) => {
+        console.error('quiz-page: Update failed:', error);
         this.toastrService.error(error.message);
       });
   }

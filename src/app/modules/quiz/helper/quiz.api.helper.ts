@@ -34,12 +34,16 @@ export const convertQuizToRequestData = (quiz: QuizTopic) => {
       return {
         ...q,
         ...restData,
+        topicQuizId: id, // Set topicQuizId to the current quiz's ID
         choices: Array.isArray(choices) ? choices : [],
         multiple: typeof multiple === 'boolean' ? multiple : false,
         data: undefined, // Remove data property
       };
     }
-    return q;
+    return {
+      ...q,
+      topicQuizId: id, // Set topicQuizId for questions without data property
+    };
   });
 
   const convertedData = {
