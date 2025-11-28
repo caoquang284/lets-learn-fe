@@ -4,12 +4,8 @@ import { GET } from '@shared/api/utils.api';
 // Backend should verify the current user and issue a signed token.
 export const GetMeetingToken = (
   topicId: string,
-  identity: string
-): Promise<{ token: string; url?: string }> => {
-  return GET(`/meeting/${topicId}/token`, { identity });
+  courseId: string
+): Promise<{ token: string; roomName: string; wsUrl: string }> => {
+  return GET(`/course/${courseId}/meeting/${topicId}/token`);
 };
-
-// Optional helpers you might expose later if needed
-// export const CreateMeetingRoom = (topicId: string) => POST(`/meeting/${topicId}/room`);
-// export const EndMeetingRoom = (topicId: string) => DELETE(`/meeting/${topicId}/room`);
 

@@ -6,7 +6,8 @@ import { User } from '@shared/models/user';
 import { Comment } from '@shared/models/comment';
 import { getComments, createComment } from '@shared/api/comment.api';
 import { UserService } from '@shared/services/user.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { GetMeetingToken } from '@modules/meeting/api/meeting.api';
 
 @Component({
   selector: 'tab-meeting',
@@ -20,6 +21,7 @@ export class TabMeetingComponent implements OnInit, OnChanges {
   hasMeeting: boolean = false;
   meetingDescription: string | null = null;
   meetingOpenDate: string | null = null;
+  isJoining: boolean = false;
   
   // Meeting data and comments
   comments: Comment[] = [];
@@ -29,7 +31,8 @@ export class TabMeetingComponent implements OnInit, OnChanges {
 
   constructor(
     private userService: UserService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {
     this.courseId = this.activatedRoute.snapshot.paramMap.get('courseId');
   }
@@ -98,6 +101,31 @@ export class TabMeetingComponent implements OnInit, OnChanges {
       this.newCommentText = '';
     } catch (error) {
       console.error('Error creating comment:', error);
+    }
+  }
+
+  // Method to join meeting - fetches token then navigates to room
+  async joinMeeting(): Promise<void> {
+    if (!this.courseId || !this.topic?.id) {
+      console.error('Missing courseId or topicId');
+      return;
+    }
+
+    this.isJoining = true;
+
+    try {
+      // Pre-fetch the token to validate access and prepare the meeting
+      await GetMeetingToken(this.topic.id, this.courseId);
+      
+      // Navigate to the meeting room with courseId in state
+      await this.router.navigate(['/meeting', this.topic.id, 'room'], {
+        state: { courseId: this.courseId }
+      });
+    } catch (error) {
+      console.error('Failed to join meeting:', error);
+      alert('Failed to join meeting. Please try again later.');
+    } finally {
+      this.isJoining = false;
     }
   }
 }

@@ -1,318 +1,196 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-// import { ActivatedRoute } from '@angular/router';
-// import { environment } from 'environments/environment.development';
-// import { UserService } from '@shared/services/user.service';
-// import { GetMeetingToken } from '@modules/meeting/api/meeting.api';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+import { LiveKitService, LiveKitConnectionState } from '../../services/livekit.service';
+import { RemoteParticipant, RemoteTrack, RemoteTrackPublication, Track } from 'livekit-client';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatMenuModule } from '@angular/material/menu'; // Thêm nếu dùng Angular Material cho menu
-import { WhiteboardComponent } from '../whiteboard/whiteboard.component';
-
-interface Participant {
-  name: string;
-  color: string;
-  isMicOn: boolean;
-  role: string;
-}
-
-interface Message {
-  sender: string;
-  text: string;
-  time: string;
-}
-
-interface WhiteboardAction {
-  type: 'draw' | 'clear' | 'text' | 'shape';
-  data: any;
-  timestamp: number;
-  userId: string;
-}
+import { GetMeetingToken } from '../../api/meeting.api';
 
 @Component({
   selector: 'app-meeting-room',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatMenuModule, WhiteboardComponent], // Thêm MatMenuModule nếu dùng
+  imports: [CommonModule, FormsModule],
   templateUrl: './meeting-room.component.html',
-  styleUrls: ['./meeting-room.component.scss']
+  styleUrls: ['./meeting-room-livekit.component.scss'],
+  providers: [LiveKitService],
 })
-export class MeetingRoomComponent implements OnDestroy {
-  isMicOn = true;
-  isCameraOn = false;
-  isChatOpen = false;
-  isParticipantsOpen = true; // Mặc định mở participants
-  isScreenSharing = false;
-  isSpeaking = false;
-  isWhiteboardOpen = false;
-  messages: Message[] = [];
-  whiteboardActions: WhiteboardAction[] = []; // Store all whiteboard actions for real-time sync
-  participants: Participant[] = [
-    { name: 'You', color: '#3b82f6', isMicOn: true, role: 'Host' }
-  ];
-  draft = '';
-  currentUser = 'You'; // Giả lập
+export class MeetingRoomComponent implements OnInit, OnDestroy {
+  @ViewChild('localVideo') localVideoElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('localAudio') localAudioElement!: ElementRef<HTMLAudioElement>;
 
-  // Video element để hiển thị camera của chính mình
-  @ViewChild('selfVideo') selfVideoRef?: ElementRef<HTMLVideoElement>;
+  connectionState: LiveKitConnectionState = {
+    isConnecting: false,
+    isConnected: false,
+    error: null,
+    room: null,
+    localParticipant: null,
+    remoteParticipants: [],
+  };
 
-  // Media/WebAudio state
-  private audioStream?: MediaStream;
-  private videoStream?: MediaStream;
-  private screenStream?: MediaStream;
-  private audioContext?: AudioContext;
-  private analyser?: AnalyserNode;
-  private dataArray?: Uint8Array;
-  private speakingTimer?: number;
+  token: string = '';
+  roomName: string = '';
+  isVideoEnabled: boolean = true;
+  isAudioEnabled: boolean = true;
+  isLoadingToken: boolean = true;
 
-  // Screen share video element
-  @ViewChild('screenVideo') screenVideoRef?: ElementRef<HTMLVideoElement>;
+  private destroy$ = new Subject<void>();
+  remoteParticipantElements: Map<string, { video?: HTMLVideoElement; audio?: HTMLAudioElement }> = new Map();
+  
+  private topicId: string | null = null;
+  private courseId: string | null = null;
 
-  get otherParticipants(): Participant[] {
-    return this.participants.filter(p => p.name !== this.currentUser);
-  }
-  get isAlone(): boolean {
-    return this.otherParticipants.length === 0;
-  }
-  get self(): Participant {
-    return (
-      this.participants.find(p => p.name === this.currentUser) ||
-      { name: this.currentUser, color: '#3b82f6', isMicOn: this.isMicOn, role: 'Host' }
-    );
-  }
+  constructor(
+    private liveKitService: LiveKitService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
-  async toggleMic() {
-    if (this.isMicOn) {
-      // Turn off mic
-      this.isMicOn = false;
-      this.stopMic();
-      return;
-    }
-    // Turn on mic with permission
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.audioStream = stream;
-      this.isMicOn = true;
-      this.startSpeakingDetection(stream);
-    } catch (err) {
-      console.error('Failed to access microphone:', err);
-      alert('Cannot access microphone. Please check browser permissions.');
-      this.isMicOn = false;
-    }
-  }
+  async ngOnInit(): Promise<void> {
+    // Get route parameters
+    this.topicId = this.route.snapshot.paramMap.get('topicId');
+    
+    // Try to get courseId from parent route first, then from navigation state
+    this.courseId = this.route.parent?.snapshot.paramMap.get('courseId') || 
+                    this.router.getCurrentNavigation()?.extras?.state?.['courseId'] ||
+                    (window.history.state && window.history.state.courseId) || 
+                    null;
 
-  async toggleCam() {
-    if (this.isCameraOn) {
-      // Turn off camera
-      this.isCameraOn = false;
-      this.stopCamera();
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
-      this.videoStream = stream;
-      this.isCameraOn = true;
-      // Bind stream to video element
-      setTimeout(() => {
-        const videoEl = this.selfVideoRef?.nativeElement;
-        if (videoEl) {
-          videoEl.srcObject = stream;
-          videoEl.muted = true; // tránh echo
-          videoEl.play().catch(() => {/* ignore autoplay errors */});
+    console.log('Meeting Room Init - TopicId:', this.topicId, 'CourseId:', this.courseId);
+
+    // Attempt to auto-fetch token from backend
+    await this.fetchTokenFromBackend();
+
+    // Subscribe to connection state changes
+    this.liveKitService.connectionState$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state) => {
+        this.connectionState = state;
+        
+        // Attach local tracks when connected
+        if (state.isConnected && state.localParticipant) {
+          setTimeout(() => this.attachLocalTracks(), 100);
         }
       });
-    } catch (err) {
-      console.error('Failed to access camera:', err);
-      alert('Cannot access camera. Please check browser permissions.');
-      this.isCameraOn = false;
-    }
+
+    // Listen for remote participant events
+    this.liveKitService.participantConnected$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((participant) => {
+        this.handleRemoteParticipant(participant);
+      });
+
+    this.liveKitService.participantDisconnected$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((participant) => {
+        this.remoteParticipantElements.delete(participant.identity);
+      });
   }
 
-  private startSpeakingDetection(stream: MediaStream) {
-    try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const source = this.audioContext.createMediaStreamSource(stream);
-      this.analyser = this.audioContext.createAnalyser();
-      this.analyser.fftSize = 2048;
-      this.dataArray = new Uint8Array(this.analyser.fftSize);
-      source.connect(this.analyser);
-
-      const updateSpeaking = () => {
-        if (!this.analyser || !this.dataArray) return;
-        // Một số môi trường TypeScript có sự khác biệt lib DOM, ép kiểu any để tránh lỗi type
-        (this.analyser as any).getByteTimeDomainData(this.dataArray as any);
-        // Tính RMS để phát hiện nói
-        let sumSquares = 0;
-        for (let i = 0; i < this.dataArray.length; i++) {
-          const v = (this.dataArray[i] - 128) / 128; // [-1,1]
-          sumSquares += v * v;
-        }
-        const rms = Math.sqrt(sumSquares / this.dataArray.length);
-        // Ngưỡng đơn giản, có thể tinh chỉnh
-        const speaking = rms > 0.04;
-
-        // Giảm nhấp nháy: giữ trạng thái nói ít nhất 250ms
-        if (speaking) {
-          this.isSpeaking = true;
-          if (this.speakingTimer) window.clearTimeout(this.speakingTimer);
-          this.speakingTimer = window.setTimeout(() => { this.isSpeaking = false; }, 250);
-        }
-        requestAnimationFrame(updateSpeaking);
-      };
-      requestAnimationFrame(updateSpeaking);
-    } catch (e) {
-      console.warn('AudioContext not available for speaking detection.', e);
-    }
-  }
-
-  private stopMic() {
-    try {
-      this.audioStream?.getTracks().forEach(t => t.stop());
-    } catch {}
-    this.audioStream = undefined;
-    this.isSpeaking = false;
-    if (this.speakingTimer) window.clearTimeout(this.speakingTimer);
-    try {
-      this.analyser?.disconnect();
-      this.audioContext?.close();
-    } catch {}
-    this.analyser = undefined;
-    this.audioContext = undefined;
-    this.dataArray = undefined;
-  }
-
-  private stopCamera() {
-    try {
-      this.videoStream?.getTracks().forEach(t => t.stop());
-    } catch {}
-    this.videoStream = undefined;
-    const videoEl = this.selfVideoRef?.nativeElement;
-    if (videoEl) {
-      try { (videoEl.srcObject as MediaStream | null) = null; } catch {}
-    }
-  }
-
-  async shareScreen() {
-    if (this.isScreenSharing) {
-      // Stop screen sharing
-      this.stopScreenShare();
+  async fetchTokenFromBackend(): Promise<void> {
+    if (!this.topicId || !this.courseId) {
+      console.error('Missing topicId or courseId');
+      this.connectionState.error = 'Invalid meeting link. Missing required parameters.';
+      this.isLoadingToken = false;
       return;
     }
 
-    // Start screen sharing
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: {
-          displaySurface: 'monitor', // Prefer full screen
-        } as any,
-        audio: false // Set to true if you want system audio
-      });
+      this.isLoadingToken = true;
+      const response = await GetMeetingToken(this.topicId, this.courseId);
+      
+      this.token = response.token;
+      this.roomName = response.roomName;
+      
+      // Auto-join with fetched token
+      await this.joinRoom();
+    } catch (error) {
+      console.error('Failed to fetch token from backend:', error);
+      this.connectionState.error = 'Failed to connect to meeting. Please try again later.';
+    } finally {
+      this.isLoadingToken = false;
+    }
+  }
 
-      this.screenStream = stream;
-      this.isScreenSharing = true;
+  async joinRoom(): Promise<void> {
+    if (!this.token.trim()) {
+      this.connectionState.error = 'Invalid token. Please try again.';
+      return;
+    }
 
-      // Bind stream to video element
-      setTimeout(() => {
-        const videoEl = this.screenVideoRef?.nativeElement;
-        if (videoEl) {
-          videoEl.srcObject = stream;
-          videoEl.muted = true;
-          videoEl.play().catch(() => {/* ignore autoplay errors */});
-        }
-      });
+    try {
+      await this.liveKitService.connect(this.token, this.roomName);
+    } catch (error) {
+      console.error('Failed to join room:', error);
+      this.connectionState.error = 'Failed to join room. Please check your connection.';
+    }
+  }
 
-      // Listen for when user stops sharing via browser UI
-      stream.getVideoTracks()[0].addEventListener('ended', () => {
-        this.stopScreenShare();
-      });
+  async leaveRoom(): Promise<void> {
+    await this.liveKitService.disconnect();
+    this.router.navigate(['../'], { relativeTo: this.route });
+  }
 
-    } catch (err) {
-      console.error('Failed to start screen sharing:', err);
-      if ((err as any).name === 'NotAllowedError') {
-        alert('Screen sharing permission denied.');
-      } else {
-        alert('Cannot share screen. Please try again.');
+  async toggleVideo(): Promise<void> {
+    this.isVideoEnabled = !this.isVideoEnabled;
+    await this.liveKitService.toggleVideo(this.isVideoEnabled);
+  }
+
+  async toggleAudio(): Promise<void> {
+    this.isAudioEnabled = !this.isAudioEnabled;
+    await this.liveKitService.toggleAudio(this.isAudioEnabled);
+  }
+
+  private attachLocalTracks(): void {
+    if (!this.connectionState.localParticipant) return;
+
+    const videoTrack = this.connectionState.localParticipant.videoTrackPublications.values().next().value;
+    const audioTrack = this.connectionState.localParticipant.audioTrackPublications.values().next().value;
+
+    if (videoTrack?.track && this.localVideoElement) {
+      videoTrack.track.attach(this.localVideoElement.nativeElement);
+    }
+
+    if (audioTrack?.track && this.localAudioElement) {
+      audioTrack.track.attach(this.localAudioElement.nativeElement);
+    }
+  }
+
+  private handleRemoteParticipant(participant: RemoteParticipant): void {
+    participant.trackPublications.forEach((publication: RemoteTrackPublication) => {
+      if (publication.track) {
+        this.attachRemoteTrack(publication.track, participant);
       }
-      this.isScreenSharing = false;
-    }
+    });
+
+    participant.on('trackSubscribed', (track: RemoteTrack) => {
+      this.attachRemoteTrack(track, participant);
+    });
   }
 
-  private stopScreenShare() {
-    try {
-      this.screenStream?.getTracks().forEach(t => t.stop());
-    } catch {}
-    this.screenStream = undefined;
-    this.isScreenSharing = false;
-    const videoEl = this.screenVideoRef?.nativeElement;
-    if (videoEl) {
-      try { (videoEl.srcObject as MediaStream | null) = null; } catch {}
-    }
+  private attachRemoteTrack(track: RemoteTrack, participant: RemoteParticipant): void {
+    setTimeout(() => {
+      if (track.kind === Track.Kind.Video) {
+        const videoElement = document.getElementById(`remote-video-${participant.identity}`) as HTMLVideoElement;
+        if (videoElement) {
+          track.attach(videoElement);
+        }
+      } else if (track.kind === Track.Kind.Audio) {
+        const audioElement = document.getElementById(`remote-audio-${participant.identity}`) as HTMLAudioElement;
+        if (audioElement) {
+          track.attach(audioElement);
+        }
+      }
+    }, 100);
   }
 
-  openWhiteboard() {
-    this.isWhiteboardOpen = !this.isWhiteboardOpen;
+  getParticipantDisplayName(identity: string): string {
+    return identity || 'Anonymous';
   }
 
-  // Handle whiteboard action from child component
-  onWhiteboardAction(action: WhiteboardAction) {
-    this.whiteboardActions.push(action);
-    // In real app: broadcast to other participants via WebSocket/WebRTC
-    console.log('Whiteboard action:', action);
-  }
-
-  // TODO(LiveKit): When enabling LiveKit, use the environment flag to decide
-  // whether to fetch a token and connect. Example flow:
-  //  - const topicId = this.route.snapshot.paramMap.get('topicId')!;
-  //  - const identity = this.userService.getUser()?.id || 'guest-' + Date.now();
-  //  - const { token, url } = await GetMeetingToken(topicId, identity);
-  //  - const wsUrl = url || environment.LIVEKIT_WS_URL;
-  //  - connect(wsUrl, token) ... and wire mic/cam toggles to the room APIs
-  // Leave disabled by default so `ng serve` works without backend.
-
-  leave() {
-    if (confirm('Are you sure you want to leave the meeting?')) {
-      history.back();
-    }
-  }
-
-  send() {
-    if (this.draft.trim()) {
-      this.messages.push({
-        sender: this.currentUser,
-        text: this.draft.trim(),
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
-      this.draft = '';
-    }
-  }
-
-  toggleChat(force?: boolean) {
-    if (force) {
-      this.isChatOpen = true;
-      this.isParticipantsOpen = false;
-    } else {
-      this.isChatOpen = !this.isChatOpen;
-      if (this.isChatOpen) this.isParticipantsOpen = false;
-    }
-  }
-
-  toggleParticipants(force?: boolean) {
-    if (force) {
-      this.isParticipantsOpen = true;
-      this.isChatOpen = false;
-    } else {
-      this.isParticipantsOpen = !this.isParticipantsOpen;
-      if (this.isParticipantsOpen) this.isChatOpen = false;
-    }
-  }
-
-  closeSidebar() {
-    this.isChatOpen = false;
-    this.isParticipantsOpen = false;
-  }
-
-  // Dọn dẹp khi component bị hủy
   ngOnDestroy(): void {
-    this.stopMic();
-    this.stopCamera();
-    this.stopScreenShare();
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.liveKitService.disconnect();
   }
 }

@@ -14,7 +14,17 @@
     </div>
 
     <div class="meeting-actions" *ngIf="meetingOpenDate">
-      <button class="join-btn" [routerLink]="['/meeting', topic.id, 'room']">Join</button>
+      <button 
+        class="join-btn" 
+        (click)="joinMeeting()" 
+        [disabled]="isJoining"
+      >
+        <span *ngIf="!isJoining">Join</span>
+        <span *ngIf="isJoining" class="joining-text">
+          <span class="spinner-small"></span>
+          Joining...
+        </span>
+      </button>
     </div>
   </div>
 </card>
