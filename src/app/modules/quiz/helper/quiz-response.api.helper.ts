@@ -10,38 +10,54 @@ export const convertQuizResponseToRequestData = (
   const { topicId, data } = quizResponse;
   const { answers, status, completedAt, startedAt } = data as QuizResponseData;
   return {
-    id: null,
     topicId,
-    status,
-    startedAt,
-    completedAt,
-    answers: answers.map(convertQuizResponseAnswerToRequestData),
-  };
-};
-
-export const convertQuizResponseFromResponseData = (
-  data: any
-): StudentResponse => {
-  const { id, topicId, student, status, startedAt, completedAt, answers } =
-    data;
-  const res: StudentResponse = {
-    id,
-    topicId,
-    student,
     data: {
       status,
       startedAt,
       completedAt,
-      answers: answers.map(convertQuizResponseAnswerFromResponseData),
+      answers: answers.map(convertQuizResponseAnswerToRequestData),
+    }
+  };
+};
+
+export const convertQuizResponseFromResponseData = (
+  responseData: any
+): StudentResponse => {
+  const { id, topicId, studentId, data } = responseData;
+  
+  if (data) {
+    const { status, startedAt, completedAt, answers } = data;
+    return {
+      id,
+      topicId,
+      studentId,
+      data: {
+        status,
+        startedAt,
+        completedAt,
+        answers: answers?.map(convertQuizResponseAnswerFromResponseData) || [],
+      },
+    };
+  }
+  
+  const { status, startedAt, completedAt, answers, student } = responseData;
+  return {
+    id,
+    topicId,
+    studentId: student?.id || responseData.studentId,
+    data: {
+      status,
+      startedAt,
+      completedAt,
+      answers: answers?.map(convertQuizResponseAnswerFromResponseData) || [],
     },
   };
-  return res;
 };
 
 export const convertQuizResponseAnswerToRequestData = (answers: QuizAnswer) => {
   const { question, answer, mark } = answers;
   return {
-    question: JSON.stringify(question),
+    topicQuizQuestionId: question.id,
     answer,
     mark,
   };
@@ -50,9 +66,30 @@ export const convertQuizResponseAnswerToRequestData = (answers: QuizAnswer) => {
 export const convertQuizResponseAnswerFromResponseData = (
   data: any
 ): QuizAnswer => {
-  const { question, answer, mark } = data;
+  // Backend now returns topicQuizQuestionId instead of question object
+  const { topicQuizQuestionId, question, answer, mark } = data;
+  
+  // If we have topicQuizQuestionId (new format), create a minimal question object
+  if (topicQuizQuestionId && !question) {
+    return {
+      question: { id: topicQuizQuestionId } as any, // Minimal question object with just ID
+      answer,
+      mark,
+    };
+  }
+  
+  // If we have the question field (old format), parse it
+  if (question) {
+    return {
+      question: JSON.parse(question),
+      answer,
+      mark,
+    };
+  }
+  
+  // Fallback
   return {
-    question: JSON.parse(question),
+    question: { id: topicQuizQuestionId || '' } as any,
     answer,
     mark,
   };

@@ -70,15 +70,15 @@ export class ResultTableComponent implements OnInit, AfterViewInit {
     responses: StudentResponse[]
   ): ResultElement[] {
     const converted: ResultElement[] = responses.map((response, index) => {
-      const student = response.student;
+      const studentId = response.studentId;
       const data = response.data as QuizResponseData;
       const duration = getDurationText(data.startedAt, data.completedAt);
       const score = this.studentResponseService.getQuizResponseMark(data);
       return {
         index: index + 1,
-        image: student.avatar,
-        name: student.username,
-        email: student.email,
+        image: '', // TODO: Fetch student avatar from studentId
+        name: `Student ${studentId}`, // TODO: Fetch student name from studentId
+        email: '', // TODO: Fetch student email from studentId
         duration: duration,
         grade: score,
       };

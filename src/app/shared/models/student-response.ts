@@ -4,7 +4,7 @@ import { User } from './user';
 
 export type StudentResponse = {
   id: string;
-  student: User;
+  studentId: string;
   topicId: string;
   data: QuizResponseData | AssignmentResponseData;
 };

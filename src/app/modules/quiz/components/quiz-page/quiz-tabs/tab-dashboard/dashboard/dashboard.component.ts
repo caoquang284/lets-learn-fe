@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit, OnChanges {
     }
 
     const uniqueStudents = new Set(
-      this.studentResponses.map((response) => response.student.id)
+      this.studentResponses.map((response) => response.studentId)
     );
     this.studentCount = uniqueStudents.size;
 
@@ -216,7 +216,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         const mark = this.getMark(r);
         return mark !== null && mark >= 32 && mark <= 40;
       })
-      .map((r) => r.student);
+      .map((r) => r.studentId);
   }
 
   get studentsA() {
@@ -225,7 +225,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         const mark = this.getMark(r);
         return mark !== null && mark >= 20 && mark < 32;
       })
-      .map((r) => r.student);
+      .map((r) => r.studentId);
   }
 
   get studentsB() {
@@ -234,7 +234,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         const mark = this.getMark(r);
         return mark !== null && mark >= 8 && mark < 20;
       })
-      .map((r) => r.student);
+      .map((r) => r.studentId);
   }
 
   get studentsC() {
@@ -243,7 +243,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         const mark = this.getMark(r);
         return mark !== null && mark >= 0 && mark < 8;
       })
-      .map((r) => r.student);
+      .map((r) => r.studentId);
   }
 
   get totalQuestions(): number {
@@ -260,7 +260,7 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   get totalStudents(): number {
     // Count unique student ids
-    const studentIds = new Set<string>(this.studentResponses.map(r => r.student.id));
+    const studentIds = new Set<string>(this.studentResponses.map(r => r.studentId));
     return studentIds.size;
   }
 }

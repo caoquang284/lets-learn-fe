@@ -7,30 +7,29 @@ import {
 export const convertAssignmentResponseToRequestData = (
   assignmentResponse: StudentResponse
 ) => {
-  const { id, data, topicId, student } = assignmentResponse;
+  const { id, data, topicId, studentId } = assignmentResponse;
   const { submittedAt, files, mark, note } = data as AssignmentResponseData;
   let req: any = {
     id: id.length === 4 ? null : id,
     topicId,
+    studentId,
     submittedAt,
     cloudinaryFiles: convertCloudinaryFilesToRequestData(files),
     mark,
     note,
   };
-  // if id is 4 characters, it means it is a new response
-  if (id.length !== 4) req['student'] = student;
   return req;
 };
 
 export const convertAssignmentResponseFromResponseData = (
   data: any
 ): StudentResponse => {
-  const { id, topicId, student, submittedAt, cloudinaryFiles, mark, note } =
+  const { id, topicId, studentId, submittedAt, cloudinaryFiles, mark, note } =
     data;
   const res: StudentResponse = {
     id,
     topicId,
-    student,
+    studentId,
     data: {
       submittedAt,
       files: cloudinaryFiles,

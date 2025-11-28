@@ -99,7 +99,7 @@ export class TabQuizStudentComponent implements OnInit {
         // Filter responses to only current userAdd commentMore actions
         const currentUser = this.userService.getUser();
         const filteredResponses = currentUser
-          ? responses.filter((r) => r.student.id === currentUser.id)
+          ? responses.filter((r) => r.studentId === currentUser.id)
           : [];
         this.updateGradingDisplayData(filteredResponses);
       })
@@ -112,7 +112,7 @@ export class TabQuizStudentComponent implements OnInit {
   updateGradingDisplayData(quizResponses: StudentResponse[]) {
     const currentUser = this.userService.getUser();
     this.studentResponses = currentUser
-      ? quizResponses.filter((r) => r.student.id === currentUser.id)
+      ? quizResponses.filter((r) => r.studentId === currentUser.id)
       : [];
 
     if (!this.topic || !this.topic.data) {

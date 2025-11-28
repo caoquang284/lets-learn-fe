@@ -96,7 +96,7 @@ export class TabAssignmentStudentComponent implements OnInit, OnChanges {
         const responses = await GetAllAssignmentResponsesOfTopic(this.topic.id);
         this.studentResponse =
           responses.find(
-            (response: StudentResponse) => response.student.id === user.id
+            (response: StudentResponse) => response.studentId === user.id
           ) || null;
         if (this.studentResponse) {
           const data = this.studentResponse.data as AssignmentResponseData;
@@ -144,7 +144,7 @@ export class TabAssignmentStudentComponent implements OnInit, OnChanges {
 
         const newResponse = {
           id: '',
-          student: user,
+          studentId: user.id,
           topicId: this.topic.id,
           data: {
             submittedAt: new Date().toISOString(),

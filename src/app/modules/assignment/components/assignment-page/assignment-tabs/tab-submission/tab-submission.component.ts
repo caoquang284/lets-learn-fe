@@ -47,7 +47,7 @@ export class TabSubmissionComponent implements OnInit {
 
   filteredStudents(searchTerm: string) {
     return this.studentResponses.filter((res) =>
-      res.student.username.toLowerCase().includes(searchTerm.toLowerCase())
+      res.studentId.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
 
@@ -56,7 +56,7 @@ export class TabSubmissionComponent implements OnInit {
   }
 
   getStudents(responses: StudentResponse[]) {
-    return responses.map((response) => response.student);
+    return responses.map((response) => response.studentId);
   }
 
   getMarkOfResponse(response: StudentResponse) {

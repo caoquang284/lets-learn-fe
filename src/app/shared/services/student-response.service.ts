@@ -69,7 +69,7 @@ export class StudentResponseService {
     const response: StudentResponse = {
       id: '',
       topicId,
-      student: this.user,
+      studentId: this.user.id,
       data: quizResponseData,
     };
     return response;
