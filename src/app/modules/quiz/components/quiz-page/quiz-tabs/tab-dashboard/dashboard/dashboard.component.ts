@@ -8,6 +8,7 @@ import {
 import { DonutChartSegment } from '@shared/components/charts/donut-chart/donut-chart.component';
 import { DashboardStat } from '@shared/models/dashboard-stats';
 import { StudentResponse } from '@shared/models/student-response';
+import { User } from '@shared/models/user';
 
 @Component({
   selector: 'overview-dashboard',
@@ -18,6 +19,7 @@ import { StudentResponse } from '@shared/models/student-response';
 export class DashboardComponent implements OnInit, OnChanges {
   @Input() studentResponses: StudentResponse[] = [];
   @Input() questionCount: number = 0;
+  @Input() students: User[] = [];
 
   studentCount = 0;
   stats: DashboardStat[] = [];
@@ -210,40 +212,44 @@ export class DashboardComponent implements OnInit, OnChanges {
     this.studentMarkSegments = [];
   }
 
-  get studentsS() {
-    return this.studentResponses
+  get studentsS(): User[] {
+    const studentIds = this.studentResponses
       .filter((r) => {
         const mark = this.getMark(r);
         return mark !== null && mark >= 32 && mark <= 40;
       })
       .map((r) => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
-  get studentsA() {
-    return this.studentResponses
+  get studentsA(): User[] {
+    const studentIds = this.studentResponses
       .filter((r) => {
         const mark = this.getMark(r);
         return mark !== null && mark >= 20 && mark < 32;
       })
       .map((r) => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
-  get studentsB() {
-    return this.studentResponses
+  get studentsB(): User[] {
+    const studentIds = this.studentResponses
       .filter((r) => {
         const mark = this.getMark(r);
         return mark !== null && mark >= 8 && mark < 20;
       })
       .map((r) => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
-  get studentsC() {
-    return this.studentResponses
+  get studentsC(): User[] {
+    const studentIds = this.studentResponses
       .filter((r) => {
         const mark = this.getMark(r);
         return mark !== null && mark >= 0 && mark < 8;
       })
       .map((r) => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
   get totalQuestions(): number {

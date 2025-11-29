@@ -9,7 +9,7 @@
   } @else if(selectedTab === tabs.SUBMISSIONS) {
   <tab-submission [topic]="topic" />
   } @else if(selectedTab === tabs.DASHBOARD) {
-  <tab-dashboard [topic]="topic" />
+  <tab-dashboard [topic]="topic" [students]="course?.students || []" />
   } }
 </topic-page-layout>
 }

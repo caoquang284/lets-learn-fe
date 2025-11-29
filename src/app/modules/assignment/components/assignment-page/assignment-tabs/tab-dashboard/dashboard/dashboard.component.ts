@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/cor
 import { DonutChartSegment } from '@shared/components/charts/donut-chart/donut-chart.component';
 import { DashboardStat } from '@shared/models/dashboard-stats';
 import { StudentResponse } from '@shared/models/student-response';
+import { User } from '@shared/models/user';
 
 @Component({
   selector: 'submission-dashboard',
@@ -11,6 +12,7 @@ import { StudentResponse } from '@shared/models/student-response';
 })
 export class DashboardComponent implements OnInit, OnChanges {
   @Input() studentResponses: StudentResponse[] = [];
+  @Input() students: User[] = [];
   
   studentCount = 0;
   stats: DashboardStat[] = [];
@@ -157,40 +159,44 @@ export class DashboardComponent implements OnInit, OnChanges {
     ).length;
   }
 
-  get studentsS() {
-    return this.studentResponses
+  get studentsS(): User[] {
+    const studentIds = this.studentResponses
       .filter(r => {
         const mark = (r.data as any)?.mark;
         return mark !== undefined && mark !== null && mark >= 80 && mark <= 100;
       })
       .map(r => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
-  get studentsA() {
-    return this.studentResponses
+  get studentsA(): User[] {
+    const studentIds = this.studentResponses
       .filter(r => {
         const mark = (r.data as any)?.mark;
         return mark !== undefined && mark !== null && mark >= 50 && mark < 80;
       })
       .map(r => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
-  get studentsB() {
-    return this.studentResponses
+  get studentsB(): User[] {
+    const studentIds = this.studentResponses
       .filter(r => {
         const mark = (r.data as any)?.mark;
         return mark !== undefined && mark !== null && mark >= 20 && mark < 50;
       })
       .map(r => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
-  get studentsC() {
-    return this.studentResponses
+  get studentsC(): User[] {
+    const studentIds = this.studentResponses
       .filter(r => {
         const mark = (r.data as any)?.mark;
         return mark !== undefined && mark !== null && mark >= 0 && mark < 20;
       })
       .map(r => r.studentId);
+    return this.students.filter(s => studentIds.includes(s.id));
   }
 
   constructor() {}

@@ -13,7 +13,7 @@
   } @else if(selectedTab === tabs.QUESTION_BANK) {
   <tab-question-bank [topic]="topic" (topicChange)="onTopicChange($event)" />
   } @else if(selectedTab === tabs.DASHBOARD) {
-  <tab-dashboard [topic]="topic" />
+  <tab-dashboard [topic]="topic" [students]="course?.students || []" />
   }
 </topic-page-layout>
 } @else {

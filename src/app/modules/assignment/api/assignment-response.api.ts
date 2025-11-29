@@ -11,7 +11,7 @@ export const GetAssignmentResponse = (
 ) => {
   return GET(
     `/topic/${topicId}/assignment-response/${assignmentResponseId}`
-  ).then(convertAssignmentResponseFromResponseData);
+  )
 };
 
 export const CreateAssignmentResponse = (
@@ -19,9 +19,7 @@ export const CreateAssignmentResponse = (
   assignmentResponse: StudentResponse
 ) => {
   const data = convertAssignmentResponseToRequestData(assignmentResponse);
-  return POST(`/topic/${topicId}/assignment-response`, data).then(
-    convertAssignmentResponseFromResponseData
-  );
+  return POST(`/topic/${topicId}/assignment-response`, data)
 };
 
 export const UpdateAssignmentResponse = (
@@ -32,19 +30,15 @@ export const UpdateAssignmentResponse = (
   return PUT(
     `/topic/${topicId}/assignment-response/${assignmentResponse.id}`,
     data
-  ).then(convertAssignmentResponseFromResponseData);
+  )
 };
 
 export const GetAllAssignmentResponsesOfTopic = (topicId: string) => {
-  return GET(`/topic/${topicId}/assignment-response`).then((res) =>
-    res.map(convertAssignmentResponseFromResponseData)
-  );
+  return GET(`/topic/${topicId}/assignment-response`)
 };
 
 export const GetAllAssignmentResponsesOfUser = (userId: string) => {
-  return GET(`/user/${userId}/assignment-responses`).then((res) =>
-    res.map(convertAssignmentResponseFromResponseData)
-  );
+  return GET(`/user/${userId}/assignment-responses`)
 };
 
 export const DeleteAssignmentResponse = (

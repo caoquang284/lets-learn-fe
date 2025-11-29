@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AssignmentTopic } from '@shared/models/topic';
 import { GetAllAssignmentResponsesOfTopic } from '@modules/assignment/api/assignment-response.api';
 import { StudentResponse } from '@shared/models/student-response';
+import { User } from '@shared/models/user';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -12,6 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class TabDashboardComponent implements OnInit {
   @Input({ required: true }) topic!: AssignmentTopic;
+  @Input({ required: true }) students: User[] = [];
 
   studentResponses: StudentResponse[] = [];
 
