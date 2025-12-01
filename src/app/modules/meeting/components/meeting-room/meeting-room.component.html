@@ -57,7 +57,12 @@
     <div class="video-container">
       <!-- Local Video -->
       <div class="video-tile local-video">
-        <video #localVideo autoplay playsinline muted></video>
+        <video #localVideo autoplay playsinline muted [class.hidden]="!isVideoEnabled"></video>
+        <div class="avatar-placeholder" *ngIf="!isVideoEnabled">
+          <div class="avatar-circle">
+            <span class="avatar-initial">{{ getInitial(currentUserIdentity) }}</span>
+          </div>
+        </div>
         <audio #localAudio autoplay></audio>
         <div class="video-label">You (Local)</div>
       </div>
@@ -71,28 +76,25 @@
           [id]="'remote-video-' + participant.identity" 
           autoplay 
           playsinline
+          [class.hidden]="!isParticipantVideoEnabled(participant)"
         ></video>
+        <div class="avatar-placeholder" *ngIf="!isParticipantVideoEnabled(participant)">
+          <div class="avatar-circle">
+            <span class="avatar-initial">{{ getInitial(participant.identity) }}</span>
+          </div>
+        </div>
         <audio 
           [id]="'remote-audio-' + participant.identity" 
           autoplay
         ></audio>
         <div class="video-label">{{ getParticipantDisplayName(participant.identity) }}</div>
       </div>
-
-      <!-- No Remote Participants Message -->
-      <div class="no-participants" *ngIf="connectionState.remoteParticipants.length === 0">
-        <div class="waiting-message">
-          <span class="material-symbols-outlined">group</span>
-          <p>Waiting for others to join...</p>
-          <p class="sub">Share the room name: <strong>{{ roomName }}</strong></p>
-        </div>
-      </div>
     </div>
 
     <!-- Controls -->
     <div class="controls-bar">
       <div class="left-controls">
-        <span class="room-name">{{ roomName }}</span>
+        <span class="meeting-time">{{ currentTime }} | {{ roomName }}</span>
       </div>
 
       <div class="center-controls">
@@ -104,7 +106,6 @@
         >
           <span class="material-icons" *ngIf="isAudioEnabled">mic</span>
           <span class="material-icons" *ngIf="!isAudioEnabled">mic_off</span>
-          <span class="label">Microphone</span>
         </button>
 
         <button 
@@ -115,7 +116,6 @@
         >
           <span class="material-icons" *ngIf="isVideoEnabled">videocam</span>
           <span class="material-icons" *ngIf="!isVideoEnabled">videocam_off</span>
-          <span class="label">Camera</span>
         </button>
 
         <button 
@@ -123,7 +123,6 @@
           title="Share Screen"
         >
           <span class="material-icons">present_to_all</span>
-          <span class="label">Share screen</span>
         </button>
 
         <button 
@@ -131,7 +130,6 @@
           title="Record"
         >
           <span class="material-icons">fiber_manual_record</span>
-          <span class="label">Record</span>
         </button>
 
         <button 
@@ -141,7 +139,6 @@
           title="Open Whiteboard"
         >
           <span class="material-icons">dashboard</span>
-          <span class="label">Open whiteboard</span>
         </button>
 
         <button 
@@ -151,7 +148,6 @@
           title="React"
         >
           <span class="material-icons">add_reaction</span>
-          <span class="label">React</span>
         </button>
 
         <!-- Reaction Picker Popup -->
@@ -171,15 +167,6 @@
           title="Raise Hand"
         >
           <span class="material-icons">pan_tool</span>
-          <span class="label">Raise hand</span>
-        </button>
-
-        <button 
-          class="control-btn"
-          title="Chat"
-        >
-          <span class="material-icons">chat</span>
-          <span class="label">Chat</span>
         </button>
 
         <button 
@@ -188,12 +175,31 @@
           title="Leave Meeting"
         >
           <span class="material-icons">call_end</span>
-          <span class="label">Leave</span>
         </button>
       </div>
 
       <div class="right-controls">
-        <!-- Empty for now, can add participant count or other info -->
+        <button 
+          class="control-btn info-btn"
+          title="Meeting Details"
+        >
+          <span class="material-icons">info</span>
+        </button>
+
+        <button 
+          class="control-btn participants-btn"
+          title="Show Participants"
+        >
+          <span class="material-icons">group</span>
+          <span class="participant-count">{{ connectionState.remoteParticipants.length + 1 }}</span>
+        </button>
+
+        <button 
+          class="control-btn chat-btn"
+          title="Chat"
+        >
+          <span class="material-icons">chat</span>
+        </button>
       </div>
     </div>
   </div>

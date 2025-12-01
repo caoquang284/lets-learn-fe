@@ -129,11 +129,12 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 0;
   height: 100vh;
   width: 100%;
   box-sizing: border-box;
   position: relative;
+  overflow: hidden;
 }
 
 /* Reactions Container */
@@ -171,59 +172,147 @@
 
 .video-container {
   flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
-  overflow-y: auto;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  overflow: hidden;
+  width: 100%;
+  height: calc(100vh - 96px); // Account for footer height (48px button + padding)
+  box-sizing: border-box;
+  margin-bottom: 96px; // Ensure space for footer
+  
+  // Dynamic grid based on number of participants
+  &:has(.video-tile:nth-child(1):last-child) {
+    // 1 participant - full screen
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+  
+  &:has(.video-tile:nth-child(2):last-child) {
+    // 2 participants - side by side
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 1fr;
+  }
+  
+  &:has(.video-tile:nth-child(3):last-child),
+  &:has(.video-tile:nth-child(4):last-child) {
+    // 3-4 participants - 2x2 grid
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+  
+  &:has(.video-tile:nth-child(5):last-child),
+  &:has(.video-tile:nth-child(6):last-child) {
+    // 5-6 participants - 3x2 grid
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+  
+  &:has(.video-tile:nth-child(7)),
+  &:has(.video-tile:nth-child(8)),
+  &:has(.video-tile:nth-child(9)) {
+    // 7-9 participants - 3x3 grid
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+  
+  &:has(.video-tile:nth-child(10)) {
+    // 10+ participants - 4 columns with scroll
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(200px, 1fr);
+    overflow-y: auto;
+  }
 }
 
 .video-tile {
   position: relative;
-  background: #2a2a2a;
-  border-radius: 12px;
+  background: #1a1a1a;
+  border-radius: 8px;
   overflow: hidden;
   width: 100%;
-  max-width: 640px;
-  aspect-ratio: 16 / 9;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  min-height: 150px;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    transform: scale(1.02);
+    z-index: 10;
+  }
 
   video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    background: #000;
+
+    &.hidden {
+      display: none;
+    }
   }
 
   audio {
     display: none;
   }
 
+  .avatar-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .avatar-initial {
+    font-size: 48px;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
   .video-label {
     position: absolute;
-    bottom: 12px;
-    left: 12px;
-    background: rgba(0, 0, 0, 0.7);
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.75);
     color: white;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 13px;
     font-weight: 500;
     z-index: 10;
+    max-width: calc(100% - 16px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
 .local-video {
-  border: 3px solid #667eea;
+  border: 2px solid #8ab4f8;
 }
 
 .remote-video {
-  border: 3px solid #4ade80;
+  border: 2px solid #5f6368;
 }
 
 .no-participants {
@@ -259,43 +348,57 @@
 /* Controls Bar */
 .controls-bar {
   background: #000;
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 8px 16px;
-  display: flex;
+  border: none;
+  border-radius: 0;
+  padding: 16px 24px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 90%;
+  gap: 24px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  transform: none;
+  box-sizing: border-box;
+  z-index: 1000;
 }
 
 .left-controls {
   display: flex;
-  align-items: center;
-  min-width: 150px;
+  flex-direction: column;
+  align-items: flex-start;
 
-  .room-name {
-    color: #fff;
+  .meeting-time {
+    color: #e8eaed;
     font-size: 14px;
     font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .room-code {
+    color: #9aa0a6;
+    font-size: 12px;
+    font-weight: 400;
+    margin-top: 2px;
   }
 }
 
 .center-controls {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
+  justify-content: center;
   position: relative;
 }
 
 /* Reaction Picker */
 .reaction-picker {
   position: absolute;
-  bottom: 60px;
+  bottom: 70px;
   left: 50%;
   transform: translateX(-50%);
   background: #1a1a1a;
@@ -325,94 +428,148 @@
 }
 
 .right-controls {
-  min-width: 150px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .control-btn {
-  width: auto;
-  min-width: 44px;
-  height: 44px;
-  padding: 0 16px;
-  border-radius: 10px;
-  border: 1px solid #333;
-  background: #000;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #3c4043;
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   transition: all 0.2s;
+  position: relative;
 
   .material-icons,
   .material-symbols-outlined {
-    font-size: 20px;
-  }
-
-  .label {
-    font-size: 14px;
-    font-weight: 400;
-    white-space: nowrap;
+    font-size: 24px;
   }
 
   &:hover {
-    background: #111;
-    border-color: #3b82f6;
+    background: #5f6368;
   }
 
   &.disabled {
-    background: #ef4444;
-    border-color: #ef4444;
+    background: #ea4335;
+    border-color: #ea4335;
 
     &:hover {
-      background: #dc2626;
+      background: #d33b2e;
     }
   }
 
   &.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: #8ab4f8;
+    border-color: #8ab4f8;
+    color: #000;
   }
 
   &.leave-btn {
-    background: #ef4444;
-    border-color: #ef4444;
+    background: #ea4335;
+    border-color: #ea4335;
 
     &:hover {
-      background: #dc2626;
+      background: #d33b2e;
     }
+  }
+}
+
+.info-btn,
+.participants-btn,
+.chat-btn {
+  background: transparent;
+  border: none;
+
+  &:hover {
+    background: #3c4043;
+  }
+}
+
+.participants-btn {
+  position: relative;
+
+  .participant-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ea4335;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
   }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .meeting-room {
-    padding: 10px;
+    padding: 0;
   }
 
   .video-container {
-    gap: 10px;
+    gap: 4px;
+    padding: 4px;
+    height: calc(100vh - 90px);
+    
+    // Adjust grid for mobile
+    &:has(.video-tile:nth-child(3):last-child),
+    &:has(.video-tile:nth-child(4):last-child),
+    &:has(.video-tile:nth-child(5):last-child),
+    &:has(.video-tile:nth-child(6):last-child) {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: minmax(150px, 1fr);
+    }
+    
+    &:has(.video-tile:nth-child(7)) {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: minmax(150px, 1fr);
+      overflow-y: auto;
+    }
   }
 
   .video-tile {
-    max-width: 100%;
+    border-radius: 4px;
+    min-height: 120px;
+    
+    .video-label {
+      font-size: 11px;
+      padding: 3px 8px;
+    }
+
+    .avatar-circle {
+      width: 80px;
+      height: 80px;
+    }
+
+    .avatar-initial {
+      font-size: 32px;
+    }
   }
 
   .controls-bar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 15px;
+    padding: 12px 16px;
+    gap: 12px;
   }
 
-  .controls-group {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .room-info {
-    flex-basis: 100%;
-    text-align: center;
+  .control-btn {
+    width: 40px;
+    height: 40px;
+    
+    .material-icons,
+    .material-symbols-outlined {
+      font-size: 20px;
+    }
   }
 
   .reaction-picker {
@@ -426,29 +583,9 @@
   .reaction-emoji {
     font-size: 28px;
   }
-}
-
-/* When there are 2+ participants, use grid layout */
-.video-container:has(.video-tile:nth-child(2)) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-}
-
-.video-container:has(.video-tile:nth-child(3)) {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.video-container:has(.video-tile:nth-child(5)) {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-@media (max-width: 1024px) {
-  .video-container:has(.video-tile:nth-child(3)) {
-    grid-template-columns: repeat(2, 1fr);
-  }
   
-  .video-container:has(.video-tile:nth-child(5)) {
-    grid-template-columns: repeat(2, 1fr);
+  .left-controls .meeting-time {
+    font-size: 12px;
   }
 }
 

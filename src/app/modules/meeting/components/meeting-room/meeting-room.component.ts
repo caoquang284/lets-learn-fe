@@ -39,6 +39,7 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   currentUserIdentity: string = 'You';
   showReactionPicker: boolean = false;
   reactions: Array<{ emoji: string; x: number; y: number; id: string; senderId: string }> = [];
+  currentTime: string = '';
 
   private destroy$ = new Subject<void>();
   remoteParticipantElements: Map<string, { video?: HTMLVideoElement; audio?: HTMLAudioElement }> = new Map();
@@ -53,6 +54,10 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    // Initialize current time
+    this.updateCurrentTime();
+    setInterval(() => this.updateCurrentTime(), 1000);
+
     // Get route parameters
     this.topicId = this.route.snapshot.paramMap.get('topicId');
     
@@ -234,6 +239,13 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
+  private updateCurrentTime(): void {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    this.currentTime = `${hours}:${minutes}`;
+  }
+
   private updateDeviceStates(): void {
     if (!this.connectionState.localParticipant) return;
 
@@ -392,6 +404,18 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
 
   getParticipantDisplayName(identity: string): string {
     return identity || 'Anonymous';
+  }
+
+  getInitial(name: string): string {
+    if (!name) return 'A';
+    return name.charAt(0).toUpperCase();
+  }
+
+  isParticipantVideoEnabled(participant: RemoteParticipant): boolean {
+    const videoPublication = Array.from(participant.videoTrackPublications.values())
+      .find(pub => pub.track?.kind === Track.Kind.Video);
+    
+    return videoPublication?.track ? !videoPublication.track.isMuted : false;
   }
 
   ngOnDestroy(): void {
