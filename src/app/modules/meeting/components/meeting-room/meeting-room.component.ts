@@ -20,6 +20,7 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   @ViewChild('localVideo') localVideoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('localAudio') localAudioElement!: ElementRef<HTMLAudioElement>;
   @ViewChild('whiteboard') whiteboardComponent!: WhiteboardComponent;
+  @ViewChild('chatMessagesContainer') chatMessagesContainer!: ElementRef<HTMLDivElement>;
 
   connectionState: LiveKitConnectionState = {
     isConnecting: false,
@@ -47,6 +48,8 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   showChat: boolean = false;
   isHandRaised: boolean = false;
   raisedHands: Set<string> = new Set();
+  chatMessages: Array<{ text: string; senderId: string; senderName: string; timestamp: Date }> = [];
+  chatInputText: string = '';
 
   private destroy$ = new Subject<void>();
   remoteParticipantElements: Map<string, { video?: HTMLVideoElement; audio?: HTMLAudioElement }> = new Map();
@@ -118,6 +121,8 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
           this.handleReceivedReaction(data, senderId);
         } else if (data.type === 'raiseHand') {
           this.handleRaiseHand(data, senderId);
+        } else if (data.type === 'chat') {
+          this.handleChatMessage(data, senderId);
         }
       });
 
@@ -287,6 +292,35 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
     }
   }
 
+  sendChatMessage(): void {
+    if (!this.chatInputText.trim()) return;
+
+    const message = {
+      type: 'chat',
+      text: this.chatInputText.trim(),
+      senderName: this.getParticipantDisplayName(this.currentUserIdentity),
+      timestamp: new Date(),
+      senderId: this.currentUserIdentity
+    };
+
+    // Broadcast to all participants
+    this.liveKitService.sendData(message);
+
+    // Add to local messages
+    this.chatMessages.push({
+      text: message.text,
+      senderId: this.currentUserIdentity,
+      senderName: 'You',
+      timestamp: message.timestamp
+    });
+
+    // Clear input
+    this.chatInputText = '';
+
+    // Scroll to bottom
+    this.scrollChatToBottom();
+  }
+
   private handleReceivedReaction(data: any, senderId: string): void {
     if (data.emoji) {
       this.displayReaction(data.emoji, senderId);
@@ -299,6 +333,18 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
     } else {
       this.raisedHands.delete(senderId);
     }
+  }
+
+  private handleChatMessage(data: any, senderId: string): void {
+    this.chatMessages.push({
+      text: data.text,
+      senderId: senderId,
+      senderName: data.senderName || this.getParticipantDisplayName(senderId),
+      timestamp: new Date(data.timestamp)
+    });
+
+    // Scroll to bottom
+    this.scrollChatToBottom();
   }
 
   private displayReaction(emoji: string, senderId: string): void {
@@ -507,6 +553,15 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
 
   isHandRaisedFor(identity: string): boolean {
     return this.raisedHands.has(identity);
+  }
+
+  private scrollChatToBottom(): void {
+    setTimeout(() => {
+      if (this.chatMessagesContainer?.nativeElement) {
+        this.chatMessagesContainer.nativeElement.scrollTop = 
+          this.chatMessagesContainer.nativeElement.scrollHeight;
+      }
+    }, 100);
   }
 
   ngOnDestroy(): void {

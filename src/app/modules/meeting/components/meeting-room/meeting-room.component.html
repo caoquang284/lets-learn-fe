@@ -168,12 +168,25 @@
             </button>
           </div>
           <div class="panel-body chat-body">
-            <div class="chat-messages">
-              <p class="chat-empty">No messages yet. Start the conversation!</p>
+            <div class="chat-messages" #chatMessagesContainer>
+              <p class="chat-empty" *ngIf="chatMessages.length === 0">No messages yet. Start the conversation!</p>
+              <div class="chat-message" *ngFor="let message of chatMessages" [class.own-message]="message.senderId === currentUserIdentity">
+                <div class="message-header">
+                  <span class="message-sender">{{ message.senderName }}</span>
+                  <span class="message-time">{{ message.timestamp | date:'shortTime' }}</span>
+                </div>
+                <div class="message-text">{{ message.text }}</div>
+              </div>
             </div>
             <div class="chat-input-container">
-              <input type="text" class="chat-input" placeholder="Type a message...">
-              <button class="send-btn">
+              <input 
+                type="text" 
+                class="chat-input" 
+                placeholder="Type a message..."
+                [(ngModel)]="chatInputText"
+                (keyup.enter)="sendChatMessage()"
+              >
+              <button class="send-btn" (click)="sendChatMessage()" [disabled]="!chatInputText.trim()">
                 <span class="material-icons">send</span>
               </button>
             </div>
