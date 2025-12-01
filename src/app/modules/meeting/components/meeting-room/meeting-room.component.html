@@ -251,6 +251,7 @@
         >
           <span class="material-icons" *ngIf="isAudioEnabled">mic</span>
           <span class="material-icons" *ngIf="!isAudioEnabled">mic_off</span>
+          <span class="btn-label">{{ isAudioEnabled ? 'Mute' : 'Unmute' }}</span>
         </button>
 
         <button 
@@ -261,6 +262,7 @@
         >
           <span class="material-icons" *ngIf="isVideoEnabled">videocam</span>
           <span class="material-icons" *ngIf="!isVideoEnabled">videocam_off</span>
+          <span class="btn-label">{{ isVideoEnabled ? 'Stop video' : 'Start video' }}</span>
         </button>
 
         <button 
@@ -270,6 +272,7 @@
           title="Share Screen"
         >
           <span class="material-icons">present_to_all</span>
+          <span class="btn-label">{{ isScreenSharing ? 'Stop sharing' : 'Present' }}</span>
         </button>
 
         <button 
@@ -277,6 +280,7 @@
           title="Record"
         >
           <span class="material-icons">fiber_manual_record</span>
+          <span class="btn-label">Record</span>
         </button>
 
         <button 
@@ -286,6 +290,7 @@
           title="Open Whiteboard"
         >
           <span class="material-icons">dashboard</span>
+          <span class="btn-label">Whiteboard</span>
         </button>
 
         <button 
@@ -295,6 +300,7 @@
           title="React"
         >
           <span class="material-icons">add_reaction</span>
+          <span class="btn-label">React</span>
         </button>
 
         <!-- Reaction Picker Popup -->
@@ -316,6 +322,7 @@
           title="Raise Hand"
         >
           <span class="material-icons">pan_tool</span>
+          <span class="btn-label">{{ isHandRaised ? 'Lower hand' : 'Raise hand' }}</span>
         </button>
 
         <button 
@@ -324,6 +331,7 @@
           title="Leave Meeting"
         >
           <span class="material-icons">call_end</span>
+          <span class="btn-label">Leave</span>
         </button>
       </div>
 
