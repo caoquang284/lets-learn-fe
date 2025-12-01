@@ -27,6 +27,18 @@
 
   <!-- Meeting Room -->
   <div class="meeting-room" *ngIf="connectionState.isConnected">
+    <!-- Reactions Display -->
+    <div class="reactions-container">
+      <div 
+        *ngFor="let reaction of reactions"
+        class="reaction-animation"
+        [style.left.%]="reaction.x"
+        [style.top.%]="reaction.y"
+      >
+        {{ reaction.emoji }}
+      </div>
+    </div>
+
     <!-- Whiteboard Modal -->
     <div class="whiteboard-modal" *ngIf="showWhiteboard">
       <div class="whiteboard-header">
@@ -134,11 +146,25 @@
 
         <button 
           class="control-btn"
+          (click)="toggleReactionPicker()"
+          [class.active]="showReactionPicker"
           title="React"
         >
           <span class="material-icons">add_reaction</span>
           <span class="label">React</span>
         </button>
+
+        <!-- Reaction Picker Popup -->
+        <div class="reaction-picker" *ngIf="showReactionPicker">
+          <button class="reaction-emoji" (click)="sendReaction('👍')">👍</button>
+          <button class="reaction-emoji" (click)="sendReaction('❤️')">❤️</button>
+          <button class="reaction-emoji" (click)="sendReaction('😂')">😂</button>
+          <button class="reaction-emoji" (click)="sendReaction('😮')">😮</button>
+          <button class="reaction-emoji" (click)="sendReaction('😢')">😢</button>
+          <button class="reaction-emoji" (click)="sendReaction('👏')">👏</button>
+          <button class="reaction-emoji" (click)="sendReaction('🎉')">🎉</button>
+          <button class="reaction-emoji" (click)="sendReaction('🔥')">🔥</button>
+        </div>
 
         <button 
           class="control-btn"

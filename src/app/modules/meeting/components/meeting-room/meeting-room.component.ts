@@ -37,6 +37,8 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   isLoadingToken: boolean = true;
   showWhiteboard: boolean = false;
   currentUserIdentity: string = 'You';
+  showReactionPicker: boolean = false;
+  reactions: Array<{ emoji: string; x: number; y: number; id: string; senderId: string }> = [];
 
   private destroy$ = new Subject<void>();
   remoteParticipantElements: Map<string, { video?: HTMLVideoElement; audio?: HTMLAudioElement }> = new Map();
@@ -97,8 +99,12 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
     this.liveKitService.dataReceived$
       .pipe(takeUntil(this.destroy$))
       .subscribe(({ data, senderId }) => {
-        console.log('Received whiteboard data from', senderId, data);
-        this.handleWhiteboardAction(data);
+        console.log('Received data from', senderId, data);
+        if (data.type === 'whiteboard') {
+          this.handleWhiteboardAction(data);
+        } else if (data.type === 'reaction') {
+          this.handleReceivedReaction(data, senderId);
+        }
       });
   }
 
@@ -178,6 +184,54 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
 
   toggleWhiteboard(): void {
     this.showWhiteboard = !this.showWhiteboard;
+  }
+
+  toggleReactionPicker(): void {
+    this.showReactionPicker = !this.showReactionPicker;
+  }
+
+  sendReaction(emoji: string): void {
+    const reaction = {
+      type: 'reaction',
+      emoji: emoji,
+      timestamp: Date.now(),
+      senderId: this.currentUserIdentity
+    };
+
+    // Send to all participants
+    this.liveKitService.sendData(reaction);
+
+    // Show locally
+    this.displayReaction(emoji, this.currentUserIdentity);
+
+    // Keep picker open for spam reactions
+  }
+
+  private handleReceivedReaction(data: any, senderId: string): void {
+    if (data.emoji) {
+      this.displayReaction(data.emoji, senderId);
+    }
+  }
+
+  private displayReaction(emoji: string, senderId: string): void {
+    // Generate random position in the upper portion of the screen
+    const x = Math.random() * 80 + 10; // 10% to 90% from left
+    const y = Math.random() * 30 + 10; // 10% to 40% from top
+
+    const reactionId = `${Date.now()}-${Math.random()}`;
+    
+    this.reactions.push({
+      emoji,
+      x,
+      y,
+      id: reactionId,
+      senderId
+    });
+
+    // Remove reaction after animation completes (3 seconds)
+    setTimeout(() => {
+      this.reactions = this.reactions.filter(r => r.id !== reactionId);
+    }, 3000);
   }
 
   private updateDeviceStates(): void {
