@@ -25,7 +25,7 @@ export const SignUp = (
 };
 
 export const RefreshToken = () => {
-  return GET('/auth/refresh');
+  return POST('/auth/refresh');
 };
 
 export const Logout = () => {

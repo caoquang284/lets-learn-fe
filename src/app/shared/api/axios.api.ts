@@ -1,9 +1,9 @@
 import { HTTP_ERRORS } from '@shared/constants/http-errors';
 import axios from 'axios';
 import { environment } from 'environments/environment.development';
-import { GET } from './utils.api';
+import { GET, POST } from './utils.api';
 
-const backendUrl = environment.BACKEND_URL || 'http://localhost:8080';
+const backendUrl = environment.BACKEND_URL || 'http://localhost:8100';
 console.log('Backend URL:', backendUrl);
 
 const Axios = axios.create({
@@ -52,7 +52,7 @@ Axios.interceptors.response.use(
 
         if (!isRefreshing) {
           isRefreshing = true;
-          GET(`${backendUrl}/auth/refresh`)
+          POST(`${backendUrl}/auth/refresh`)
             .then(() => {
               isRefreshing = false;
               onRefreshed();
