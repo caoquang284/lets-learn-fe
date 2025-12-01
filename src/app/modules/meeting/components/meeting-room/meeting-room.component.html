@@ -39,6 +39,149 @@
       </div>
     </div>
 
+    <!-- Main Content Area -->
+    <div class="main-content" [class.sidebar-open]="showMeetingDetails || showParticipants || showChat">
+      <!-- Video Container -->
+      <div class="video-area">
+        <div class="video-container">
+          <!-- Local Video -->
+          <div class="video-tile local-video" [class.speaking]="isLocalSpeaking">
+            <video #localVideo autoplay playsinline muted [class.hidden]="!isVideoEnabled"></video>
+            <div class="avatar-placeholder" *ngIf="!isVideoEnabled">
+              <div class="avatar-circle">
+                <span class="avatar-initial">{{ getInitial(currentUserIdentity) }}</span>
+          </div>
+        </div>
+        <audio #localAudio autoplay></audio>
+        <div class="raised-hand-indicator" *ngIf="isHandRaised">
+          <span class="material-icons">pan_tool</span>
+        </div>
+        <div class="video-label">You (Local)</div>
+      </div>          <!-- Remote Participants -->
+          <div 
+            class="video-tile remote-video" 
+            [class.speaking]="isParticipantSpeaking(participant.identity)"
+            *ngFor="let participant of connectionState.remoteParticipants"
+          >
+            <video 
+              [id]="'remote-video-' + participant.identity" 
+              autoplay 
+              playsinline
+              [class.hidden]="!isParticipantVideoEnabled(participant)"
+            ></video>
+            <div class="avatar-placeholder" *ngIf="!isParticipantVideoEnabled(participant)">
+              <div class="avatar-circle">
+                <span class="avatar-initial">{{ getInitial(participant.identity) }}</span>
+              </div>
+            </div>
+            <audio 
+              [id]="'remote-audio-' + participant.identity" 
+              autoplay
+            ></audio>
+            <div class="raised-hand-indicator" *ngIf="isHandRaisedFor(participant.identity)">
+              <span class="material-icons">pan_tool</span>
+            </div>
+            <div class="video-label">{{ getParticipantDisplayName(participant.identity) }}</div>
+          </div>
+        </div> <!-- End video-container -->
+      </div> <!-- End video-area -->
+
+      <!-- Sidebar Panels -->
+      <div class="sidebar-panel" *ngIf="showMeetingDetails || showParticipants || showChat">
+        <!-- Meeting Details Panel -->
+        <div class="panel-content" *ngIf="showMeetingDetails">
+          <div class="panel-header">
+            <h3>Meeting Details</h3>
+            <button class="close-panel" (click)="toggleMeetingDetails()">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <div class="panel-body">
+            <div class="detail-item">
+              <span class="detail-label">Room Name</span>
+              <span class="detail-value">{{ roomName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Meeting Time</span>
+              <span class="detail-value">{{ currentTime }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Participants</span>
+              <span class="detail-value">{{ connectionState.remoteParticipants.length + 1 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participants Panel -->
+        <div class="panel-content" *ngIf="showParticipants">
+          <div class="panel-header">
+            <h3>Participants ({{ connectionState.remoteParticipants.length + 1 }})</h3>
+            <button class="close-panel" (click)="toggleParticipants()">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <div class="panel-body">
+            <!-- Local Participant -->
+            <div class="participant-item">
+              <div class="participant-avatar">
+                <span class="avatar-text">{{ getInitial(currentUserIdentity) }}</span>
+              </div>
+              <div class="participant-info">
+                <span class="participant-name">You</span>
+                <span class="participant-role">Host</span>
+              </div>
+              <div class="participant-status">
+                <span class="material-icons" [class.muted]="!isAudioEnabled">
+                  {{ isAudioEnabled ? 'mic' : 'mic_off' }}
+                </span>
+                <span class="material-icons" [class.muted]="!isVideoEnabled">
+                  {{ isVideoEnabled ? 'videocam' : 'videocam_off' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Remote Participants -->
+            <div class="participant-item" *ngFor="let participant of connectionState.remoteParticipants">
+              <div class="participant-avatar">
+                <span class="avatar-text">{{ getInitial(participant.identity) }}</span>
+              </div>
+              <div class="participant-info">
+                <span class="participant-name">{{ getParticipantDisplayName(participant.identity) }}</span>
+                <span class="participant-role">Participant</span>
+              </div>
+              <div class="participant-status">
+                <span class="material-icons">mic</span>
+                <span class="material-icons" [class.muted]="!isParticipantVideoEnabled(participant)">
+                  {{ isParticipantVideoEnabled(participant) ? 'videocam' : 'videocam_off' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="panel-content" *ngIf="showChat">
+          <div class="panel-header">
+            <h3>Chat</h3>
+            <button class="close-panel" (click)="toggleChat()">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <div class="panel-body chat-body">
+            <div class="chat-messages">
+              <p class="chat-empty">No messages yet. Start the conversation!</p>
+            </div>
+            <div class="chat-input-container">
+              <input type="text" class="chat-input" placeholder="Type a message...">
+              <button class="send-btn">
+                <span class="material-icons">send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Whiteboard Modal -->
     <div class="whiteboard-modal" *ngIf="showWhiteboard">
       <div class="whiteboard-header">
@@ -52,43 +195,6 @@
         [currentUser]="currentUserIdentity"
         (onAction)="onWhiteboardAction($event)">
       </app-whiteboard>
-    </div>
-
-    <div class="video-container">
-      <!-- Local Video -->
-      <div class="video-tile local-video">
-        <video #localVideo autoplay playsinline muted [class.hidden]="!isVideoEnabled"></video>
-        <div class="avatar-placeholder" *ngIf="!isVideoEnabled">
-          <div class="avatar-circle">
-            <span class="avatar-initial">{{ getInitial(currentUserIdentity) }}</span>
-          </div>
-        </div>
-        <audio #localAudio autoplay></audio>
-        <div class="video-label">You (Local)</div>
-      </div>
-
-      <!-- Remote Participants -->
-      <div 
-        class="video-tile remote-video" 
-        *ngFor="let participant of connectionState.remoteParticipants"
-      >
-        <video 
-          [id]="'remote-video-' + participant.identity" 
-          autoplay 
-          playsinline
-          [class.hidden]="!isParticipantVideoEnabled(participant)"
-        ></video>
-        <div class="avatar-placeholder" *ngIf="!isParticipantVideoEnabled(participant)">
-          <div class="avatar-circle">
-            <span class="avatar-initial">{{ getInitial(participant.identity) }}</span>
-          </div>
-        </div>
-        <audio 
-          [id]="'remote-audio-' + participant.identity" 
-          autoplay
-        ></audio>
-        <div class="video-label">{{ getParticipantDisplayName(participant.identity) }}</div>
-      </div>
     </div>
 
     <!-- Controls -->
@@ -164,6 +270,8 @@
 
         <button 
           class="control-btn"
+          (click)="toggleRaiseHand()"
+          [class.active]="isHandRaised"
           title="Raise Hand"
         >
           <span class="material-icons">pan_tool</span>
@@ -181,6 +289,8 @@
       <div class="right-controls">
         <button 
           class="control-btn info-btn"
+          (click)="toggleMeetingDetails()"
+          [class.active]="showMeetingDetails"
           title="Meeting Details"
         >
           <span class="material-icons">info</span>
@@ -188,6 +298,8 @@
 
         <button 
           class="control-btn participants-btn"
+          (click)="toggleParticipants()"
+          [class.active]="showParticipants"
           title="Show Participants"
         >
           <span class="material-icons">group</span>
@@ -196,6 +308,8 @@
 
         <button 
           class="control-btn chat-btn"
+          (click)="toggleChat()"
+          [class.active]="showChat"
           title="Chat"
         >
           <span class="material-icons">chat</span>

@@ -40,6 +40,13 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   showReactionPicker: boolean = false;
   reactions: Array<{ emoji: string; x: number; y: number; id: string; senderId: string }> = [];
   currentTime: string = '';
+  speakingParticipants: Set<string> = new Set();
+  isLocalSpeaking: boolean = false;
+  showMeetingDetails: boolean = false;
+  showParticipants: boolean = false;
+  showChat: boolean = false;
+  isHandRaised: boolean = false;
+  raisedHands: Set<string> = new Set();
 
   private destroy$ = new Subject<void>();
   remoteParticipantElements: Map<string, { video?: HTMLVideoElement; audio?: HTMLAudioElement }> = new Map();
@@ -109,8 +116,31 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
           this.handleWhiteboardAction(data);
         } else if (data.type === 'reaction') {
           this.handleReceivedReaction(data, senderId);
+        } else if (data.type === 'raiseHand') {
+          this.handleRaiseHand(data, senderId);
         }
       });
+
+    // Setup speaking detection for local participant
+    this.setupSpeakingDetection();
+  }
+
+  private setupSpeakingDetection(): void {
+    // Check speaking status periodically
+    setInterval(() => {
+      if (this.connectionState.localParticipant) {
+        this.isLocalSpeaking = this.connectionState.localParticipant.isSpeaking;
+      }
+
+      // Update remote participants speaking status
+      this.connectionState.remoteParticipants.forEach(participant => {
+        if (participant.isSpeaking) {
+          this.speakingParticipants.add(participant.identity);
+        } else {
+          this.speakingParticipants.delete(participant.identity);
+        }
+      });
+    }, 100);
   }
 
   async fetchTokenFromBackend(): Promise<void> {
@@ -195,6 +225,30 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
     this.showReactionPicker = !this.showReactionPicker;
   }
 
+  toggleMeetingDetails(): void {
+    this.showMeetingDetails = !this.showMeetingDetails;
+    if (this.showMeetingDetails) {
+      this.showParticipants = false;
+      this.showChat = false;
+    }
+  }
+
+  toggleParticipants(): void {
+    this.showParticipants = !this.showParticipants;
+    if (this.showParticipants) {
+      this.showMeetingDetails = false;
+      this.showChat = false;
+    }
+  }
+
+  toggleChat(): void {
+    this.showChat = !this.showChat;
+    if (this.showChat) {
+      this.showMeetingDetails = false;
+      this.showParticipants = false;
+    }
+  }
+
   sendReaction(emoji: string): void {
     const reaction = {
       type: 'reaction',
@@ -212,9 +266,38 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
     // Keep picker open for spam reactions
   }
 
+  toggleRaiseHand(): void {
+    this.isHandRaised = !this.isHandRaised;
+
+    // Broadcast hand status to all participants
+    const handStatus = {
+      type: 'raiseHand',
+      isRaised: this.isHandRaised,
+      timestamp: Date.now(),
+      senderId: this.currentUserIdentity
+    };
+
+    this.liveKitService.sendData(handStatus);
+
+    // Update local raised hands set
+    if (this.isHandRaised) {
+      this.raisedHands.add(this.currentUserIdentity);
+    } else {
+      this.raisedHands.delete(this.currentUserIdentity);
+    }
+  }
+
   private handleReceivedReaction(data: any, senderId: string): void {
     if (data.emoji) {
       this.displayReaction(data.emoji, senderId);
+    }
+  }
+
+  private handleRaiseHand(data: any, senderId: string): void {
+    if (data.isRaised) {
+      this.raisedHands.add(senderId);
+    } else {
+      this.raisedHands.delete(senderId);
     }
   }
 
@@ -416,6 +499,14 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
       .find(pub => pub.track?.kind === Track.Kind.Video);
     
     return videoPublication?.track ? !videoPublication.track.isMuted : false;
+  }
+
+  isParticipantSpeaking(participantIdentity: string): boolean {
+    return this.speakingParticipants.has(participantIdentity);
+  }
+
+  isHandRaisedFor(identity: string): boolean {
+    return this.raisedHands.has(identity);
   }
 
   ngOnDestroy(): void {
