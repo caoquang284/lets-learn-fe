@@ -27,6 +27,21 @@
 
   <!-- Meeting Room -->
   <div class="meeting-room" *ngIf="connectionState.isConnected">
+    <!-- Whiteboard Modal -->
+    <div class="whiteboard-modal" *ngIf="showWhiteboard">
+      <div class="whiteboard-header">
+        <h2>Collaborative Whiteboard</h2>
+        <button class="close-whiteboard" (click)="toggleWhiteboard()" title="Close Whiteboard">
+          ×
+        </button>
+      </div>
+      <app-whiteboard 
+        #whiteboard
+        [currentUser]="currentUserIdentity"
+        (onAction)="onWhiteboardAction($event)">
+      </app-whiteboard>
+    </div>
+
     <div class="video-container">
       <!-- Local Video -->
       <div class="video-tile local-video">
@@ -83,6 +98,15 @@
         >
           <span class="material-icons" *ngIf="isVideoEnabled">videocam</span>
           <span class="material-icons" *ngIf="!isVideoEnabled">videocam_off</span>
+        </button>
+
+        <button 
+          class="control-btn" 
+          (click)="toggleWhiteboard()"
+          [class.active]="showWhiteboard"
+          title="Toggle Whiteboard"
+        >
+          <span class="material-icons">draw</span>
         </button>
 
         <button 

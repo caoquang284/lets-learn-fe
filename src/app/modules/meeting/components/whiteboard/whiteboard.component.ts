@@ -37,7 +37,7 @@ export class WhiteboardComponent implements AfterViewInit, OnDestroy {
   @Input() currentUser: string = 'You';
   @Output() onAction = new EventEmitter<WhiteboardAction>();
   
-  private ctx!: CanvasRenderingContext2D;
+  ctx!: CanvasRenderingContext2D;
   private isDrawing = false;
   private lastX = 0;
   private lastY = 0;

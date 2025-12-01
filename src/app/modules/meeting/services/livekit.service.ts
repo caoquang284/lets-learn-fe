@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Room, RoomEvent, RemoteParticipant, LocalParticipant, Track } from 'livekit-client';
+import { Room, RoomEvent, RemoteParticipant, LocalParticipant, Track, DataPacket_Kind } from 'livekit-client';
 import { environment } from 'environments/environment.development';
 
 export interface LiveKitConnectionState {
@@ -26,10 +26,12 @@ export class LiveKitService implements OnDestroy {
 
   private participantConnectedSubject = new Subject<RemoteParticipant>();
   private participantDisconnectedSubject = new Subject<RemoteParticipant>();
+  private dataReceivedSubject = new Subject<{ data: any; senderId: string }>();
 
   public connectionState$: Observable<LiveKitConnectionState> = this.connectionStateSubject.asObservable();
   public participantConnected$: Observable<RemoteParticipant> = this.participantConnectedSubject.asObservable();
   public participantDisconnected$: Observable<RemoteParticipant> = this.participantDisconnectedSubject.asObservable();
+  public dataReceived$: Observable<{ data: any; senderId: string }> = this.dataReceivedSubject.asObservable();
 
   constructor() {}
 
@@ -57,9 +59,29 @@ export class LiveKitService implements OnDestroy {
 
       console.log('Connected to room:', room);
 
-      // Enable camera and microphone by default
-      await this.room.localParticipant.setCameraEnabled(true);
-      await this.room.localParticipant.setMicrophoneEnabled(true);
+      // Try to enable camera and microphone by default, but don't block if they fail
+      let cameraEnabled = false;
+      let microphoneEnabled = false;
+
+      try {
+        await this.room.localParticipant.setCameraEnabled(true);
+        cameraEnabled = true;
+        console.log('Camera enabled successfully');
+      } catch (error) {
+        console.warn('Failed to enable camera, continuing without camera:', error);
+      }
+
+      try {
+        await this.room.localParticipant.setMicrophoneEnabled(true);
+        microphoneEnabled = true;
+        console.log('Microphone enabled successfully');
+      } catch (error) {
+        console.warn('Failed to enable microphone, continuing without microphone:', error);
+      }
+
+      if (!cameraEnabled && !microphoneEnabled) {
+        console.warn('Joined meeting without camera and microphone');
+      }
 
       this.updateConnectionState({
         isConnecting: false,
@@ -100,17 +122,33 @@ export class LiveKitService implements OnDestroy {
   /**
    * Enable/disable local video
    */
-  async toggleVideo(enabled: boolean): Promise<void> {
-    if (!this.room) return;
-    await this.room.localParticipant.setCameraEnabled(enabled);
+  async toggleVideo(enabled: boolean): Promise<boolean> {
+    if (!this.room) return false;
+    
+    try {
+      await this.room.localParticipant.setCameraEnabled(enabled);
+      console.log(`Camera ${enabled ? 'enabled' : 'disabled'} successfully`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to ${enabled ? 'enable' : 'disable'} camera:`, error);
+      return false;
+    }
   }
 
   /**
    * Enable/disable local audio
    */
-  async toggleAudio(enabled: boolean): Promise<void> {
-    if (!this.room) return;
-    await this.room.localParticipant.setMicrophoneEnabled(enabled);
+  async toggleAudio(enabled: boolean): Promise<boolean> {
+    if (!this.room) return false;
+    
+    try {
+      await this.room.localParticipant.setMicrophoneEnabled(enabled);
+      console.log(`Microphone ${enabled ? 'enabled' : 'disabled'} successfully`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to ${enabled ? 'enable' : 'disable'} microphone:`, error);
+      return false;
+    }
   }
 
   /**
@@ -118,6 +156,31 @@ export class LiveKitService implements OnDestroy {
    */
   getRoom(): Room | null {
     return this.room;
+  }
+
+  /**
+   * Send data to all participants (for whiteboard sync)
+   */
+  async sendData(data: any): Promise<void> {
+    if (!this.room) {
+      console.warn('Cannot send data: not connected to room');
+      return;
+    }
+
+    try {
+      const encoder = new TextEncoder();
+      const dataString = JSON.stringify(data);
+      const payload = encoder.encode(dataString);
+      
+      await this.room.localParticipant.publishData(payload, {
+        reliable: true,
+        destinationIdentities: [], // Empty array means broadcast to all
+      });
+      
+      console.log('Data sent to all participants:', data);
+    } catch (error) {
+      console.error('Failed to send data:', error);
+    }
   }
 
   /**
@@ -162,6 +225,21 @@ export class LiveKitService implements OnDestroy {
     this.room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
       console.log('Track subscribed:', track.kind, 'from', participant.identity);
     });
+
+    this.room.on(RoomEvent.DataReceived, (payload: Uint8Array, participant?: RemoteParticipant) => {
+      try {
+        const decoder = new TextDecoder();
+        const dataString = decoder.decode(payload);
+        const data = JSON.parse(dataString);
+        console.log('Data received from', participant?.identity || 'unknown', data);
+        this.dataReceivedSubject.next({ 
+          data, 
+          senderId: participant?.identity || 'unknown' 
+        });
+      } catch (error) {
+        console.error('Failed to parse received data:', error);
+      }
+    });
   }
 
   /**
@@ -190,5 +268,6 @@ export class LiveKitService implements OnDestroy {
     this.connectionStateSubject.complete();
     this.participantConnectedSubject.complete();
     this.participantDisconnectedSubject.complete();
+    this.dataReceivedSubject.complete();
   }
 }

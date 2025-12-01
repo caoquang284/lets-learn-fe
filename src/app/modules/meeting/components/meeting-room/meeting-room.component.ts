@@ -6,11 +6,12 @@ import { RemoteParticipant, RemoteTrack, RemoteTrackPublication, Track } from 'l
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GetMeetingToken } from '../../api/meeting.api';
+import { WhiteboardComponent } from '../whiteboard/whiteboard.component';
 
 @Component({
   selector: 'app-meeting-room',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, WhiteboardComponent],
   templateUrl: './meeting-room.component.html',
   styleUrls: ['./meeting-room-livekit.component.scss'],
   providers: [LiveKitService],
@@ -18,6 +19,7 @@ import { GetMeetingToken } from '../../api/meeting.api';
 export class MeetingRoomComponent implements OnInit, OnDestroy {
   @ViewChild('localVideo') localVideoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('localAudio') localAudioElement!: ElementRef<HTMLAudioElement>;
+  @ViewChild('whiteboard') whiteboardComponent!: WhiteboardComponent;
 
   connectionState: LiveKitConnectionState = {
     isConnecting: false,
@@ -33,6 +35,8 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   isVideoEnabled: boolean = true;
   isAudioEnabled: boolean = true;
   isLoadingToken: boolean = true;
+  showWhiteboard: boolean = false;
+  currentUserIdentity: string = 'You';
 
   private destroy$ = new Subject<void>();
   remoteParticipantElements: Map<string, { video?: HTMLVideoElement; audio?: HTMLAudioElement }> = new Map();
@@ -69,7 +73,10 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
         
         // Attach local tracks when connected
         if (state.isConnected && state.localParticipant) {
-          setTimeout(() => this.attachLocalTracks(), 500);
+          setTimeout(() => {
+            this.attachLocalTracks();
+            this.updateDeviceStates();
+          }, 500);
         }
       });
 
@@ -84,6 +91,14 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((participant) => {
         this.remoteParticipantElements.delete(participant.identity);
+      });
+
+    // Listen for data messages (whiteboard actions)
+    this.liveKitService.dataReceived$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ data, senderId }) => {
+        console.log('Received whiteboard data from', senderId, data);
+        this.handleWhiteboardAction(data);
       });
   }
 
@@ -132,13 +147,141 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   }
 
   async toggleVideo(): Promise<void> {
-    this.isVideoEnabled = !this.isVideoEnabled;
-    await this.liveKitService.toggleVideo(this.isVideoEnabled);
+    const newState = !this.isVideoEnabled;
+    const success = await this.liveKitService.toggleVideo(newState);
+    
+    if (success) {
+      this.isVideoEnabled = newState;
+    } else {
+      console.warn('Failed to toggle video, keeping current state');
+      // Show user-friendly message
+      if (newState) {
+        alert('Unable to access camera. Please check your camera permissions and try again.');
+      }
+    }
   }
 
   async toggleAudio(): Promise<void> {
-    this.isAudioEnabled = !this.isAudioEnabled;
-    await this.liveKitService.toggleAudio(this.isAudioEnabled);
+    const newState = !this.isAudioEnabled;
+    const success = await this.liveKitService.toggleAudio(newState);
+    
+    if (success) {
+      this.isAudioEnabled = newState;
+    } else {
+      console.warn('Failed to toggle audio, keeping current state');
+      // Show user-friendly message
+      if (newState) {
+        alert('Unable to access microphone. Please check your microphone permissions and try again.');
+      }
+    }
+  }
+
+  toggleWhiteboard(): void {
+    this.showWhiteboard = !this.showWhiteboard;
+  }
+
+  private updateDeviceStates(): void {
+    if (!this.connectionState.localParticipant) return;
+
+    // Check if camera track exists and is enabled
+    const videoTrack = Array.from(
+      this.connectionState.localParticipant.videoTrackPublications.values()
+    ).find(pub => pub.track?.kind === Track.Kind.Video);
+
+    // Check if audio track exists and is enabled
+    const audioTrack = Array.from(
+      this.connectionState.localParticipant.audioTrackPublications.values()
+    ).find(pub => pub.track?.kind === Track.Kind.Audio);
+
+    this.isVideoEnabled = videoTrack?.track ? !videoTrack.track.isMuted : false;
+    this.isAudioEnabled = audioTrack?.track ? !audioTrack.track.isMuted : false;
+
+    console.log('Device states updated - Video:', this.isVideoEnabled, 'Audio:', this.isAudioEnabled);
+  }
+
+  onWhiteboardAction(action: any): void {
+    console.log('Local whiteboard action:', action);
+    // Send action to all participants via data channel
+    this.liveKitService.sendData({
+      type: 'whiteboard',
+      action: action
+    });
+  }
+
+  private handleWhiteboardAction(data: any): void {
+    if (data.type === 'whiteboard' && this.whiteboardComponent) {
+      // Apply the remote action to local whiteboard
+      this.applyRemoteWhiteboardAction(data.action);
+    }
+  }
+
+  private applyRemoteWhiteboardAction(action: any): void {
+    if (!this.whiteboardComponent) return;
+
+    const canvas = this.whiteboardComponent.canvasRef?.nativeElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    console.log('Applying remote action:', action);
+
+    switch (action.type) {
+      case 'draw':
+        this.drawRemotePath(ctx, action.data);
+        break;
+      case 'clear':
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        break;
+      case 'text':
+        ctx.fillStyle = action.data.color;
+        ctx.font = `${action.data.fontSize}px Arial`;
+        ctx.fillText(action.data.text, action.data.x, action.data.y);
+        break;
+      case 'shape':
+        this.drawRemoteShape(ctx, action.data);
+        break;
+    }
+  }
+
+  private drawRemotePath(ctx: CanvasRenderingContext2D, data: any): void {
+    if (!data.path || data.path.length === 0) return;
+
+    const path = data.path;
+    ctx.beginPath();
+    ctx.moveTo(path[0].x, path[0].y);
+
+    for (let i = 1; i < path.length; i++) {
+      ctx.strokeStyle = data.tool === 'eraser' ? '#FFFFFF' : path[i].color;
+      ctx.lineWidth = data.tool === 'eraser' ? path[i].width * 2 : path[i].width;
+      ctx.lineTo(path[i].x, path[i].y);
+    }
+
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+  private drawRemoteShape(ctx: CanvasRenderingContext2D, data: any): void {
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth = data.width;
+    ctx.beginPath();
+
+    if (data.tool === 'line') {
+      ctx.moveTo(data.startX, data.startY);
+      ctx.lineTo(data.endX, data.endY);
+      ctx.stroke();
+    } else if (data.tool === 'rectangle') {
+      const width = data.endX - data.startX;
+      const height = data.endY - data.startY;
+      ctx.strokeRect(data.startX, data.startY, width, height);
+    } else if (data.tool === 'circle') {
+      const radius = Math.sqrt(
+        Math.pow(data.endX - data.startX, 2) + Math.pow(data.endY - data.startY, 2)
+      );
+      ctx.arc(data.startX, data.startY, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
   }
 
   private attachLocalTracks(): void {
