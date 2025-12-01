@@ -57,6 +57,10 @@ export class LiveKitService implements OnDestroy {
 
       console.log('Connected to room:', room);
 
+      // Enable camera and microphone by default
+      await this.room.localParticipant.setCameraEnabled(true);
+      await this.room.localParticipant.setMicrophoneEnabled(true);
+
       this.updateConnectionState({
         isConnecting: false,
         isConnected: true,

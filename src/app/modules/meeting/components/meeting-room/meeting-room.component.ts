@@ -69,7 +69,7 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
         
         // Attach local tracks when connected
         if (state.isConnected && state.localParticipant) {
-          setTimeout(() => this.attachLocalTracks(), 100);
+          setTimeout(() => this.attachLocalTracks(), 500);
         }
       });
 
@@ -144,15 +144,24 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   private attachLocalTracks(): void {
     if (!this.connectionState.localParticipant) return;
 
-    const videoTrack = this.connectionState.localParticipant.videoTrackPublications.values().next().value;
-    const audioTrack = this.connectionState.localParticipant.audioTrackPublications.values().next().value;
+    // Get video track
+    const videoPublication = Array.from(
+      this.connectionState.localParticipant.videoTrackPublications.values()
+    ).find(pub => pub.track?.kind === Track.Kind.Video);
 
-    if (videoTrack?.track && this.localVideoElement) {
-      videoTrack.track.attach(this.localVideoElement.nativeElement);
+    // Get audio track
+    const audioPublication = Array.from(
+      this.connectionState.localParticipant.audioTrackPublications.values()
+    ).find(pub => pub.track?.kind === Track.Kind.Audio);
+
+    if (videoPublication?.track && this.localVideoElement) {
+      videoPublication.track.attach(this.localVideoElement.nativeElement);
+      console.log('Local video track attached');
     }
 
-    if (audioTrack?.track && this.localAudioElement) {
-      audioTrack.track.attach(this.localAudioElement.nativeElement);
+    if (audioPublication?.track && this.localAudioElement) {
+      audioPublication.track.attach(this.localAudioElement.nativeElement);
+      console.log('Local audio track attached');
     }
   }
 
