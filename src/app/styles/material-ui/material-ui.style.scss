@@ -5,16 +5,30 @@ $google-icon-hover-setting: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 48;
 $google-icon-active-setting: "FILL" 1, "wght" 100, "GRAD" 0, "opsz" 48;
 
 .material-symbols-outlined {
+  font-family:
+    "Material Symbols Outlined",
+    "Material Symbols Rounded",
+    "Material Symbols Sharp",
+    "Material Symbols",
+    sans-serif !important;
+
   --icon-color: $icon-color;
+
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
 
   color: var(--icon-color, $icon-color);
   cursor: pointer;
   user-select: none;
+
   font-variation-settings: $google-icon-default-setting;
   transition: font-variation-settings 0.3s;
+
   &:hover {
     font-variation-settings: $google-icon-hover-setting;
   }
+
   &:active {
     font-variation-settings: $google-icon-active-setting;
   }

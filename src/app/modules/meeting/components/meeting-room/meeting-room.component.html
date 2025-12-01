@@ -71,9 +71,8 @@
           (click)="toggleAudio()"
           title="Toggle Microphone"
         >
-          <span class="material-symbols-outlined">
-            {{ isAudioEnabled ? 'mic' : 'mic_off' }}
-          </span>
+          <span class="material-icons" *ngIf="isAudioEnabled">mic</span>
+          <span class="material-icons" *ngIf="!isAudioEnabled">mic_off</span>
         </button>
 
         <button 
@@ -82,9 +81,8 @@
           (click)="toggleVideo()"
           title="Toggle Camera"
         >
-          <span class="material-symbols-outlined">
-            {{ isVideoEnabled ? 'videocam' : 'videocam_off' }}
-          </span>
+          <span class="material-icons" *ngIf="isVideoEnabled">videocam</span>
+          <span class="material-icons" *ngIf="!isVideoEnabled">videocam_off</span>
         </button>
 
         <button 
@@ -92,7 +90,7 @@
           (click)="leaveRoom()"
           title="Leave Meeting"
         >
-          <span class="material-symbols-outlined">call_end</span>
+          <span class="material-icons">call_end</span>
         </button>
       </div>
 
