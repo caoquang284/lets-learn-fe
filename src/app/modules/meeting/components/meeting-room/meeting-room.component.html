@@ -44,6 +44,15 @@
       <!-- Video Container -->
       <div class="video-area">
         <div class="video-container">
+          <!-- Local Screen Share -->
+          <div class="video-tile screen-share-tile" *ngIf="isScreenSharing">
+            <video #screenShareVideo autoplay playsinline class="screen-share-video"></video>
+            <div class="video-label">
+              <span class="material-icons screen-share-icon">present_to_all</span>
+              You are presenting
+            </div>
+          </div>
+
           <!-- Local Video -->
           <div class="video-tile local-video" [class.speaking]="isLocalSpeaking">
             <video #localVideo autoplay playsinline muted [class.hidden]="!isVideoEnabled"></video>
@@ -82,6 +91,23 @@
               <span class="material-icons">pan_tool</span>
             </div>
             <div class="video-label">{{ getParticipantDisplayName(participant.identity) }}</div>
+          </div>
+
+          <!-- Remote Screen Shares -->
+          <div 
+            class="video-tile screen-share-tile" 
+            *ngFor="let screenShare of remoteScreenShares"
+          >
+            <video 
+              [id]="'screen-share-' + screenShare.participantId" 
+              autoplay 
+              playsinline
+              class="screen-share-video"
+            ></video>
+            <div class="video-label">
+              <span class="material-icons screen-share-icon">present_to_all</span>
+              {{ screenShare.participantName }} is presenting
+            </div>
           </div>
         </div> <!-- End video-container -->
       </div> <!-- End video-area -->
@@ -239,6 +265,8 @@
 
         <button 
           class="control-btn"
+          (click)="toggleScreenShare()"
+          [class.active]="isScreenSharing"
           title="Share Screen"
         >
           <span class="material-icons">present_to_all</span>

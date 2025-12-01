@@ -21,6 +21,7 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   @ViewChild('localAudio') localAudioElement!: ElementRef<HTMLAudioElement>;
   @ViewChild('whiteboard') whiteboardComponent!: WhiteboardComponent;
   @ViewChild('chatMessagesContainer') chatMessagesContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('screenShareVideo') screenShareVideoElement!: ElementRef<HTMLVideoElement>;
 
   connectionState: LiveKitConnectionState = {
     isConnecting: false,
@@ -35,6 +36,7 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   roomName: string = '';
   isVideoEnabled: boolean = true;
   isAudioEnabled: boolean = true;
+  isScreenSharing: boolean = false;
   isLoadingToken: boolean = true;
   showWhiteboard: boolean = false;
   currentUserIdentity: string = 'You';
@@ -50,6 +52,8 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   raisedHands: Set<string> = new Set();
   chatMessages: Array<{ text: string; senderId: string; senderName: string; timestamp: Date }> = [];
   chatInputText: string = '';
+  activeScreenShare: { participantId: string; participantName: string } | null = null;
+  remoteScreenShares: Array<{ participantId: string; participantName: string }> = [];
 
   private destroy$ = new Subject<void>();
   remoteParticipantElements: Map<string, { video?: HTMLVideoElement; audio?: HTMLAudioElement }> = new Map();
@@ -93,6 +97,7 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
           setTimeout(() => {
             this.attachLocalTracks();
             this.updateDeviceStates();
+            this.checkForScreenShare();
           }, 500);
         }
       });
@@ -218,6 +223,24 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
       // Show user-friendly message
       if (newState) {
         alert('Unable to access microphone. Please check your microphone permissions and try again.');
+      }
+    }
+  }
+
+  async toggleScreenShare(): Promise<void> {
+    const newState = !this.isScreenSharing;
+    const success = await this.liveKitService.toggleScreenShare(newState);
+    
+    if (success) {
+      this.isScreenSharing = newState;
+      // Wait a bit for track to be published, then check for screen share
+      setTimeout(() => {
+        this.checkForScreenShare();
+      }, 500);
+    } else {
+      console.warn('Failed to toggle screen share, keeping current state');
+      if (newState) {
+        alert('Unable to share screen. Screen sharing may have been cancelled or is not supported.');
       }
     }
   }
@@ -501,6 +524,21 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
       audioPublication.track.attach(this.localAudioElement.nativeElement);
       console.log('Local audio track attached');
     }
+
+    // Listen for track published/unpublished events (for screen share)
+    this.connectionState.localParticipant.on('trackPublished', (publication) => {
+      console.log('Local track published:', publication.source);
+      if (publication.source === Track.Source.ScreenShare) {
+        setTimeout(() => this.checkForScreenShare(), 300);
+      }
+    });
+
+    this.connectionState.localParticipant.on('trackUnpublished', (publication) => {
+      console.log('Local track unpublished:', publication.source);
+      if (publication.source === Track.Source.ScreenShare) {
+        setTimeout(() => this.checkForScreenShare(), 300);
+      }
+    });
   }
 
   private handleRemoteParticipant(participant: RemoteParticipant): void {
@@ -512,11 +550,34 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
 
     participant.on('trackSubscribed', (track: RemoteTrack) => {
       this.attachRemoteTrack(track, participant);
+      // Check if it's a screen share track
+      if (track.source === Track.Source.ScreenShare) {
+        this.checkForScreenShare();
+      }
+    });
+
+    participant.on('trackUnsubscribed', (track: RemoteTrack) => {
+      // Check if screen share was stopped
+      if (track.source === Track.Source.ScreenShare) {
+        this.checkForScreenShare();
+      }
     });
   }
 
   private attachRemoteTrack(track: RemoteTrack, participant: RemoteParticipant): void {
     setTimeout(() => {
+      // Handle screen share tracks
+      if (track.source === Track.Source.ScreenShare) {
+        if (this.screenShareVideoElement?.nativeElement) {
+          track.attach(this.screenShareVideoElement.nativeElement);
+          this.activeScreenShare = {
+            participantId: participant.identity,
+            participantName: this.getParticipantDisplayName(participant.identity)
+          };
+        }
+        return;
+      }
+
       if (track.kind === Track.Kind.Video) {
         const videoElement = document.getElementById(`remote-video-${participant.identity}`) as HTMLVideoElement;
         if (videoElement) {
@@ -562,6 +623,69 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
           this.chatMessagesContainer.nativeElement.scrollHeight;
       }
     }, 100);
+  }
+
+  private checkForScreenShare(): void {
+    console.log('Checking for screen share...');
+    
+    // Clear remote screen shares
+    this.remoteScreenShares = [];
+    
+    // Check local participant for screen share - it's already handled by isScreenSharing
+    // We just need to attach the track when it becomes available
+    if (this.connectionState.localParticipant && this.isScreenSharing) {
+      const screenTrack = Array.from(
+        this.connectionState.localParticipant.videoTrackPublications.values()
+      ).find(pub => pub.source === Track.Source.ScreenShare);
+
+      console.log('Local screen share track:', screenTrack);
+
+      if (screenTrack?.track) {
+        console.log('Found local screen share track, attaching...');
+        
+        // Wait for the video element to be available in the DOM
+        setTimeout(() => {
+          if (this.screenShareVideoElement?.nativeElement && screenTrack.track) {
+            screenTrack.track.attach(this.screenShareVideoElement.nativeElement);
+            console.log('Local screen share attached to video element');
+          } else {
+            console.error('Screen share video element not found!');
+          }
+        }, 100);
+      }
+    }
+
+    // Check remote participants for screen share
+    for (const participant of this.connectionState.remoteParticipants) {
+      const screenTrack = Array.from(
+        participant.videoTrackPublications.values()
+      ).find(pub => pub.source === Track.Source.ScreenShare);
+
+      console.log(`Remote participant ${participant.identity} screen share track:`, screenTrack);
+
+      if (screenTrack?.track) {
+        console.log(`Found screen share from ${participant.identity}, adding to list...`);
+        
+        // Add to remote screen shares list
+        this.remoteScreenShares.push({
+          participantId: participant.identity,
+          participantName: this.getParticipantDisplayName(participant.identity)
+        });
+
+        // Wait for the video element to be available in the DOM
+        setTimeout(() => {
+          const videoElement = document.getElementById(`screen-share-${participant.identity}`) as HTMLVideoElement;
+          if (videoElement && screenTrack.track) {
+            screenTrack.track.attach(videoElement);
+            console.log('Remote screen share attached to video element');
+          } else {
+            console.error('Screen share video element not found for:', participant.identity);
+          }
+        }, 100);
+      }
+    }
+
+    console.log('Remote screen shares:', this.remoteScreenShares);
   }
 
   ngOnDestroy(): void {

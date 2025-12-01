@@ -152,6 +152,22 @@ export class LiveKitService implements OnDestroy {
   }
 
   /**
+   * Enable/disable screen sharing
+   */
+  async toggleScreenShare(enabled: boolean): Promise<boolean> {
+    if (!this.room) return false;
+    
+    try {
+      await this.room.localParticipant.setScreenShareEnabled(enabled);
+      console.log(`Screen share ${enabled ? 'enabled' : 'disabled'} successfully`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to ${enabled ? 'enable' : 'disable'} screen share:`, error);
+      return false;
+    }
+  }
+
+  /**
    * Get current room instance
    */
   getRoom(): Room | null {
