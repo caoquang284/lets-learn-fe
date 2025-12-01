@@ -79,7 +79,11 @@
 
     <!-- Controls -->
     <div class="controls-bar">
-      <div class="controls-group">
+      <div class="left-controls">
+        <span class="room-name">{{ roomName }}</span>
+      </div>
+
+      <div class="center-controls">
         <button 
           class="control-btn" 
           [class.disabled]="!isAudioEnabled"
@@ -88,6 +92,7 @@
         >
           <span class="material-icons" *ngIf="isAudioEnabled">mic</span>
           <span class="material-icons" *ngIf="!isAudioEnabled">mic_off</span>
+          <span class="label">Microphone</span>
         </button>
 
         <button 
@@ -98,15 +103,57 @@
         >
           <span class="material-icons" *ngIf="isVideoEnabled">videocam</span>
           <span class="material-icons" *ngIf="!isVideoEnabled">videocam_off</span>
+          <span class="label">Camera</span>
+        </button>
+
+        <button 
+          class="control-btn"
+          title="Share Screen"
+        >
+          <span class="material-icons">present_to_all</span>
+          <span class="label">Share screen</span>
+        </button>
+
+        <button 
+          class="control-btn"
+          title="Record"
+        >
+          <span class="material-icons">fiber_manual_record</span>
+          <span class="label">Record</span>
         </button>
 
         <button 
           class="control-btn" 
           (click)="toggleWhiteboard()"
           [class.active]="showWhiteboard"
-          title="Toggle Whiteboard"
+          title="Open Whiteboard"
         >
-          <span class="material-icons">draw</span>
+          <span class="material-icons">dashboard</span>
+          <span class="label">Open whiteboard</span>
+        </button>
+
+        <button 
+          class="control-btn"
+          title="React"
+        >
+          <span class="material-icons">add_reaction</span>
+          <span class="label">React</span>
+        </button>
+
+        <button 
+          class="control-btn"
+          title="Raise Hand"
+        >
+          <span class="material-icons">pan_tool</span>
+          <span class="label">Raise hand</span>
+        </button>
+
+        <button 
+          class="control-btn"
+          title="Chat"
+        >
+          <span class="material-icons">chat</span>
+          <span class="label">Chat</span>
         </button>
 
         <button 
@@ -115,12 +162,12 @@
           title="Leave Meeting"
         >
           <span class="material-icons">call_end</span>
+          <span class="label">Leave</span>
         </button>
       </div>
 
-      <div class="room-info">
-        Room: <strong>{{ roomName }}</strong> | 
-        Participants: <strong>{{ connectionState.remoteParticipants.length + 1 }}</strong>
+      <div class="right-controls">
+        <!-- Empty for now, can add participant count or other info -->
       </div>
     </div>
   </div>
