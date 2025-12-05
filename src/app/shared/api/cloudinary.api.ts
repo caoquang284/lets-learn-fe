@@ -4,7 +4,7 @@ import {
   getPublicIdFromCloudinaryUrl,
 } from '@shared/helper/cloudinary.api.helper';
 import { POST } from './utils.api';
-import { environment } from 'environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 const VIDEO_TYPES = [
   'video/mp4',

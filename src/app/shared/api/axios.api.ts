@@ -1,6 +1,6 @@
 import { HTTP_ERRORS } from '@shared/constants/http-errors';
 import axios from 'axios';
-import { environment } from 'environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { GET, POST } from './utils.api';
 
 const backendUrl = environment.BACKEND_URL || 'http://localhost:8100';

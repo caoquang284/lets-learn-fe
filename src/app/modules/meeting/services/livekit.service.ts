@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Room, RoomEvent, RemoteParticipant, LocalParticipant, Track, DataPacket_Kind } from 'livekit-client';
-import { environment } from 'environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 export interface LiveKitConnectionState {
   isConnecting: boolean;
