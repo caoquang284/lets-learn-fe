@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'auth/signup', component: RegisterPageComponent },
   { path: 'home', redirectTo: 'courses' },
   {
-    path: 'app',
+    path: '',
     component: LayoutComponent,
     children: [
       { path: 'calendar', component: CalendarPageComponent },
@@ -67,6 +67,5 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
-  exports: [RouterModule],
 })
 export class AppRoutingModule {}
