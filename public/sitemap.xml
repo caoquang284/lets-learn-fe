@@ -7,7 +7,7 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://hoctapvui.id.vn/courses</loc>
+    <loc>https://hoctapvui.id.vn/app/courses</loc>
     <lastmod>2025-12-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -19,7 +19,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hoctapvui.id.vn/auth/register</loc>
+    <loc>https://hoctapvui.id.vn/auth/signup</loc>
     <lastmod>2025-12-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

@@ -5,13 +5,15 @@ import { RegisterPageComponent } from '../modules/auth/components/register-page/
 import { CalendarPageComponent } from '@modules/calendar/components/calendar-page/calendar-page.component';
 import { LayoutComponent } from '@shared/components/layout/layout.component';
 import { SettingsPageComponent } from '@modules/settings/components/settings-page/settings-page.component';
+import { LandingPageComponent } from '@modules/page/components/landing-page/landing-page.component';
 
 const routes: Routes = [
+  { path: '', component: LandingPageComponent },
   { path: 'auth/login', component: LoginPageComponent },
   { path: 'auth/signup', component: RegisterPageComponent },
   { path: 'home', redirectTo: 'courses' },
   {
-    path: '',
+    path: 'app',
     component: LayoutComponent,
     children: [
       { path: 'calendar', component: CalendarPageComponent },
@@ -58,12 +60,13 @@ const routes: Routes = [
         (m) => m.QuizAttemptingRoutingModule
       ),
   },
-  { path: '**', redirectTo: 'auth/login' }, // Temporarily disabled for topic link testing
+  { path: '**', redirectTo: 'auth/login' },
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}
