@@ -9,4 +9,5 @@ import { Component, Input } from '@angular/core';
 export class CircleImageComponent {
   @Input() src: string | null = null;
   @Input() defaultImage: string = 'image';
+  @Input() alt: string = 'User avatar';
 }
