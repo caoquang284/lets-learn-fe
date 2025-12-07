@@ -7,11 +7,9 @@ export const environment = {
   LIVEKIT_WS_URL: 'wss://update-zero-military-founded.trycloudflare.com',
   LIVEKIT_DEFAULT_ROOM: 'test-room',
   TINYMCE_API_KEY: '',
-  CLOUDINARY_CLOUD_NAME: '',
-  UPLOAD_PRESET_NAME: '',
-  CLOUDINARY_API_KEY: '',
-  CLOUDINARY_API_SECRET: '',
-  CLOUD_API_KEY: 965853596633558,
-  CLOUD_API_SECRET: 'g7d33_DwBb3DkEXas09fMIarWho',
-  CLOUD_NAME: 'drusgyddb'
+  CLOUDINARY_CLOUD_NAME: 'drusgyddb',
+  UPLOAD_PRESET_NAME: 'LetsLearn',
+  CLOUDINARY_API_KEY: '523351553226775',
+  CLOUDINARY_API_SECRET: 'k2Ju2mZw8M2k8O3Wwjv9n_7nzbc',
+
 };
