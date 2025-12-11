@@ -75,11 +75,8 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
     // Get route parameters
     this.topicId = this.route.snapshot.paramMap.get('topicId');
     
-    // Try to get courseId from parent route first, then from navigation state
-    this.courseId = this.route.parent?.snapshot.paramMap.get('courseId') || 
-                    this.router.getCurrentNavigation()?.extras?.state?.['courseId'] ||
-                    (window.history.state && window.history.state.courseId) || 
-                    null;
+    // Get courseId from query params
+    this.courseId = this.route.snapshot.queryParamMap.get('courseId');
 
     console.log('Meeting Room Init - TopicId:', this.topicId, 'CourseId:', this.courseId);
 
@@ -193,8 +190,38 @@ export class MeetingRoomComponent implements OnInit, OnDestroy {
   }
 
   async leaveRoom(): Promise<void> {
+    console.log('=== LEAVE ROOM DEBUG ===');
+    console.log('Current URL:', this.router.url);
+    console.log('CourseId:', this.courseId);
+    console.log('TopicId:', this.topicId);
+    
     await this.liveKitService.disconnect();
-    this.router.navigate(['../'], { relativeTo: this.route });
+    
+    // Navigate back to meeting page  
+    if (this.courseId && this.topicId) {
+      // Correct route structure: /courses/:courseId/meeting/:topicId (NO 'topic' segment!)
+      const targetRoute = ['/courses', this.courseId, 'meeting', this.topicId];
+      console.log('Navigating to:', targetRoute.join('/'));
+      
+      try {
+        const result = await this.router.navigate(targetRoute);
+        console.log('Navigation result:', result);
+        
+        if (!result) {
+          console.error('Navigation failed! Falling back to browser history.');
+          window.history.back();
+        }
+      } catch (error) {
+        console.error('Navigation error:', error);
+        window.history.back();
+      }
+    } else {
+      console.warn('Missing courseId or topicId, falling back to browser history');
+      console.log('Available data - CourseId:', this.courseId, 'TopicId:', this.topicId);
+      window.history.back();
+    }
+    
+    console.log('=== END LEAVE ROOM DEBUG ===');
   }
 
   async toggleVideo(): Promise<void> {

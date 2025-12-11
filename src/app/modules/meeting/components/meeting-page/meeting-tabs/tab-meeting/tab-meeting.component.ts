@@ -117,9 +117,9 @@ export class TabMeetingComponent implements OnInit, OnChanges {
       // Pre-fetch the token to validate access and prepare the meeting
       await GetMeetingToken(this.topic.id, this.courseId);
       
-      // Navigate to the meeting room with courseId in state
+      // Navigate to the meeting room with courseId in query params
       await this.router.navigate(['/meeting', this.topic.id, 'room'], {
-        state: { courseId: this.courseId }
+        queryParams: { courseId: this.courseId }
       });
     } catch (error) {
       console.error('Failed to join meeting:', error);
