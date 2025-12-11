@@ -261,4 +261,8 @@ export class CreateShortAnswerQuestionComponent {
         this.loading = false;
       });
   }
+
+  onCancel() {
+    this.location.back();
+  }
 }

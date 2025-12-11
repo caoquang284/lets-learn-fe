@@ -277,4 +277,8 @@ export class CreateChoiceQuestionComponent {
         this.loading = false;
       });
   }
+
+  onCancel() {
+    this.location.back();
+  }
 }

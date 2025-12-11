@@ -49,6 +49,12 @@
     </app-collapsible-list>
     <div class="submit-container">
       <app-button
+        type="button"
+        label="Cancel"
+        variant="secondary"
+        (onClick)="onCancel()"
+      />
+      <app-button
         type="submit"
         label="Save"
         class="submit-button"

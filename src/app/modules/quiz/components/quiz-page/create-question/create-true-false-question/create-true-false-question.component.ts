@@ -175,4 +175,8 @@ export class CreateTrueFalseQuestionComponent {
         this.loading = false;
       });
   }
+
+  onCancel() {
+    this.location.back();
+  }
 }
