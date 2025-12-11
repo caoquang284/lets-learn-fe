@@ -6,9 +6,7 @@ import {
 import { StudentResponse } from '@shared/models/student-response';
 
 export const GetQuizResponse = (topicId: string, quizResponseId: string) => {
-  return GET(`/topic/${topicId}/quiz-response/${quizResponseId}`).then(
-    convertQuizResponseFromResponseData
-  );
+  return GET(`/topic/${topicId}/quiz-response/${quizResponseId}`)
 };
 
 export const CreateQuizResponse = (
@@ -16,21 +14,15 @@ export const CreateQuizResponse = (
   quizResponse: StudentResponse
 ) => {
   const data = convertQuizResponseToRequestData(quizResponse);
-  return POST(`/topic/${topicId}/quiz-response`, data).then(
-    convertQuizResponseFromResponseData
-  );
+  return POST(`/topic/${topicId}/quiz-response`, data)
 };
 
 export const GetAllQuizResponsesOfTopic = (
   topicId: string
 ): Promise<StudentResponse[]> => {
-  return GET(`/topic/${topicId}/quiz-response`).then((res) =>
-    res.map(convertQuizResponseFromResponseData)
-  );
+  return GET(`/topic/${topicId}/quiz-response`)
 };
 
 export const GetAllQuizResponsesOfUser = (userId: string) => {
-  return GET(`/user/${userId}/quiz-responses`).then((res) =>
-    res.map(convertQuizResponseFromResponseData)
-  );
+  return GET(`/user/${userId}/quiz-responses`)
 };
