@@ -1,0 +1,61 @@
+<div class="container">
+  <h3 class="title">Updating a True/False question</h3>
+  @if (form) {
+  <form [formGroup]="form" (submit)="onSubmit($event)">
+    <app-collapsible-list>
+      <app-collapsible-section
+        [sectionId]="sectionIds[0]"
+        [hasBorder]="false"
+        title="General"
+      >
+        <span class="section-title" title>General</span>
+        <div class="content" content>
+          @for(control of generalFormControls; track control.id) {
+          <setting-row [label]="control.label" [id]="control.id">
+            <app-form-field
+              [control]="control"
+              [controlName]="control.id"
+              [form]="form"
+              [showLabel]="false"
+            />
+          </setting-row>
+          }
+        </div>
+      </app-collapsible-section>
+      <app-collapsible-section
+        [sectionId]="sectionIds[1]"
+        [hasBorder]="false"
+        title="Answer"
+      >
+        <span class="section-title" title>Answer</span>
+        <div class="content" content>
+          @for(control of answerFormControls; track control.id) {
+          <setting-row [label]="control.label" [id]="control.id">
+            <app-form-field
+              [control]="control"
+              [controlName]="control.id"
+              [form]="form"
+              [showLabel]="false"
+            />
+          </setting-row>
+          }
+        </div>
+      </app-collapsible-section>
+    </app-collapsible-list>
+    <div class="submit-container">
+      <app-button
+        type="button"
+        label="Cancel"
+        variant="secondary"
+        (onClick)="onCancel()"
+      />
+      <app-button
+        type="submit"
+        label="Update"
+        class="submit-button"
+        [loading]="loading"
+      />
+    </div>
+  </form>
+  }
+</div>

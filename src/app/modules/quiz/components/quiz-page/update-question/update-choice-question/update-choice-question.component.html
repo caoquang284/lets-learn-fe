@@ -1,0 +1,74 @@
+<div class="container">
+  <h3 class="title">Updating a Choice question</h3>
+  @if (form) {
+  <form [formGroup]="form" (submit)="onSubmit($event)">
+    <app-collapsible-list>
+      <app-collapsible-section [sectionId]="sectionIds[0]" [hasBorder]="false">
+        <!-- Section dynamic title -->
+        <span class="section-title" title>General</span>
+
+        <!-- Section dynamic content -->
+        <div class="content" content>
+          @for(control of generalFormControls; track control.id) {
+          <setting-row [label]="control.label" [id]="control.id">
+            <app-form-field
+              [control]="control"
+              [controlName]="control.id"
+              [form]="form"
+              [showLabel]="false"
+            />
+          </setting-row>
+          }
+        </div>
+      </app-collapsible-section>
+      <app-collapsible-section [sectionId]="sectionIds[1]" [hasBorder]="false">
+        <!-- Section dynamic title -->
+        <span class="section-title" title>Answers</span>
+
+        <!-- Section dynamic content -->
+        <div class="content" content>
+          @for(controls of answerFormControls; track controls; let i = $index) {
+          <div class="flex-row">
+            @for(control of controls; track control.id) {
+            <app-form-field
+              [showLabel]="true"
+              labelPosition="top"
+              [control]="control"
+              [controlName]="control.id"
+              [form]="getFormGroupFromForm(i)"
+            />
+            }
+          </div>
+          }
+        </div>
+      </app-collapsible-section>
+    </app-collapsible-list>
+    <div class="action-container">
+      <app-button
+        type="button"
+        label="Add answer"
+        variant="ghost"
+        (onClick)="addQuestionChoice()"
+      />
+      <app-button
+        type="button"
+        label="Remove answer"
+        variant="ghost"
+        (onClick)="removeQuestionChoice()"
+      />
+      <app-button
+        type="button"
+        label="Cancel"
+        variant="secondary"
+        (onClick)="onCancel()"
+      />
+      <app-button
+        type="submit"
+        label="Update"
+        class="submit-button"
+        [loading]="loading"
+      />
+    </div>
+  </form>
+  }
+</div>

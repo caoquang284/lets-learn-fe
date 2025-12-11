@@ -38,10 +38,25 @@ export const convertQuestionFromResponseData = (data: any): Question => {
     multiple,
     choices,
     createdAt,
-    createdBy,
-    modifiedBy,
+    createdById,
+    modifiedById,
     updatedAt,
   } = data;
+
+  // Map backend field names to frontend field names
+  const createdBy = createdById;
+  const modifiedBy = modifiedById;
+  const modifiedAt = updatedAt;
+
+  // Map backend type strings to frontend QuestionType enum
+  let questionType = type;
+  if (type === 'Choices Answer') {
+    questionType = QuestionType.CHOICE;
+  } else if (type === 'True/False') {
+    questionType = QuestionType.TRUE_FALSE;
+  } else if (type === 'Short Answer') {
+    questionType = QuestionType.SHORT_ANSWER;
+  }
 
   const choiceQuestion: ChoiceQuestion = {
     choices,
@@ -63,19 +78,19 @@ export const convertQuestionFromResponseData = (data: any): Question => {
     questionName,
     questionText,
     status,
-    type,
+    type: questionType,
     defaultMark,
     usage,
     data: choiceQuestion,
     createdAt: createdAt ? new Date(createdAt) : undefined,
-    modifiedAt: updatedAt ? new Date(updatedAt) : (createdAt ? new Date(createdAt) : undefined),
+    modifiedAt: modifiedAt ? new Date(modifiedAt) : (createdAt ? new Date(createdAt) : undefined),
     createdBy,
     modifiedBy,
   };
 
-  if (type === QuestionType.SHORT_ANSWER) {
+  if (questionType === QuestionType.SHORT_ANSWER) {
     question.data = shortAnswerQuestion;
-  } else if (type === QuestionType.TRUE_FALSE) {
+  } else if (questionType === QuestionType.TRUE_FALSE) {
     question.data = trueFalseQuestion;
   }
   return question;

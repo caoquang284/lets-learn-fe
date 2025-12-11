@@ -16,7 +16,7 @@ import {
   createTrueFalseQuestionAnswerFormControls,
   createTrueFalseQuestionGeneralFormControls,
 } from './create-true-false-question-form.config';
-import { CreateQuestion, GetQuestion } from '@modules/quiz/api/question.api';
+import { CreateQuestion, GetQuestion, UpdateQuestion } from '@modules/quiz/api/question.api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { generateId } from '@shared/helper/string.helper';
 import { ToastrService } from 'ngx-toastr';
@@ -119,6 +119,12 @@ export class CreateTrueFalseQuestionComponent {
 
   async onSubmit(e: Event) {
     e.preventDefault(); // Prevent default form submission
+    
+    // Force blur on active element to ensure value is synced
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    
     // Stop here if form is invalid
     if (this.form.invalid) {
       this.form.markAllAsTouched(); // Mark all controls as touched to show validation errors
@@ -139,6 +145,8 @@ export class CreateTrueFalseQuestionComponent {
       return;
     }
 
+    const isEditing = !!this.question?.id;
+
     const newQuestion: Question = {
       id: this.question?.id ?? generateId(4),
       type: QuestionType.TRUE_FALSE,
@@ -151,24 +159,28 @@ export class CreateTrueFalseQuestionComponent {
         feedbackOfTrue: this.form.get('feedbackOfTrue')?.value ?? '',
         feedbackOfFalse: this.form.get('feedbackOfFalse')?.value ?? '',
       },
-      createdBy: null,
-      createdAt: new Date().toISOString(),
+      createdBy: this.question?.createdBy ?? null,
+      createdAt: this.question?.createdAt ?? new Date().toISOString(),
       modifiedAt: new Date().toISOString(),
-      modifiedBy: null,
-      usage: 0,
+      modifiedBy: this.question?.modifiedBy ?? null,
+      usage: this.question?.usage ?? 0,
     };
     console.log('submit attempt with:', this.form.value);
     console.log('new question:', newQuestion);
 
     this.loading = true;
-    await CreateQuestion(newQuestion, this.courseId)
+    const apiCall = isEditing 
+      ? UpdateQuestion(newQuestion, this.courseId)
+      : CreateQuestion(newQuestion, this.courseId);
+    
+    await apiCall
       .then((question) => {
-        console.log('Question created successfully:', question);
-        this.toastrService.success('Question created successfully!');
+        console.log(`Question ${isEditing ? 'updated' : 'created'} successfully:`, question);
+        this.toastrService.success(`Question ${isEditing ? 'updated' : 'created'} successfully!`);
         this.location.back(); // Navigate back to the previous page
       })
       .catch((error) => {
-        console.error('Error creating question:', error);
+        console.error(`Error ${isEditing ? 'updating' : 'creating'} question:`, error);
         this.toastrService.error(error.message);
       })
       .finally(() => {

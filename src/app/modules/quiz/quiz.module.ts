@@ -34,8 +34,13 @@ import { DashboardComponent } from './components/quiz-page/quiz-tabs/tab-dashboa
 import { CreateTrueFalseQuestionComponent } from './components/quiz-page/create-question/create-true-false-question/create-true-false-question.component';
 import { CreateChoiceQuestionComponent } from './components/quiz-page/create-question/create-choice-question/create-choice-question.component';
 import { CreateShortAnswerQuestionComponent } from './components/quiz-page/create-question/create-short-answer-question/create-short-answer-question.component';
+import { UpdateTrueFalseQuestionComponent } from './components/quiz-page/update-question/update-true-false-question/update-true-false-question.component';
+import { UpdateChoiceQuestionComponent } from './components/quiz-page/update-question/update-choice-question/update-choice-question.component';
+import { UpdateShortAnswerQuestionComponent } from './components/quiz-page/update-question/update-short-answer-question/update-short-answer-question.component';
 import { CreateQuestionDialogComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/create-question-dialog/create-question-dialog.component';
 import { CreateQuestionDialogContentComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/create-question-dialog/create-question-dialog-content/create-question-dialog-content.component';
+import { UpdateQuestionDialogComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/update-question-dialog/update-question-dialog.component';
+import { UpdateQuestionDialogContentComponent } from './components/quiz-page/quiz-tabs/tab-question-bank/update-question-dialog/update-question-dialog-content/update-question-dialog-content.component';
 import { MatDialogActions, MatDialogContent } from '@angular/material/dialog';
 @NgModule({
   declarations: [
@@ -67,8 +72,13 @@ import { MatDialogActions, MatDialogContent } from '@angular/material/dialog';
     CreateTrueFalseQuestionComponent,
     CreateChoiceQuestionComponent,
     CreateShortAnswerQuestionComponent,
+    UpdateTrueFalseQuestionComponent,
+    UpdateChoiceQuestionComponent,
+    UpdateShortAnswerQuestionComponent,
     CreateQuestionDialogComponent,
     CreateQuestionDialogContentComponent,
+    UpdateQuestionDialogComponent,
+    UpdateQuestionDialogContentComponent,
   ],
   imports: [
     SharedModule,

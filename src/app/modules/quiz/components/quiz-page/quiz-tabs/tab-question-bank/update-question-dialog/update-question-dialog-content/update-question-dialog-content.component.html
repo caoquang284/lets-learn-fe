@@ -1,0 +1,43 @@
+<div class="container">
+  <h3 class="dialog-title" mat-dialog-title>Choose a question type to update</h3>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="content-left">
+      <h4 class="section-title">Question</h4>
+
+      <div class="question-types">
+        <div
+          class="question-type-item"
+          *ngFor="let questionType of questionTypes"
+          [class.selected]="selectedQuestionType === questionType"
+          (click)="selectQuestionType(questionType)"
+        >
+          <span class="material-symbols-outlined">{{
+            getIconKey(questionType)
+          }}</span>
+          <span class="question-name">{{ questionType }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-right">
+      <h4 class="section-title">Description</h4>
+      <div class="description-content" *ngIf="selectedQuestionType">
+        <p>{{ getQuestionTypeDescription(selectedQuestionType) }}</p>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <app-button label="Cancel" variant="ghost" (click)="onCancel()">
+    </app-button>
+
+    <app-button
+      cdkFocusInitial
+      variant="primary"
+      (click)="onConfirm()"
+      label="Update"
+    >
+    </app-button>
+  </mat-dialog-actions>
+</div>

@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { CreateQuestion, GetQuestion, UpdateQuestion } from '@modules/quiz/api/question.api';
+import { GetQuestion, UpdateQuestion } from '@modules/quiz/api/question.api';
 import { CollapsibleListService } from '@shared/components/collapsible-list/collapsible-list.service';
 import { generateId } from '@shared/helper/string.helper';
 import {
@@ -23,16 +23,16 @@ import {
   createChoiceQuestionGeneralFormControls,
   getChoiceQuestionAnswerFormControls,
   getChoiceQuestionAnswersFormControls,
-} from './create-choice-question-form.config';
+} from '../../create-question/create-choice-question/create-choice-question-form.config';
 
 @Component({
-  selector: 'create-choice-question',
+  selector: 'update-choice-question',
   standalone: false,
-  templateUrl: './create-choice-question.component.html',
-  styleUrl: './create-choice-question.component.scss',
+  templateUrl: './update-choice-question.component.html',
+  styleUrl: './update-choice-question.component.scss',
   providers: [CollapsibleListService],
 })
-export class CreateChoiceQuestionComponent {
+export class UpdateChoiceQuestionComponent {
   question: Question | null = null;
   courseId: string = '';
   sectionIds: string[] = ['general', 'answer'];
@@ -50,40 +50,30 @@ export class CreateChoiceQuestionComponent {
     private location: Location
   ) {}
 
-  initForm(question: Question | null): void {
-    const questionData = question ? (question.data as ChoiceQuestion) : null;
-    this.form = this.fb.group(
-      {
-        questionName: new FormControl<string>(question?.questionName ?? '', [
-          Validators.required,
-          Validators.minLength(2),
-        ]),
-        questionText: new FormControl<string>(question?.questionText ?? '', [
-          Validators.required,
-          Validators.minLength(2),
-        ]),
-        status: new FormControl<QuestionStatus>(
-          question?.status ?? QuestionStatus.READY,
-          [Validators.required]
-        ),
-        defaultMark: new FormControl<number>(question?.defaultMark ?? 1, [
-          Validators.required,
-          Validators.min(0),
-        ]),
-        multiple: new FormControl<boolean>(questionData?.multiple ?? false),
-        answers: this.fb.array(
-          questionData
-            ? questionData.choices.map((choice) =>
-                this.getAnswerFormGroup(choice)
-              )
-            : Array.from({ length: 3 }, (_, index) =>
-                this.getDefaultAnswerFormGroup(index)
-              ),
-          Validators.required
-        ),
-      },
-      { updateOn: 'submit' }
-    );
+  initForm(question: Question): void {
+    const questionData = question.data as ChoiceQuestion;
+    this.form = this.fb.group({
+      questionName: new FormControl<string>(question.questionName, [
+        Validators.required,
+        Validators.minLength(2),
+      ]),
+      questionText: new FormControl<string>(question.questionText, [
+        Validators.required,
+        Validators.minLength(2),
+      ]),
+      status: new FormControl<QuestionStatus>(question.status, [
+        Validators.required,
+      ]),
+      defaultMark: new FormControl<number>(question.defaultMark, [
+        Validators.required,
+        Validators.min(0),
+      ]),
+      multiple: new FormControl<boolean>(questionData?.multiple ?? false),
+      answers: this.fb.array(
+        questionData.choices.map((choice) => this.getAnswerFormGroup(choice)),
+        Validators.required
+      ),
+    });
   }
 
   getAnswerFormGroup(choice: QuestionChoice) {
@@ -150,29 +140,27 @@ export class CreateChoiceQuestionComponent {
   ngOnInit(): void {
     this.courseId = this.activedRoute.snapshot.paramMap.get('courseId') ?? '';
     const questionId = this.activedRoute.snapshot.paramMap.get('questionId');
-    if (questionId) {
-      this.fetchQuestionData(questionId);
-    } else {
-      this.initForm(this.question);
+    if (!questionId) {
+      this.toastrService.error('Question ID is required for update.');
+      this.location.back();
+      return;
     }
+    this.fetchQuestionData(questionId);
     this.collapsibleListService.setSectionIds(this.sectionIds);
-    this.collapsibleListService.setCanEdit(false); // disable edit UI in collapsible list
+    this.collapsibleListService.setCanEdit(false);
     this.collapsibleListService.expandAll();
   }
 
   async fetchQuestionData(id: string) {
     await GetQuestion(id)
       .then((question) => {
-        console.log('Fetched question:', question);
-        console.log('Question name from response:', question.questionName);
         this.question = question;
-        this.initForm(this.question);
-        console.log('Form value after init:', this.form.value);
-        console.log('Question name form control value:', this.form.get('questionName')?.value);
+        this.initForm(question);
       })
       .catch((error) => {
         console.error('Failed to fetch question:', error);
         this.toastrService.error('Failed to fetch question data.');
+        this.location.back();
       });
   }
 
@@ -192,7 +180,6 @@ export class CreateChoiceQuestionComponent {
         return false;
       }
     } else {
-      // For multiple choice questions, the total grade percent must be equal to 100
       const totalGradePercent = answers.controls.reduce(
         (total, control) =>
           total + (Number(control.get('gradePercent')?.value) ?? 0),
@@ -209,22 +196,18 @@ export class CreateChoiceQuestionComponent {
   }
 
   async onSubmit(e: Event) {
-    e.preventDefault(); // Prevent default form submission
-    
+    e.preventDefault();
+
     // Force blur on active element to ensure value is synced
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-    
-    // Stop here if form is invalid
-    if (this.form.invalid) {
-      this.form.markAllAsTouched(); // Mark all controls as touched to show validation errors
 
-      // Find first invalid control and scroll to it
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       const firstInvalidControl: HTMLElement = document.querySelector(
         'form .ng-invalid'
       ) as HTMLElement;
-
       if (firstInvalidControl) {
         firstInvalidControl.scrollIntoView({
           behavior: 'smooth',
@@ -232,30 +215,25 @@ export class CreateChoiceQuestionComponent {
         });
         firstInvalidControl.focus();
       }
-
       return;
     }
 
     if (!this.checkValidGradePercents()) return;
 
     const answersArray = (this.form.get('answers') as FormArray).value;
-    const newQuestionTempId = this.question?.id ?? generateId(4);
-    const isEditing = !!this.question?.id;
-
-    // Preserve existing choice IDs when editing, or generate new ones when creating
-    const existingChoices = this.question?.data ? (this.question.data as ChoiceQuestion).choices : [];
+    const existingChoices = (this.question!.data as ChoiceQuestion).choices;
     const questionChoices: QuestionChoice[] = answersArray.map(
       (answer: any, index: number) => ({
         id: existingChoices[index]?.id ?? generateId(4),
-        questionId: newQuestionTempId,
+        questionId: this.question!.id,
         text: answer.text,
         gradePercent: answer.gradePercent,
         feedback: answer.feedback || '',
       })
     );
 
-    const newQuestion: Question = {
-      id: newQuestionTempId,
+    const updatedQuestion: Question = {
+      ...this.question!,
       type: QuestionType.CHOICE,
       questionName: this.form.get('questionName')?.value ?? '',
       questionText: this.form.get('questionText')?.value ?? '',
@@ -265,28 +243,17 @@ export class CreateChoiceQuestionComponent {
         multiple: this.form.get('multiple')?.value ?? false,
         choices: questionChoices,
       },
-      createdBy: this.question?.createdBy ?? null,
-      createdAt: this.question?.createdAt ?? new Date().toISOString(),
       modifiedAt: new Date().toISOString(),
-      modifiedBy: this.question?.modifiedBy ?? null,
-      usage: this.question?.usage ?? 0,
     };
-    console.log('submit attempt with:', this.form.value);
-    console.log('new question:', newQuestion);
 
     this.loading = true;
-    const apiCall = isEditing 
-      ? UpdateQuestion(newQuestion, this.courseId)
-      : CreateQuestion(newQuestion, this.courseId);
-    
-    await apiCall
+    await UpdateQuestion(updatedQuestion, this.courseId)
       .then((question) => {
-        console.log(`Question ${isEditing ? 'updated' : 'created'} successfully:`, question);
-        this.toastrService.success(`Question ${isEditing ? 'updated' : 'created'} successfully!`);
+        this.toastrService.success('Question updated successfully!');
         this.location.back();
       })
       .catch((error) => {
-        console.error(`Error ${isEditing ? 'updating' : 'creating'} question:`, error);
+        console.error('Error updating question:', error);
         this.toastrService.error(error.message);
       })
       .finally(() => {
