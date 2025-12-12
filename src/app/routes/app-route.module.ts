@@ -8,14 +8,19 @@ import { SettingsPageComponent } from '@modules/settings/components/settings-pag
 import { LandingPageComponent } from '@modules/page/components/landing-page/landing-page.component';
 
 const routes: Routes = [
+  // Landing page - trang chủ cho người dùng chưa đăng nhập
   { path: '', component: LandingPageComponent },
+  
+  // Auth routes - đăng nhập và đăng ký
   { path: 'auth/login', component: LoginPageComponent },
   { path: 'auth/signup', component: RegisterPageComponent },
-  { path: 'home', redirectTo: 'courses' },
+  
+  // App routes với Layout - chỉ dành cho người dùng đã đăng nhập
   {
-    path: '',
+    path: 'app',
     component: LayoutComponent,
     children: [
+      { path: '', redirectTo: 'courses', pathMatch: 'full' },
       { path: 'calendar', component: CalendarPageComponent },
       { path: 'settings', component: SettingsPageComponent },
       {
@@ -39,6 +44,16 @@ const routes: Routes = [
       },
     ],
   },
+  
+  // Legacy routes - redirect to new structure
+  { path: 'home', redirectTo: 'app/courses', pathMatch: 'full' },
+  { path: 'courses', redirectTo: 'app/courses', pathMatch: 'full' },
+  { path: 'calendar', redirectTo: 'app/calendar', pathMatch: 'full' },
+  { path: 'settings', redirectTo: 'app/settings', pathMatch: 'full' },
+  { path: 'to-do', redirectTo: 'app/to-do', pathMatch: 'full' },
+  { path: 'to-review', redirectTo: 'app/to-review', pathMatch: 'full' },
+  
+  // Quiz attempting routes - không có layout
   {
     path: 'quiz',
     loadChildren: () =>
@@ -47,20 +62,24 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'app/courses/:courseId/quiz',
+    loadChildren: () =>
+      import('@routes/quiz-attempting-route.module').then(
+        (m) => m.QuizAttemptingRoutingModule
+      ),
+  },
+  
+  // Meeting room routes - không có layout
+  {
     path: 'meeting',
     loadChildren: () =>
       import('@routes/meeting-room-route.module').then(
         (m) => m.MeetingRoomRoutingModule
       ),
   },
-  {
-    path: 'courses/:courseId/quiz',
-    loadChildren: () =>
-      import('@routes/quiz-attempting-route.module').then(
-        (m) => m.QuizAttemptingRoutingModule
-      ),
-  },
-  { path: '**', redirectTo: 'auth/login' },
+  
+  // Wildcard redirect về landing page
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({
