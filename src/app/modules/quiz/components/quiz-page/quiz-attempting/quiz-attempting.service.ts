@@ -216,6 +216,60 @@ export class QuizAttemptingService {
     this.studentResponse.next(response);
   }
 
+  getQuestionFeedback(question: Question): string {
+    if (!question || !question.data) return 'Try Again';
+    
+    const answer = this.getAnswer(question.id);
+    
+    // If no answer provided, return default feedback
+    if (!answer || answer === '') {
+      return 'Try Again';
+    }
+    
+    if (question.type === QuestionType.TRUE_FALSE) {
+      const data = question.data as any;
+      if (!data) return 'Try Again';
+      
+      const selectedValue = answer === '1';
+      const feedback = selectedValue ? (data.feedbackOfTrue || '') : (data.feedbackOfFalse || '');
+      const isCorrect = this.questionService.getQuestionMark(question, answer) > 0;
+      
+      // Return stored feedback if exists, otherwise return default based on correctness
+      return feedback || (isCorrect ? 'Great Job' : 'Try Again');
+    } else if (question.type === QuestionType.CHOICE) {
+      const choices = this.getChoices(question);
+      if (!choices || choices.length === 0) return 'Try Again';
+      
+      const isMultiple = this.isMultipleChoice(question);
+      
+      if (isMultiple) {
+        const selectedIds = answer as string[];
+        if (!selectedIds || selectedIds.length === 0) return 'Try Again';
+        
+        const selectedChoices = choices.filter(c => selectedIds.includes(c.id));
+        const feedbacks = selectedChoices.map(c => c.feedback).filter(f => f);
+        const isCorrect = this.questionService.getQuestionMark(question, answer) === question.defaultMark;
+        
+        // Return stored feedbacks if exist, otherwise return default based on correctness
+        return feedbacks.length > 0 ? feedbacks.join(' ') : (isCorrect ? 'Great Job' : 'Try Again');
+      } else {
+        const selectedChoice = choices.find(c => c.id === answer);
+        const isCorrect = this.questionService.getQuestionMark(question, answer) > 0;
+        
+        // Return stored feedback if exists, otherwise return default based on correctness
+        return selectedChoice?.feedback || (isCorrect ? 'Great Job' : 'Try Again');
+      }
+    }
+    
+    return 'Try Again';
+  }
+
+  isQuestionAnsweredCorrectly(question: Question): boolean {
+    const answer = this.getAnswer(question.id);
+    const mark = this.questionService.getQuestionMark(question, answer);
+    return mark === question.defaultMark;
+  }
+
   async finishQuiz() {
     const studentResponse = this.studentResponse.value;
     if (!studentResponse || !this.topicId) return;

@@ -64,6 +64,16 @@
           <quiz-short-answer [question]="question" />
           }
         </div>
+
+        @if(shouldShowFeedback()) {
+        <div class="teacher-feedback" [class.correct]="isCurrentAnswerCorrect()" [class.incorrect]="!isCurrentAnswerCorrect()">
+          <div class="feedback-header">
+            <span class="material-icons">info</span>
+            <span class="feedback-title">Teacher Feedback</span>
+          </div>
+          <div class="feedback-content" [innerHTML]="getCurrentQuestionFeedback()"></div>
+        </div>
+        }
       </div>
       } }
     </ng-container>

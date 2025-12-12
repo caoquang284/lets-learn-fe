@@ -99,8 +99,53 @@ export class QuizAttemptingComponent implements OnInit {
   }
 
   InitFirstQuizDisplayData(topic: QuizTopic) {
-    this.quizAttemptingService.setQuestions(topic.data.questions);
-    this.quizAttemptingService.setCurrentQuestionId(this.questions[0].id);
+    // Convert questions to proper format if they're in flat structure
+    const questions = topic.data.questions.map(q => this.normalizeQuestion(q));
+    this.quizAttemptingService.setQuestions(questions);
+    this.quizAttemptingService.setCurrentQuestionId(questions[0].id);
+  }
+
+  // Normalize question structure - convert flat backend format to nested frontend format
+  normalizeQuestion(question: Question): Question {
+    const flatData = question as any;
+    
+    // If already in correct nested format, return as-is
+    if (question.data && typeof question.data === 'object' && 
+        (question.data.hasOwnProperty('choices') || question.data.hasOwnProperty('correctAnswer'))) {
+      return question;
+    }
+    
+    // Convert flat structure to nested
+    if (question.type === QuestionType.TRUE_FALSE || flatData.type === 'True/False') {
+      return {
+        ...question,
+        type: QuestionType.TRUE_FALSE,
+        data: {
+          correctAnswer: flatData.correctAnswer ?? false,
+          feedbackOfTrue: flatData.feedbackOfTrue || '',
+          feedbackOfFalse: flatData.feedbackOfFalse || ''
+        }
+      };
+    } else if (question.type === QuestionType.CHOICE || flatData.type === 'Choices Answer') {
+      return {
+        ...question,
+        type: QuestionType.CHOICE,
+        data: {
+          multiple: flatData.multiple ?? false,
+          choices: flatData.choices || []
+        }
+      };
+    } else if (question.type === QuestionType.SHORT_ANSWER || flatData.type === 'Short Answer') {
+      return {
+        ...question,
+        type: QuestionType.SHORT_ANSWER,
+        data: {
+          choices: flatData.choices || []
+        }
+      };
+    }
+    
+    return question;
   }
 
   async InitAttemptingModeData(courseId: string, topicId: string) {
@@ -159,5 +204,22 @@ export class QuizAttemptingComponent implements OnInit {
 
   flagQuestion(question: Question) {
     this.quizAttemptingService.flagQuestion(question.id);
+  }
+
+  getCurrentQuestionFeedback(): string {
+    const currentQuestion = this.questions.find(q => q.id === this.currentQuestionId);
+    if (!currentQuestion || !this.isReviewMode) return '';
+
+    return this.quizAttemptingService.getQuestionFeedback(currentQuestion);
+  }
+
+  shouldShowFeedback(): boolean {
+    return this.isReviewMode && this.showAnswer;
+  }
+
+  isCurrentAnswerCorrect(): boolean {
+    const currentQuestion = this.questions.find(q => q.id === this.currentQuestionId);
+    if (!currentQuestion) return false;
+    return this.quizAttemptingService.isQuestionAnsweredCorrectly(currentQuestion);
   }
 }

@@ -1,6 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
 import { QuestionResult } from '@modules/quiz/constants/quiz.constant';
-import { Question } from '@shared/models/question';
+import { Question, TrueFalseQuestion } from '@shared/models/question';
 import { QuizTrueFalseAnswerService } from './quiz-true-false-answer.service';
 
 type Variant =
@@ -63,5 +63,25 @@ export class QuizTrueFalseAnswerComponent {
 
   isSelectedChoice(): boolean {
     return this.quizTrueFalseAnswerService.isSelectedChoice();
+  }
+
+  getFeedback(): string {
+    if (!this.showAnswer) return '';
+    const data = this.question.data as TrueFalseQuestion;
+    if (!data) return '';
+    
+    const feedback = this.value ? data.feedbackOfTrue : data.feedbackOfFalse;
+    
+    // Provide fallback messages if feedback is null or empty
+    if (!feedback) {
+      const isCorrect = this.quizTrueFalseAnswerService.isCorrectChoice();
+      return isCorrect ? 'Great Job' : 'Try Again';
+    }
+    
+    return feedback;
+  }
+
+  shouldShowFeedback(): boolean {
+    return this.showAnswer && this.isSelectedChoice();
   }
 }

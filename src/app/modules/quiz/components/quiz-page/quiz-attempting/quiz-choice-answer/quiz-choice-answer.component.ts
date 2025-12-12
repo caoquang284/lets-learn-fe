@@ -74,4 +74,22 @@ export class QuizChoiceAnswerComponent implements OnInit {
   isSelectedChoice(): boolean {
     return this.quizChoiceAnswerService.isSelectedChoice();
   }
+
+  getFeedback(): string {
+    if (!this.showAnswer || !this.choice) return '';
+    
+    const feedback = this.choice.feedback;
+    
+    // Provide fallback messages if feedback is null or empty
+    if (!feedback) {
+      const isCorrect = this.variant === 'correct';
+      return isCorrect ? 'Great Job' : 'Try Again';
+    }
+    
+    return feedback;
+  }
+
+  shouldShowFeedback(): boolean {
+    return this.showAnswer && this.isSelectedChoice();
+  }
 }
