@@ -204,8 +204,14 @@ export class QuizAttemptingService {
     const answerRecord: Record<string, any> = {};
     quizAnsers.forEach((quizAnswer) => {
       const questionId = quizAnswer.question.id;
+      
+      // Find the full question from the current questions list (which has choices and feedback from Topic API)
+      // instead of using the question from quiz response (which has empty choices array)
+      const fullQuestion = this.questions.value.find(q => q.id === questionId);
+      const questionToUse = fullQuestion || quizAnswer.question;
+      
       answerRecord[questionId] = this.questionService.parseFromHashAnswer(
-        quizAnswer.question,
+        questionToUse,
         quizAnswer.answer
       );
     });
@@ -247,17 +253,27 @@ export class QuizAttemptingService {
         if (!selectedIds || selectedIds.length === 0) return 'Try Again';
         
         const selectedChoices = choices.filter(c => selectedIds.includes(c.id));
-        const feedbacks = selectedChoices.map(c => c.feedback).filter(f => f);
-        const isCorrect = this.questionService.getQuestionMark(question, answer) === question.defaultMark;
+        const feedbacks = selectedChoices
+          .map(c => c.feedback != null && c.feedback !== '' ? c.feedback : null)
+          .filter(f => f != null);
         
         // Return stored feedbacks if exist, otherwise return default based on correctness
-        return feedbacks.length > 0 ? feedbacks.join(' ') : (isCorrect ? 'Great Job' : 'Try Again');
+        if (feedbacks.length > 0) {
+          return feedbacks.join('; ');
+        }
+        const isCorrect = this.questionService.getQuestionMark(question, answer) === question.defaultMark;
+        return isCorrect ? 'Great Job' : 'Try Again';
       } else {
         const selectedChoice = choices.find(c => c.id === answer);
-        const isCorrect = this.questionService.getQuestionMark(question, answer) > 0;
+        if (!selectedChoice) return 'Try Again';
         
-        // Return stored feedback if exists, otherwise return default based on correctness
-        return selectedChoice?.feedback || (isCorrect ? 'Great Job' : 'Try Again');
+        // Return stored feedback if exists (including empty string), otherwise return default based on correctness
+        if (selectedChoice.feedback != null && selectedChoice.feedback !== '') {
+          return selectedChoice.feedback;
+        }
+        
+        const isCorrect = this.questionService.getQuestionMark(question, answer) > 0;
+        return isCorrect ? 'Great Job' : 'Try Again';
       }
     }
     
