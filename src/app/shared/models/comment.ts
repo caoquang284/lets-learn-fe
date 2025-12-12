@@ -1,10 +1,14 @@
-import { Topic } from "./topic";
-import { User } from "./user";
+
+export type CommentUser = {
+  id: string;
+  username: string;
+  avatar: string;
+};
 
 export type Comment = {
   id: string;
   text: string;
-  user: User;
-  topic: Topic;
+  user: CommentUser;
+  topicId: string;    
   createdAt: string;
 };
