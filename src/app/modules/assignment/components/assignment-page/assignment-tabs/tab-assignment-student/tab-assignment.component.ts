@@ -74,7 +74,8 @@ export class TabAssignmentStudentComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['topic'] && this.topic) {
       const assignmentData = this.topic.data as AssignmentData;
-      this.uploadedFiles = assignmentData.cloudinaryFiles ?? [];
+      // Backend returns 'files', fallback to 'cloudinaryFiles' for backward compatibility
+      this.uploadedFiles = assignmentData.files ?? assignmentData.cloudinaryFiles ?? [];
       this.updateCanSubmitStatus(this.topic);
     }
   }

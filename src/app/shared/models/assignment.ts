@@ -7,7 +7,8 @@ export type AssignmentData = {
   remindToGrade: string | null;
   maximumFile: number | null;
   maximumFileSize: FileSizeOption | null;
-  cloudinaryFiles?: CloudinaryFile[];
+  cloudinaryFiles?: CloudinaryFile[]; // Deprecated: kept for backward compatibility
+  files?: CloudinaryFile[]; // New field from backend
 };
 
 export enum FileSizeOption {
