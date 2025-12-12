@@ -27,25 +27,25 @@ export class AppComponent implements OnInit {
       // Use set timeout to ensure the router navigation happens after the current change detection cycle
       // This ensures that we can get correct current URL
       setTimeout(() => {
-        // If user is not logged in, redirect to login page
+        const currentUrl = this.router.url;
+        const publicRoutes = ['/', '/auth/login', '/auth/signup'];
+        const isPublicRoute = publicRoutes.includes(currentUrl) || currentUrl.startsWith('/auth/');
+        
+        // If user is not logged in
         if (!user) {
-          // If the current URL is not login or sign up, redirect to login page
-          if (
-            this.router.url !== ROUTES.LOGIN &&
-            this.router.url !== ROUTES.SIGN_UP
-          ) {
-            const tree = this.router.createUrlTree([ROUTES.LOGIN]);
+          // If not on public route, redirect to landing page
+          if (!isPublicRoute) {
+            const tree = this.router.createUrlTree(['/']);
             this.router.navigateByUrl(tree, { replaceUrl: true });
           }
         }
-        // If user is logged in, redirect to home page if current URL is login or sign up
-        else if (
-          this.router.url === ROUTES.LOGIN ||
-          this.router.url === ROUTES.SIGN_UP
-        ) {
-          // Clear the url tree to avoid go back to the login page
-          const tree = this.router.createUrlTree([ROUTES.HOME]);
-          this.router.navigateByUrl(tree, { replaceUrl: true });
+        // If user is logged in
+        else {
+          // If on landing page or auth pages, redirect to app
+          if (isPublicRoute) {
+            const tree = this.router.createUrlTree(['/app/courses']);
+            this.router.navigateByUrl(tree, { replaceUrl: true });
+          }
         }
       });
     });
