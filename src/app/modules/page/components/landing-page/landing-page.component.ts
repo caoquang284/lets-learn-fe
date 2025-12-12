@@ -11,6 +11,7 @@ import { RouterModule } from '@angular/router';
 })
 export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
   private observer!: IntersectionObserver;
+  showScrollButton = false;
 
   constructor(private elementRef: ElementRef) {}
 
@@ -29,6 +30,9 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
         rootMargin: '0px 0px -50px 0px' // Start animation slightly before element is fully visible
       }
     );
+
+    // Listen for scroll events to show/hide scroll button
+    window.addEventListener('scroll', this.onWindowScroll.bind(this));
   }
 
   ngAfterViewInit() {
@@ -44,5 +48,21 @@ export class LandingPageComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.observer) {
       this.observer.disconnect();
     }
+    // Remove scroll event listener
+    window.removeEventListener('scroll', this.onWindowScroll.bind(this));
+  }
+
+  // Handle window scroll event
+  onWindowScroll() {
+    // Show button when user scrolls down 300px from top
+    this.showScrollButton = window.pageYOffset > 300;
+  }
+
+  // Scroll to top smoothly
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 }
